@@ -18,7 +18,7 @@
   --line:rgba(125,170,235,.17); --line2:rgba(125,170,235,.32);
   --ink:#EAF1FB; --mute:#9DB0CB; --faint:#7487A4;
   --cyan:#38BDF8; --cyan2:#8FDcff; --cyanbg:rgba(56,189,248,.13);
-  --ok:#3DDC97; --warn:#FFB020; --crit:#FF4D4F; --nd:#8F9AAE;
+  --ok:#3DDC97; --warn:#FF8A1F;--att:#F5D90A; --crit:#FF4D4F; --nd:#8F9AAE;
   --f-disp:'Exo 2','Segoe UI',system-ui,sans-serif;
   --f-body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
   --f-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
@@ -148,21 +148,21 @@ a{color:var(--cyan2)}
 /* status */
 .lvw{display:inline-flex;align-items:center;gap:7px;font-family:var(--f-disp);font-weight:800;letter-spacing:1.3px;font-size:14px;white-space:nowrap}
 .lvw svg{width:14px;height:14px;flex:none}
-.c-2{color:var(--crit)} .c-1{color:var(--warn)} .c-0{color:var(--ok)} .c-n{color:#AEB8CA}
+.c-3{color:var(--crit)} .c-2{color:var(--warn)} .c-0{color:var(--ok)} .c-n{color:#AEB8CA}
 .dot{width:10px;height:10px;border-radius:50%;flex:none}
-.d-2{background:var(--crit);box-shadow:0 0 8px var(--crit)} .d-1{background:var(--warn)} .d-0{background:var(--ok)} .d-n{background:none;border:2px solid var(--nd);box-sizing:border-box}
+.d-3{background:var(--crit);box-shadow:0 0 8px var(--crit)} .d-2{background:var(--warn)} .d-0{background:var(--ok)} .d-n{background:none;border:2px solid var(--nd);box-sizing:border-box}
 .av{flex:none;display:inline-block;width:40px;height:40px;border-radius:50%;overflow:hidden;background:#1A2746;border:2px solid var(--line2);box-sizing:border-box}
 .av img{width:100%;height:100%;object-fit:cover;display:block}
-.av.r-2{border-color:var(--crit)} .av.r-1{border-color:var(--warn)} .av.r-0{border-color:var(--ok)} .av.r-n{border-color:var(--nd);border-style:dashed}
+.av.r-3{border-color:var(--crit)} .av.r-2{border-color:var(--warn)} .av.r-0{border-color:var(--ok)} .av.r-n{border-color:var(--nd);border-style:dashed}
 
 /* env strip */
 .envstrip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
 .env{display:flex;align-items:center;gap:12px;padding:12px 16px;text-align:left;border:1px solid var(--line);color:var(--ink);min-height:64px}
 .env .k{font-size:12px;color:var(--mute);font-weight:600}
 .env .v{font-family:var(--f-mono);font-size:17px}
-.env.e-1{border-color:rgba(255,176,32,.55);background:rgba(60,40,8,.45)}
-.env.e-2{border-color:rgba(255,77,79,.6);background:rgba(70,14,18,.5)}
-.envbanner{display:flex;gap:12px;align-items:center;padding:12px 16px;margin-bottom:16px;border-radius:14px;border:1px solid rgba(255,176,32,.5);background:rgba(60,40,8,.5);font-size:14.5px}
+.env.e-2{border-color:rgba(255,138,31,.55);background:rgba(60,40,8,.45)}
+.env.e-3{border-color:rgba(255,77,79,.6);background:rgba(70,14,18,.5)}
+.envbanner{display:flex;gap:12px;align-items:center;padding:12px 16px;margin-bottom:16px;border-radius:14px;border:1px solid rgba(255,138,31,.5);background:rgba(60,40,8,.5);font-size:14.5px}
 
 /* crew cards */
 .crewgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
@@ -174,7 +174,7 @@ a{color:var(--cyan2)}
 .wtrack{display:flex;transition:transform .45s cubic-bezier(.2,.7,.2,1)}
 .witem{flex:0 0 100%;box-sizing:border-box;min-height:54px;display:flex;align-items:center;justify-content:center;gap:7px;padding:6px 10px;border:none;border-radius:12px;background:rgba(125,170,235,.08);color:var(--ink);font-size:14px;line-height:1.3;cursor:pointer}
 .witem svg{width:12px;height:12px;flex:none}
-.witem.w-2{background:rgba(255,77,79,.13)} .witem.w-1{background:rgba(255,176,32,.11)} .witem.w-n{background:rgba(143,154,174,.12)}
+.witem.w-3{background:rgba(255,77,79,.13)} .witem.w-2{background:rgba(255,138,31,.11)} .witem.w-n{background:rgba(143,154,174,.12)}
 .wbtn{flex:none;width:34px;height:30px;border-radius:15px;border:1px solid var(--line);background:rgba(10,18,36,.8);color:var(--ink);font-size:18px;line-height:1;padding:0 0 2px}
 .wdots{display:flex;gap:6px;justify-content:center;align-items:center;min-height:6px}
 .wctl{display:flex;align-items:center;justify-content:center;gap:10px;min-height:30px}
@@ -190,18 +190,18 @@ a{color:var(--cyan2)}
 .dots button{width:12px;height:12px;border-radius:6px;border:none;padding:0;background:rgba(125,170,235,.3);position:relative}
 .dots button::after{content:"";position:absolute;inset:-14px -6px}
 .dots button[aria-current="true"]{width:30px;background:var(--cyan)}
-.dots button.dw-2{box-shadow:0 0 0 2px var(--crit)} .dots button.dw-1{box-shadow:0 0 0 2px var(--warn)}
+.dots button.dw-3{box-shadow:0 0 0 2px var(--crit)} .dots button.dw-2{box-shadow:0 0 0 2px var(--warn)}
 .dots .pglbl{font-size:12.5px;color:var(--mute);margin-left:8px}
-.ccard.k-2{border-color:rgba(255,77,79,.65);box-shadow:0 0 0 1px rgba(255,77,79,.25),0 0 34px rgba(255,77,79,.18)}
-.ccard.k-1{border-color:rgba(255,176,32,.55);box-shadow:0 0 26px rgba(255,176,32,.10)}
+.ccard.k-3{border-color:rgba(255,77,79,.65);box-shadow:0 0 0 1px rgba(255,77,79,.25),0 0 34px rgba(255,77,79,.18)}
+.ccard.k-2{border-color:rgba(255,138,31,.55);box-shadow:0 0 26px rgba(255,138,31,.10)}
 .ccard.k-0{border-color:rgba(61,220,151,.35)}
 .ccard.k-n{border-style:dashed;border-color:rgba(143,154,174,.6)}
 .ring{position:relative;width:110px;height:110px;border-radius:50%;padding:6px;box-sizing:border-box;margin-bottom:4px}
 .ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 50%;display:block;background:#0A1224}
 .ring::before{content:"";position:absolute;inset:0;border-radius:50%;border:5px solid var(--rc,var(--ok));box-shadow:0 0 18px var(--rc,var(--ok)),inset 0 0 12px var(--rc,var(--ok))}
-.ring.g-2{--rc:var(--crit)} .ring.g-1{--rc:var(--warn)} .ring.g-0{--rc:var(--ok)}
+.ring.g-3{--rc:var(--crit)} .ring.g-2{--rc:var(--warn)} .ring.g-0{--rc:var(--ok)}
 .ring.g-n::before{border-style:dashed;border-color:var(--nd);box-shadow:none}
-.ring.g-2::before{animation:glow 1.6s ease-in-out infinite}
+.ring.g-3::before{animation:glow 1.6s ease-in-out infinite}
 @keyframes glow{50%{box-shadow:0 0 34px var(--crit),inset 0 0 16px var(--crit)}}
 .ccard .nm{font-family:var(--f-disp);font-weight:700;font-size:21px}
 .ccard .rl{font-size:13.5px;color:var(--mute)}
@@ -251,10 +251,10 @@ a{color:var(--cyan2)}
 .syslist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
 .sysb{display:flex;align-items:center;gap:8px;min-height:48px;padding:0 10px;border-radius:12px;border:1px solid var(--line);background:rgba(14,24,44,.7);color:var(--ink);font-size:13.5px;text-align:left}
 .sysb[aria-pressed="true"]{border-color:var(--cyan);background:var(--cyanbg)}
-.sysb.s-2{border-color:rgba(255,77,79,.55)} .sysb.s-1{border-color:rgba(255,176,32,.55)}
+.sysb.s-3{border-color:rgba(255,77,79,.55)} .sysb.s-2{border-color:rgba(255,138,31,.55)}
 .issue{padding:18px 20px 16px 24px;margin-bottom:14px;overflow:hidden}
 .issue::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--sc)}
-.issue.i-2{--sc:var(--crit);border-color:rgba(255,77,79,.5)} .issue.i-1{--sc:var(--warn);border-color:rgba(255,176,32,.45)} .issue.i-n{--sc:var(--nd);border-style:dashed}
+.issue.i-3{--sc:var(--crit);border-color:rgba(255,77,79,.5)} .issue.i-2{--sc:var(--warn);border-color:rgba(255,138,31,.45)} .issue.i-n{--sc:var(--nd);border-style:dashed}
 .issue .row1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .issue .row1 .conf{margin-left:auto;font-size:13.5px;color:var(--mute)}
 .issue h3{margin:10px 0 4px;font-family:var(--f-disp);font-size:21px;font-weight:700;text-wrap:balance}
@@ -274,7 +274,7 @@ a{color:var(--cyan2)}
 .done{color:var(--ok);font-weight:600;font-size:14px}
 .tiles{display:flex;flex-direction:column;gap:10px}
 .tile{display:block;width:100%;padding:14px 16px;text-align:left;color:var(--ink)}
-.tile.t-2{border-color:rgba(255,77,79,.55)} .tile.t-1{border-color:rgba(255,176,32,.5)} .tile.t-n{border-style:dashed}
+.tile.t-3{border-color:rgba(255,77,79,.55)} .tile.t-2{border-color:rgba(255,138,31,.5)} .tile.t-n{border-style:dashed}
 .tile .tr{display:flex;align-items:center;gap:8px}
 .tile .tn{font-size:14.5px;font-weight:600;flex:1;min-width:0}
 .tile .tv{display:flex;align-items:baseline;gap:6px;margin-top:4px}
@@ -370,6 +370,7 @@ details.card .in{padding:0 18px 16px;color:#C8D5E8;font-size:14.5px;line-height:
 .qrow:last-child{border-bottom:none}
 .qrow .q{flex:1;min-width:160px}
 .prio{flex:none;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:1px}
+.prio.p1{background:rgba(255,138,31,.16);color:#FFB067;border-color:rgba(255,138,31,.45)}
 .prio.p2{background:#B91C1C;color:#fff} .prio.p0{background:rgba(125,170,235,.14);color:#C8D5E8}
 .compose{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
 .compose input{flex:1;min-width:180px;height:48px;border-radius:24px;border:1px solid var(--line2);background:var(--solid);padding:0 18px}
@@ -387,7 +388,7 @@ table.th input{width:72px;height:40px;border-radius:10px;border:1px solid var(--
 table.th input:disabled{opacity:.6}
 table.th tr.chg td{background:rgba(56,189,248,.07)}
 table.th tr.chg input{border-color:var(--cyan)}
-.mixed{display:inline-block;padding:1px 6px;border-radius:5px;border:1px solid rgba(255,176,32,.55);color:var(--warn);font-size:10.5px;font-weight:800;letter-spacing:.8px}
+.mixed{display:inline-block;padding:1px 6px;border-radius:5px;border:1px solid rgba(255,138,31,.55);color:var(--warn);font-size:10.5px;font-weight:800;letter-spacing:.8px}
 .mono{font-family:var(--f-mono)}
 .thrq{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .thrq .lb{font-size:11px;font-weight:700;letter-spacing:1.3px;color:var(--faint);margin-right:4px}
@@ -461,7 +462,7 @@ table.map{width:100%;border-collapse:collapse;font-size:14px}
 table.map th{text-align:left;font-size:11px;letter-spacing:1px;color:var(--faint);padding:8px 10px;border-bottom:1px solid var(--line2)}
 table.map td{padding:10px;border-bottom:1px solid var(--line)}
 table.map code{font-family:var(--f-mono);font-size:13px;color:#C8D5E8}
-.warnbox{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:rgba(255,176,32,.10);border:1px solid rgba(255,176,32,.45);font-size:14px;margin-top:12px}
+.warnbox{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:rgba(255,138,31,.10);border:1px solid rgba(255,138,31,.45);font-size:14px;margin-top:12px}
 .progpill{position:absolute;left:20px;bottom:20px;z-index:46;width:270px;padding:12px 16px;border-radius:24px;background:#0D1730;border:1px solid var(--line2);font-size:13.5px;font-weight:600}
 .toasts{position:absolute;right:20px;top:80px;z-index:60;display:flex;flex-direction:column;gap:10px;width:340px;max-width:calc(100% - 40px)}
 .toast{padding:14px 16px;border-radius:14px;background:#0F1C38;border:1px solid var(--line2);box-shadow:0 14px 40px rgba(0,0,0,.5);font-size:14px;display:flex;gap:10px;align-items:flex-start}
@@ -504,7 +505,7 @@ table.map code{font-family:var(--f-mono);font-size:13px;color:#C8D5E8}
 .yn .d{border:3px solid var(--cyan);background:rgba(56,189,248,.1);font-size:26px;width:auto;padding:0 32px}
 .vit{display:flex;flex-direction:column;gap:10px}
 .vbox{padding:12px 16px;border-radius:14px;background:#0C1426;border:1px solid var(--line)}
-.vbox.b-2{border-color:rgba(255,77,79,.55)} .vbox.b-1{border-color:rgba(255,176,32,.45)}
+.vbox.b-3{border-color:rgba(255,77,79,.55)} .vbox.b-2{border-color:rgba(255,138,31,.45)}
 .vbox .vr{display:flex;align-items:center;justify-content:space-between;font-size:14px;color:#C8D5E8}
 .vbox .vv{font-family:var(--f-mono);font-size:38px;line-height:1.1}
 .vbox .vv small{font-family:var(--f-body);font-size:14px;color:var(--mute);margin-left:6px}
@@ -543,7 +544,7 @@ canvas.ecg{display:block;width:100%;height:64px}
 .navgrp .chev{width:16px;height:16px;transition:transform .18s}
 .navgrp[aria-expanded="true"] .chev{transform:rotate(180deg)}
 .badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;box-sizing:border-box;border-radius:10px;font-size:11.5px;font-weight:800;color:#fff}
-.badge.b-2{background:#C9262B} .badge.b-1{background:#A86F05} .badge.b-n{background:#4A5468}
+.badge.b-3{background:#C9262B} .badge.b-2{background:#A86F05} .badge.b-n{background:#4A5468}
 .navsub{max-height:300px;overflow-y:auto;flex:none;display:flex;flex-direction:column;gap:2px;padding-left:8px;margin-left:12px;border-left:1px solid var(--line)}
 .shell.collapsed .navgrp .cnt{position:absolute;top:4px;right:6px;margin:0}
 .shell.collapsed .navgrp .chev{display:none}
@@ -556,7 +557,7 @@ canvas.ecg{display:block;width:100%;height:64px}
 .sortseg .seg button{height:36px}
 .pgplay{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;margin-left:10px;border-radius:17px;border:1px solid var(--line2);background:rgba(10,18,36,.8);color:var(--mute);font-size:12.5px;font-weight:600}
 .pgplay svg{width:12px;height:12px}
-.pgplay[aria-pressed="false"]{color:var(--warn);border-color:rgba(255,176,32,.5)}
+.pgplay[aria-pressed="false"]{color:var(--warn);border-color:rgba(255,138,31,.5)}
 .ticker{margin-top:14px;padding:8px 14px 8px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .tkhd{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
 .tkhd .sec{margin:0}
@@ -569,7 +570,7 @@ canvas.ecg{display:block;width:100%;height:64px}
 .tkrow .tkt b{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tkrow .tkt span{font-size:12.5px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tkrow .due{flex:none;font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:8px;background:rgba(125,170,235,.12);color:#C8D5E8}
-.tkrow .due.now{background:rgba(255,176,32,.16);color:var(--warn)}
+.tkrow .due.now{background:rgba(255,138,31,.16);color:var(--warn)}
 .tkrow .btn{height:38px}
 
 /* all crew metrics matrix */
@@ -594,8 +595,8 @@ table.mx th.who{left:0;z-index:3;text-align:left;padding-left:14px}
 .mxc b small{font-family:var(--f-body);font-size:10.5px;color:var(--mute);margin-left:2px}
 .mxc .lvw{font-size:9.5px;letter-spacing:.8px;gap:4px}
 .mxc .lvw svg{width:9px;height:9px}
-.mxc.x-2{background:rgba(255,77,79,.16);border-color:rgba(255,77,79,.5)}
-.mxc.x-1{background:rgba(255,176,32,.12);border-color:rgba(255,176,32,.42)}
+.mxc.x-3{background:rgba(255,77,79,.16);border-color:rgba(255,77,79,.5)}
+.mxc.x-2{background:rgba(255,138,31,.12);border-color:rgba(255,138,31,.42)}
 .mxc.x-n{background:rgba(143,154,174,.08);border:1px dashed rgba(143,154,174,.45)}
 .mxc.x-0 .lvw{opacity:.75}
 table.mx td.mxo .lvw{font-size:11.5px}
@@ -667,7 +668,7 @@ table.mx tr:hover td{background-color:rgba(125,170,235,.04)}
 .pers{display:inline-block;font:700 10.5px/1 var(--f-body);letter-spacing:1px;padding:4px 7px;border-radius:6px;background:rgba(56,189,248,.16);color:var(--cyan2)}
 .syncpill{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border-radius:17px;border:1px solid var(--line2);font-size:12.5px;color:var(--mute);white-space:nowrap}
 .syncpill i{width:8px;height:8px;border-radius:50%;background:var(--ok)}
-.syncpill.warn{color:var(--warn);border-color:rgba(255,176,32,.5)}.syncpill.warn i{background:var(--warn)}
+.syncpill.warn{color:var(--warn);border-color:rgba(255,138,31,.5)}.syncpill.warn i{background:var(--warn)}
 .syncpill.err{color:#FF8A8C;border-color:rgba(255,77,79,.5)}.syncpill.err i{background:var(--crit)}
 .crumb{flex:1 1 120px}
 @media (max-width:1600px){.laybtn .lb2{display:none}.syncpill{font-size:0;gap:0;width:34px;padding:0;justify-content:center}.syncpill i{width:10px;height:10px}}
@@ -677,6 +678,8 @@ table.mx tr:hover td{background-color:rgba(125,170,235,.04)}
 .empty p{color:var(--mute);max-width:620px;margin:0 auto 16px;line-height:1.5}
 .empty .acts{justify-content:center}
 .entry .frow{flex-wrap:wrap}
+.xgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-top:10px}.xgrid label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mute)}.xgrid select,.xgrid input{height:46px;border-radius:12px;border:1px solid var(--line2);background:var(--solid);padding:0 12px;font-size:15px}
+@media (max-width:700px){.xgrid{grid-template-columns:1fr}}
 .entry .frow input[type=number],.entry .frow input[type=datetime-local],.entry .frow select{width:100%}
 .entry select,.entry input[type=number],.entry input[type=text],.entry input[type=datetime-local],.mform input,.mform select{height:46px;border-radius:12px;border:1px solid var(--line2);background:var(--solid);padding:0 12px;font-size:15px;min-width:0}
 .entry label,.mform label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mute);flex:1;min-width:150px}
@@ -774,6 +777,28 @@ table.mx tr:hover td{background-color:rgba(125,170,235,.04)}
   .linkpill{display:none}
   .livebtn{padding:0 10px}
 }
+
+.tile .tv.txtv b{font-family:var(--f-body);font-size:16px;line-height:1.35;font-weight:600;letter-spacing:0}
+.dtag{display:inline-block;font:700 10.5px/1 var(--f-body);letter-spacing:1px;padding:3px 6px;border-radius:5px;margin-right:6px;vertical-align:1px}.dtag.real{background:rgba(61,220,151,.15);color:#3DDC97}.dtag.sim{background:rgba(167,139,250,.18);color:#C4B5FD}
+.wb.voff svg{opacity:.45}.wb.voff{position:relative}.wb.voff::after{content:'';position:absolute;width:20px;height:2px;background:currentColor;transform:rotate(-45deg);border-radius:2px}
+.vprog{font:700 10.5px/1 var(--f-body);letter-spacing:1px;color:var(--mute);margin-left:10px;white-space:nowrap}.vprog:empty{display:none}
+#vunlock{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:9999;display:none;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid rgba(125,170,235,.45);background:#13203a;color:#e8eef8;font:600 14px/1.2 var(--f-body);box-shadow:0 8px 24px rgba(0,0,0,.4);cursor:pointer}
+#vunlock.on{display:flex}#vunlock svg{width:18px;height:18px}
+/* ATTENTION (yellow) level */
+.badge.b-1{background:#8F7F00;color:#fff}.badge.b-2{background:#B4560A}
+.c-1{color:var(--att)}
+.d-1{background:var(--att)}
+.av.r-1{border-color:var(--att)}
+.env.e-1{border-color:rgba(245,217,10,.55);background:rgba(60,40,8,.45)}
+.witem.w-1{background:rgba(245,217,10,.11)}
+.dots button.dw-1{box-shadow:0 0 0 2px var(--att)}
+.ccard.k-1{border-color:rgba(245,217,10,.55);box-shadow:0 0 26px rgba(245,217,10,.10)}
+.ring.g-1{--rc:var(--att)}
+.sysb.s-1{border-color:rgba(245,217,10,.55)}
+.issue.i-1{--sc:var(--att);border-color:rgba(245,217,10,.45)}
+.tile.t-1{border-color:rgba(245,217,10,.5)}
+.vbox.b-1{border-color:rgba(245,217,10,.45)}
+.mxc.x-1{background:rgba(245,217,10,.12);border-color:rgba(245,217,10,.42)}
 </style>
 
 <style>
@@ -796,8 +821,10 @@ html.intro-on #intro{display:block;position:fixed;inset:0;z-index:9999;backgroun
   try{localStorage.setItem('charm-last-active',String(now));}catch(e){}
   if(show)document.documentElement.classList.add('intro-on');})();
 </script>
+<script src="voice/charmy-voice.js?v=1"></script>
 </head>
 <body>
+<button id="vunlock" type="button" aria-label="Tap to enable Charmy's voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>Tap to enable Charmy's voice</button>
 <div id="intro" aria-label="C.H.A.R.M. intro. Press Escape or tap to skip.">
   <img class="ibg" src="" data-src="assets/intro-backdrop.webp" alt="">
   <video id="introv" data-src="assets/intro.mp4" playsinline preload="auto"></video>
@@ -921,12 +948,36 @@ var MDEF={
  mood:{label:'Mood check-in',short:'Mood',unit:'/10',dec:0,sys:'mind',src:'Daily check-in · self-report',csv:15,lens:'Mood'},
  ex:{label:'Exercise completion',short:'Exercise',unit:'%',dec:0,sys:'muscle',src:'Exercise device log',csv:10,lens:'Exercise'},
  dose:{label:'Radiation dose budget',short:'Dose',unit:'%',dec:1,sys:'body',src:'Personal dosimeter · every 5 min',csv:6,lens:'Radiation'},
- vision:{label:'Vision (SANS)',short:'Vision',unit:'',dec:0,sys:'head',src:'Weekly near-vision + Amsler grid self-test',csv:14,stat:true},
- blood:{label:'Blood and immune panel',short:'Blood panel',unit:'',dec:0,sys:'blood',src:'Small blood analyzer · every 2 weeks',csv:13,stat:true}
+ vision:{label:'Eye exam (SANS)',short:'Eyes',unit:'',dec:0,sys:'head',src:'OCT · refraction · retinal imaging',csv:14,stat:true},
+ blood:{label:'Blood and immune panel',short:'Blood panel',unit:'',dec:0,sys:'blood',src:'Small blood analyzer · every 2 weeks',csv:13,stat:true},
+ fluid:{label:'Fluid intake',short:'Fluids',unit:'L/day',dec:1,sys:'abdomen',src:'Drink log · daily total',csv:'k1',lens:'Fluids'},
+ ecg:{label:'ECG rhythm review',short:'ECG',unit:'',dec:0,sys:'heart',src:'Smart shirt ECG · reviewed by crew',csv:'a1',stat:true},
+ ortho:{label:'Orthostatic BP test',short:'Orthostatic',unit:'',dec:0,sys:'heart',src:'Cuff · lying then standing 3 min',csv:'o1',stat:true},
+ urine:{label:'Urine and kidney check',short:'Kidney',unit:'',dec:0,sys:'abdomen',src:'24-h urine · dipstick · kidney ultrasound',csv:'k2',stat:true},
+ ijv:{label:'Neck vein ultrasound (IJV)',short:'Neck vein',unit:'',dec:0,sys:'blood',src:'Doppler ultrasound · crew-operated',csv:'v1',stat:true},
+ sym:{label:'Symptom check',short:'Symptoms',unit:'',dec:0,sys:'mind',src:'Crew report',csv:'s1',stat:true},
+ c_inf:{label:'Infection / systemic deterioration',short:'Infection',unit:'',dec:0,sys:'blood',src:'Combined rule · SIRS and qSOFA',csv:'i0',cond:true,hidden:true},
+ c_af:{label:'Atrial fibrillation / arrhythmia',short:'Arrhythmia',unit:'',dec:0,sys:'heart',src:'Combined rule · ECG review',csv:'a0',cond:true,hidden:true},
+ c_orth:{label:'Orthostatic hypotension',short:'Orthostatic',unit:'',dec:0,sys:'heart',src:'Combined rule · lying vs standing BP',csv:'o0',cond:true,hidden:true},
+ c_kid:{label:'Kidney stone risk',short:'Kidney',unit:'',dec:0,sys:'abdomen',src:'Combined rule · hydration, urine, ultrasound',csv:'k0',cond:true,hidden:true},
+ c_sans:{label:'SANS (eyes and optic disc)',short:'SANS',unit:'',dec:0,sys:'head',src:'Combined rule · OCT, refraction, imaging',csv:'n0',cond:true,hidden:true},
+ c_vte:{label:'Venous thrombosis (neck vein)',short:'VTE',unit:'',dec:0,sys:'blood',src:'Combined rule · Doppler ultrasound',csv:'v0',cond:true,hidden:true}
 };
-var MKEYS=['hr','bp','spo2','rr','temp','glu','sleep','mood','ex','dose','vision','blood'];
-var LKEYS=['hr','bp','spo2','rr','temp','glu','sleep','mood','ex','dose'];
+var MKEYS=EN.MKEYS.slice();
+var LKEYS=EN.LKEYS.slice();
 var CSV={
+ i0:{why:'Several infection signs together. SIRS is a screening pattern; qSOFA marks higher-risk deterioration (Sepsis-3).',c:'Medical assessment; find the source; repeat key measurements.',x:'Urgent medical review and increased monitoring.'},
+ a0:{why:'Atrial fibrillation needs ECG evidence: at least 30 s of irregular RR intervals with no P waves (ESC). Fluid shift stretches the atria in flight.',c:'Medical review; assess rhythm, blood pressure and symptoms.',x:'Urgent medical assessment per mission medical protocol.'},
+ a1:{why:'A crew-reviewed ECG strip decides if a fast or irregular pulse is atrial fibrillation.',c:'Repeat the ECG for at least 30 seconds.',x:'Urgent medical assessment.'},
+ o0:{why:'Blood pressure that falls on standing (≥20 systolic or ≥10 diastolic within 3 minutes, AHA) is common after fluid loss and on return to gravity.',c:'Sit or lie down; repeat BP and HR; review fluids; medical review if it persists.',x:'Urgent medical assessment.'},
+ o1:{why:'Lying, then standing blood pressure within 3 minutes shows orthostatic hypotension.',c:'Repeat the test after fluids.',x:'Lie down; urgent review.'},
+ k0:{why:'Dehydration, bone loss and changed urine chemistry raise kidney-stone risk in flight (NASA OCHMO-MTB-003).',c:'Urinalysis and kidney assessment; consider kidney ultrasound.',x:'Medical review and renal-stone protocol.'},
+ k1:{why:'NASA provides at least 2.5 L of water per crew member per day; AUA targets ≥2.5 L urine for stone prevention.',c:'Drink more if medically appropriate.',x:'Medical review.'},
+ k2:{why:'24-hour urine volume, blood in urine and kidney ultrasound separate stone risk from an actual stone.',c:'Repeat the check.',x:'Medical review and renal-stone protocol.'},
+ n0:{why:'NASA SANS thresholds: retinal thickening ΔTRT ≥20 µm, refraction shift ≥+0.75 D, folds or globe flattening are earliest signs; ΔTRT ≥55 µm or Frisén ≥1 is clinically concerning.',c:'Repeat OCT and eye exam; trend against baseline.',x:'Ophthalmic medical review; follow the mission SANS protocol.'},
+ v0:{why:'In weightlessness blood can pool in the neck veins. NASA research: peak flow below 10 cm/s or backward flow marks stasis; a thrombus needs the VTE protocol.',c:'Repeat the Doppler; compare with the prior scan; request medical review.',x:'Immediate medical review and VTE protocol.'},
+ v1:{why:'Doppler of the left internal jugular vein: peak velocity, flow direction, thrombus.',c:'Repeat the Doppler.',x:'Immediate medical review.'},
+ s1:{why:'Symptoms the crew reports feed the infection, arrhythmia and orthostatic rules (suspected infection, confusion, fainting, chest pain).',c:'Repeat vital signs.',x:'Contact the flight surgeon.'},
  1:{why:'Fluid shifts and deconditioning change heart function; arrhythmias are a known spaceflight risk.',c:'Rest 5 min, re-measure, hydrate.',x:'Stop activity, record a 1-min ECG, contact flight surgeon.'},
  2:{why:'Headward fluid shift raises upper-body pressure; low pressure on return to gravity.',c:'Re-measure in 15 min, log symptoms.',x:'Lie down, re-measure, contact flight surgeon.'},
  3:{why:'Early sign of cabin air or respiratory problems.',c:'Check sensor fit, check cabin O₂ and CO₂.',x:'Put on oxygen mask, check cabin air, alert crew.'},
@@ -962,12 +1013,13 @@ function levelOf(pid,k,val){return EN.levelOf(k,val,(PROFILE[pid]||EN.COMMON)[k]
 function personAt(pid,t){return EN.personStatus(RD[pid]||{},PROFILE[pid]||EN.profile(null),t);}
 function lastT(pid,k,t){var r=EN.lastReading(RD[pid],k,t==null?liveNow():t);return r?r.t:null;}
 function hasData(pid){return !!RD[pid]&&Object.keys(RD[pid]).length>0;}
-function rank(l){return l===2?3:l===1?2:l===-1?1:0;}
+function rank(l){return l===3?4:l===2?3:l===1?2:l===-1?1:0;}
 function lvKey(l){return l===-1?'n':String(l);}
-var WORD={'2':'CRITICAL','1':'CAUTION','0':'NORMAL','n':'NO DATA'};
+var WORD={'3':'CRITICAL','2':'CAUTION','1':'ATTENTION','0':'NORMAL','n':'NO DATA'};
 function shape(l){
-  if(l===2)return '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 15 8 8 15 1 8z" fill="currentColor"/></svg>';
-  if(l===1)return '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 15 14.5H1z" fill="currentColor"/></svg>';
+  if(l===3)return '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 15 8 8 15 1 8z" fill="currentColor"/></svg>';
+  if(l===2)return '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 15 14.5H1z" fill="currentColor"/></svg>';
+  if(l===1)return '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" rx="2" fill="currentColor"/></svg>';
   if(l===0)return '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="currentColor"/></svg>';
   return '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
 }
@@ -976,6 +1028,7 @@ function fmtV(k,val){return EN.fmtV(k,val);}
 /* Cabin environment. Values are null when nobody has entered or measured them recently. */
 function envAt(t){var e=EN.envAt(ENVS,t);e.link=MISSION.link!==false;return e;}
 function f1(v,d){return v==null?'—':v.toFixed(d==null?1:d);}
+function dtag(v){if(!v)return '';return v.sim?'<span class="dtag sim" title="Simulated value">SIM</span>':'<span class="dtag real" title="Real measured value">REAL</span>';}
 function srcLabel(v,k){if(!v)return '';var s=v.src;if(v.ref)return (s==='record'?'Record · ':s==='import'?'Imported · ':'')+v.ref;return s==='demo'?'Demo scenario':s==='import'?'Imported file':s==='record'?'Imported record':s==='test'?'Guided test'+(v.by?' · '+v.by:''):s==='manual'?'Entered'+(v.by?' by '+v.by:''):s==='device'?(MDEF[k]?MDEF[k].src:'Device'):'';}
 function reasonOf(pid,st,t){
   if(!st.top){return hasData(pid)?'All current metrics in range':'No readings yet';}
@@ -1042,7 +1095,7 @@ var S={route:{v:'crew'},mode:'live',tp:Date.now(),rf:Date.now()-6*H,rt:Date.now(
   ov:null,charmy:false,chat:[],ttTab:'point',emPick:null,emArm:false,emSel:null,emg:{},bodySel:null,showNom:false,mrange:'24h',evp:'all',evl:'all',
   wi:{},cpage:0,chSet:false,autoRead:true,rate:1,wake:true,brief:false,seenCrit:{},acked:{},tasksDone:{},imported:false,imp:null,impJob:null,toasts:[],outbox:[],unlocked:{},prefTab:'thr',thrPid:'elena',thrSel:{elena:true},thrDraft:{},thrWhy:'',thrErr:'',earthTab:'out',testWho:null,run:null,drag:false,
   crewOpen:false,sort:'urgency',msort:null,autoRot:true,lastPg:0,tki:0,talking:false,chVariant:'astronaut',chGender:'male',chCrisis:false,chAnim:'greeting',chExpr:'auto',sayText:'Hi, I\'m Charmy, your AI Assistant. I write my answers here and can read them out loud.'};
-(function(){var ly=lsGet('charm-layout');if(ly==='laptop'||ly==='tablet')S.layout=ly;var sg=lsGet('charm-signed');if(sg)S.signed=sg;var c=lsGet('charm-collapsed');if(c)S.collapsed=c==='1';var cv=lsGet('charm-chvar');if(cv==='female'){S.chVariant='astronaut';S.chGender='female';}else if(cv&&/^(astronaut|labcoat)$/.test(cv))S.chVariant=cv;var cg=lsGet('charm-chgender');if(cg&&/^(male|female)$/.test(cg))S.chGender=cg;})();
+(function(){var ly=lsGet('charm-layout');if(ly==='laptop'||ly==='tablet')S.layout=ly;var sg=lsGet('charm-signed');if(sg)S.signed=sg;var c=lsGet('charm-collapsed');if(c)S.collapsed=c==='1';var cv=lsGet('charm-chvar');if(cv==='female'){S.chVariant='astronaut';S.chGender='female';}else if(cv&&/^(astronaut|labcoat)$/.test(cv))S.chVariant=cv;var cg=lsGet('charm-chgender');if(cg&&/^(male|female)$/.test(cg))S.chGender=cg;var vo=lsGet('charm-voice');if(vo==='0'||vo==='1')S.voice=vo==='1';})();
 function viewT(){return S.mode==='live'?liveNow():S.mode==='point'?S.tp:S.rt;}
 function isLive(){return S.mode==='live';}
 
@@ -1056,8 +1109,8 @@ function seriesOf(pid,k,from,to,maxPts){
     var r=arr[i];if(r.t<from||typeof r.v!=='number')continue;
     var b=Math.floor((r.t-from)/bs);
     if(lastT2!=null&&r.t-lastT2>Math.max(3*bs,EN.freshFor(k,r.src))){if(cur){out.push(cur.p());cur=null;}out.push([lastT2+1,null]);}
-    if(!cur||cur.b!==b){if(cur)out.push(cur.p());cur={b:b,s:0,n:0,lo:Infinity,hi:-Infinity,p:function(){return [from+(this.b+0.5)*bs,this.s/this.n,this.lo,this.hi];}};}
-    cur.s+=r.v;cur.n++;if(r.v<cur.lo)cur.lo=r.v;if(r.v>cur.hi)cur.hi=r.v;lastT2=r.t;
+    if(!cur||cur.b!==b){if(cur)out.push(cur.p());cur={b:b,s:0,n:0,sm:0,lo:Infinity,hi:-Infinity,p:function(){return [from+(this.b+0.5)*bs,this.s/this.n,this.lo,this.hi,this.sm*2>this.n];}};}
+    cur.s+=r.v;cur.n++;if(r.sim||r.src==='demo')cur.sm++;if(r.v<cur.lo)cur.lo=r.v;if(r.v>cur.hi)cur.hi=r.v;lastT2=r.t;
   }
   if(cur)out.push(cur.p());
   return out;
@@ -1065,6 +1118,8 @@ function seriesOf(pid,k,from,to,maxPts){
 function niceTicks(lo,hi,n){var span=hi-lo,step=Math.pow(10,Math.floor(Math.log10(span/n))),e=span/n/step;step*=e>5?10:e>2?5:e>1?2:1;var out=[];for(var v=Math.ceil(lo/step)*step;v<=hi+1e-9;v+=step)out.push(Math.round(v*1000)/1000);return out;}
 function timeTicks(from,to){var span=to-from,st=span<=3*H?30*MIN:span<=8*H?H:span<=26*H?3*H:span<=4*D?6*H:D;var out=[],t=Math.ceil(from/st)*st;for(;t<=to;t+=st)out.push(t);return {ticks:out,st:st};}
 function tlabel(t,st){if(st>=6*H){var h=new Date(t).getUTCHours();return h===0?'Day '+dayOf(t):hm(t);}return hm(t);}
+/* split a line into real and simulated runs (simulated = dashed); runs share their joining point */
+function runs(sg){var out=[],cur=null;sg.forEach(function(p){var sm=!!p[4];if(!cur||cur.sim!==sm){var prev=cur&&cur.pts[cur.pts.length-1];cur={sim:sm,pts:prev?[prev]:[]};out.push(cur);}cur.pts.push(p);});return out;}
 function chart(o){
   var W=800,Hh=o.h||270,L=48,R=18,Tp=14,B=30,iw=W-L-R,ih=Hh-Tp-B;
   var x=function(t){return L+(t-o.from)/(o.to-o.from)*iw;},y=function(v){return Tp+(1-(v-o.ylo)/(o.yhi-o.ylo))*ih;};
@@ -1073,14 +1128,14 @@ function chart(o){
   var tt=timeTicks(o.from,o.to);tt.ticks.forEach(function(t){s+='<line x1="'+x(t)+'" x2="'+x(t)+'" y1="'+Tp+'" y2="'+(Tp+ih)+'" stroke="rgba(125,170,235,.07)"/><text x="'+x(t)+'" y="'+(Hh-9)+'" text-anchor="middle" font-size="12" fill="#7487A4">'+tlabel(t,tt.st)+'</text>';});
   if(o.range){var a=x(Math.max(o.from,o.range[0])),b=x(Math.min(o.to,o.range[1]));s+='<rect x="'+a+'" y="'+Tp+'" width="'+Math.max(2,b-a)+'" height="'+ih+'" fill="rgba(56,189,248,.08)" stroke="rgba(56,189,248,.35)"/>';}
   if(o.band){s+='<rect x="'+L+'" y="'+y(o.band[1])+'" width="'+iw+'" height="'+Math.max(1,y(o.band[0])-y(o.band[1]))+'" fill="rgba(61,220,151,.10)"/><text x="'+(W-R-6)+'" y="'+(y(o.band[1])-5)+'" text-anchor="end" font-size="11.5" fill="#3DDC97">'+(o.bandLabel||'Your baseline')+'</text>';}
-  (o.th||[]).forEach(function(h){if(h.v<o.ylo||h.v>o.yhi)return;var c=h.l===2?'#FF4D4F':'#FFB020';s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(h.v)+'" y2="'+y(h.v)+'" stroke="'+c+'" stroke-dasharray="6 5" stroke-width="1.3"/><text x="'+(L+6)+'" y="'+(y(h.v)-5)+'" font-size="11.5" font-weight="600" fill="'+c+'">'+esc(h.label)+'</text>';});
+  (o.th||[]).forEach(function(h){if(h.v<o.ylo||h.v>o.yhi)return;var c=h.l===3?'#FF4D4F':'#F5D90A';s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(h.v)+'" y2="'+y(h.v)+'" stroke="'+c+'" stroke-dasharray="6 5" stroke-width="1.3"/><text x="'+(L+6)+'" y="'+(y(h.v)-5)+'" font-size="11.5" font-weight="600" fill="'+c+'">'+esc(h.label)+'</text>';});
   (o.series||[]).forEach(function(se){
     var pts=se.pts,seg=[],segs=[],env='';
     pts.forEach(function(p){if(p[1]==null){if(seg.length)segs.push(seg);seg=[];}else seg.push(p);});if(seg.length)segs.push(seg);
     segs.forEach(function(sg){
       if(se.env&&sg.length>1){var up=sg.map(function(p){return x(p[0]).toFixed(1)+','+y(clamp(p[3],o.ylo,o.yhi)).toFixed(1);}),dn=sg.slice().reverse().map(function(p){return x(p[0]).toFixed(1)+','+y(clamp(p[2],o.ylo,o.yhi)).toFixed(1);});env+='<polygon points="'+up.concat(dn).join(' ')+'" fill="'+se.color+'" fill-opacity=".14"/>';}
       s+=env;env='';
-      s+='<polyline points="'+sg.map(function(p){return x(p[0]).toFixed(1)+','+y(clamp(p[1],o.ylo,o.yhi)).toFixed(1);}).join(' ')+'" fill="none" stroke="'+se.color+'" stroke-width="'+(se.w||2.2)+'" stroke-linejoin="round" '+(se.dash?'stroke-dasharray="5 4"':'')+' opacity="'+(se.op||1)+'"/>';
+      runs(sg).forEach(function(rn){s+='<polyline points="'+rn.pts.map(function(p){return x(p[0]).toFixed(1)+','+y(clamp(p[1],o.ylo,o.yhi)).toFixed(1);}).join(' ')+'" fill="none" stroke="'+se.color+'" stroke-width="'+(se.w||2.2)+'" stroke-linejoin="round" '+(se.dash||rn.sim?'stroke-dasharray="5 4"':'')+' opacity="'+(se.op||1)+'"/>';});
     });
     if(se.end&&segs.length){var lp=segs[segs.length-1];lp=lp[lp.length-1];s+='<circle cx="'+x(lp[0])+'" cy="'+y(clamp(lp[1],o.ylo,o.yhi))+'" r="4.5" fill="'+se.color+'"/>';}
   });
@@ -1094,21 +1149,21 @@ function bars(o){
   var s='<svg class="chart" viewBox="0 0 '+W+' '+Hh+'" role="img" aria-label="'+esc(o.aria||'chart')+'">';
   niceTicks(o.ylo,o.yhi,4).forEach(function(v){s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="rgba(125,170,235,.10)"/><text x="'+(L-8)+'" y="'+(y(v)+4)+'" text-anchor="end" font-size="12" fill="#7487A4" font-family="IBM Plex Mono,monospace">'+v+'</text>';});
   if(o.band)s+='<rect x="'+L+'" y="'+y(o.band[1])+'" width="'+iw+'" height="'+(y(o.band[0])-y(o.band[1]))+'" fill="rgba(61,220,151,.10)"/>';
-  o.items.forEach(function(it,i){var cx=L+iw*(i+0.5)/n,c=it.l===2?'#FF4D4F':it.l===1?'#FFB020':'#3DDC97';
+  o.items.forEach(function(it,i){var cx=L+iw*(i+0.5)/n,c=it.l===3?'#FF4D4F':it.l===2?'#FF8A1F':it.l===1?'#F5D90A':'#3DDC97';
     if(it.v!=null){s+='<rect x="'+(cx-bw/2)+'" y="'+y(it.v)+'" width="'+bw+'" height="'+(y(o.ylo)-y(it.v))+'" rx="6" fill="'+c+'" fill-opacity="'+(it.dim?.25:.8)+'"/><text x="'+cx+'" y="'+(y(it.v)+22)+'" text-anchor="middle" font-size="16" font-weight="600" fill="#061022" font-family="IBM Plex Mono,monospace">'+it.v+'</text>';}
     else s+='<text x="'+cx+'" y="'+(y(o.ylo)-10)+'" text-anchor="middle" font-size="12" fill="#7487A4">no data yet</text>';
     s+='<text x="'+cx+'" y="'+(Hh-9)+'" text-anchor="middle" font-size="12" fill="#7487A4">'+esc(it.label)+'</text>';});
-  (o.th||[]).forEach(function(h){var c=h.l===2?'#FF4D4F':'#FFB020';s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(h.v)+'" y2="'+y(h.v)+'" stroke="'+c+'" stroke-dasharray="6 5" stroke-width="1.3"/><text x="'+(W-R-6)+'" y="'+(y(h.v)-5)+'" text-anchor="end" font-size="11.5" font-weight="600" fill="'+c+'">'+esc(h.label)+'</text>';});
+  (o.th||[]).forEach(function(h){var c=h.l===3?'#FF4D4F':'#F5D90A';s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(h.v)+'" y2="'+y(h.v)+'" stroke="'+c+'" stroke-dasharray="6 5" stroke-width="1.3"/><text x="'+(W-R-6)+'" y="'+(y(h.v)-5)+'" text-anchor="end" font-size="11.5" font-weight="600" fill="'+c+'">'+esc(h.label)+'</text>';});
   return s+'</svg>';
 }
 function spark(pid,k,from,to,l){
   var pts=seriesOf(pid,k,from,to,60);if(!pts.length)return '';
   var vs=pts.filter(function(p){return p[1]!=null;}).map(function(p){return p[1];});if(!vs.length)return '';
   var lo=Math.min.apply(null,vs),hi=Math.max.apply(null,vs);if(hi-lo<1e-6){hi+=1;lo-=1;}var pad=(hi-lo)*0.15;lo-=pad;hi+=pad;
-  var c=l===2?'#FF4D4F':l===1?'#FFB020':l===-1?'#8F9AAE':'#3DDC97';
+  var c=l===3?'#FF4D4F':l===2?'#FF8A1F':l===1?'#F5D90A':l===-1?'#8F9AAE':'#3DDC97';
   var bl=baseline(pid,k),band='';if(bl){var yb1=34-(clamp(bl[1],lo,hi)-lo)/(hi-lo)*34,yb0=34-(clamp(bl[0],lo,hi)-lo)/(hi-lo)*34;band='<rect x="0" y="'+yb1.toFixed(1)+'" width="300" height="'+Math.max(0,yb0-yb1).toFixed(1)+'" fill="#3DDC97" fill-opacity=".10"/>';}
   var segs=[],sg=[];pts.forEach(function(p){if(p[1]==null){if(sg.length)segs.push(sg);sg=[];}else sg.push(p);});if(sg.length)segs.push(sg);
-  var lines=segs.map(function(s){return '<polyline points="'+s.map(function(p){return ((p[0]-from)/(to-from)*300).toFixed(1)+','+(34-(p[1]-lo)/(hi-lo)*34).toFixed(1);}).join(' ')+'" fill="none" stroke="'+c+'" stroke-width="2" vector-effect="non-scaling-stroke"/>';}).join('');
+  var lines=segs.map(function(s){return runs(s).map(function(rn){return '<polyline points="'+rn.pts.map(function(p){return ((p[0]-from)/(to-from)*300).toFixed(1)+','+(34-(p[1]-lo)/(hi-lo)*34).toFixed(1);}).join(' ')+'" fill="none" stroke="'+c+'" stroke-width="2" vector-effect="non-scaling-stroke"'+(rn.sim?' stroke-dasharray="4 3"':'')+'/>';}).join('');}).join('');
   return '<svg class="sp" viewBox="0 0 300 34" preserveAspectRatio="none" aria-hidden="true">'+band+lines+'</svg>';
 }
 var BLC={};
@@ -1161,8 +1216,8 @@ function av(pid,l,cls){var p=CREWBY[pid]||{img:'',name:''};return '<span class="
 var $=function(id){return document.getElementById(id);};
 function routeName(){return S.route.v;}
 function navCrewBtn(p,t,r){var st=personAt(p.id,t);return '<button class="navbtn navcrew" data-act="open" data-id="'+p.id+'" '+((r.v==='astro'||r.v==='metric')&&r.id===p.id?'aria-current="page"':'')+' title="'+p.name+' · '+WORD[lvKey(st.lvl)]+'">'+av(p.id,st.lvl)+'<span class="navlabel">'+p.name+'</span><span class="dot d-'+lvKey(st.lvl)+'"></span></button>';}
-function crewCounts(t){var c={2:0,1:0,'-1':0,0:0};CREW.forEach(function(p){c[personAt(p.id,t).lvl]++;});return c;}
-function badges(c){return (c[2]?'<span class="badge b-2" title="'+c[2]+' critical">'+c[2]+'</span>':'')+(c[1]?'<span class="badge b-1" title="'+c[1]+' caution">'+c[1]+'</span>':'')+(c[-1]?'<span class="badge b-n" title="'+c[-1]+' no data">'+c[-1]+'</span>':'');}
+function crewCounts(t){var c={3:0,2:0,1:0,'-1':0,0:0};CREW.forEach(function(p){c[personAt(p.id,t).lvl]++;});return c;}
+function badges(c){return (c[3]?'<span class="badge b-3" title="'+c[3]+' critical">'+c[3]+'</span>':'')+(c[2]?'<span class="badge b-2" title="'+c[2]+' caution">'+c[2]+'</span>':'')+(c[1]?'<span class="badge b-1" title="'+c[1]+' attention">'+c[1]+'</span>':'')+(c[-1]?'<span class="badge b-n" title="'+c[-1]+' no data">'+c[-1]+'</span>':'');}
 function renderNav(){
   var t=viewT(),r=S.route,h='',drawer=$('app').clientWidth<=900,list=crewByUrgency(t),c=crewCounts(t);
   if(drawer)h+='<button class="navbtn coltog" data-act="closedrawer" title="Close menu">'+IC.x+'<span class="navlabel">Close menu</span></button>';
@@ -1234,7 +1289,7 @@ function renderHist(){
   var now=liveNow(),span=Math.max(H,now-T0), w=function(x){return clamp((x-T0)/span*100,0,100).toFixed(3)+'%';};
   h+='<div class="scrub"><span class="lbl">TIMELINE</span><div class="track" id="track" role="slider" tabindex="0" aria-label="Pick a time" aria-valuemin="'+T0+'" aria-valuemax="'+now+'" aria-valuenow="'+t+'" aria-valuetext="'+fmtT(t)+'"><div class="rail"></div>';
   for(var dd=dayStart(T0);dd<=now;dd+=D){if(dd>=T0)h+='<div class="dayseg" style="left:'+w(dd)+'"><span>Day '+dayOf(dd)+'</span></div>';}
-  allEvents().forEach(function(ev){if(ev.t>now)return;var c=null;if(ev.type==='raise')c=ev.lv===2?'var(--crit)':ev.lv===1?'var(--warn)':null;if(ev.type==='nodata')c='var(--nd)';if(c)h+='<div class="tick" style="left:'+w(ev.t)+';background:'+c+'"></div>';});
+  allEvents().forEach(function(ev){if(ev.t>now)return;var c=null;if(ev.type==='raise')c=ev.lv===3?'var(--crit)':ev.lv===2?'var(--warn)':ev.lv===1?'var(--att)':null;if(ev.type==='nodata')c='var(--nd)';if(c)h+='<div class="tick" style="left:'+w(ev.t)+';background:'+c+'"></div>';});
   if(S.mode==='range')h+='<div class="rng" style="left:'+w(S.rf)+';width:calc('+w(S.rt)+' - '+w(S.rf)+')"></div>';
   h+='<div class="nowmark" style="left:'+w(now)+'" title="Now"></div>';
   if(S.mode!=='range')h+='<div class="handle" style="left:'+w(Math.max(t,T0))+'"></div>';
@@ -1256,9 +1311,9 @@ function vCrew(){
   var t=viewT(),e=envAt(t),list=crewSorted(t),h='';
   if(!READY.crew)return '<div class="card empty"><h2>Connecting to the CHARM server…</h2><p>'+(CONN.error?esc(CONN.error):'Loading crew and readings.')+'</p></div>';
   if(!ALLREAD.length&&isLive())h+='<div class="card empty" style="margin-bottom:16px"><h2>No health data yet</h2><p>The crew profiles are ready. Add a measurement, run a guided test, or import a CSV from any agency. For a judges\' demo you can load the demo scenario in Settings · Demo.</p><div class="acts"><button class="btn pri" data-act="entry">Add measurement</button><button class="btn" data-act="go" data-to="tests">Guided tests</button><button class="btn" data-act="import">Import CSV</button><button class="btn ghost" data-act="go" data-to="prefs" data-tab="demo">Demo scenario</button></div></div>';
-  var cnt={2:0,1:0,'-1':0,0:0};list.forEach(function(x){cnt[x.l]++;});
+  var cnt={3:0,2:0,1:0,'-1':0,0:0};list.forEach(function(x){cnt[x.l]++;});
   h+='<div class="ph"><div><h1>Crew status</h1><p>'+(S.mode==='range'?'Worst status between '+fmtT(S.rf)+' and '+fmtT(S.rt):'Sorted by '+(S.sort==='urgency'?'urgency':S.sort==='name'?'name':'space agency')+' · '+fmtT(t)+' GMT')+'</p></div><span class="sp"></span><div class="sum">';
-  [[2,'critical'],[1,'caution'],[-1,'no data'],[0,'normal']].forEach(function(z){if(cnt[z[0]])h+='<span class="chip"><span class="dot d-'+lvKey(z[0])+'"></span>'+cnt[z[0]]+' '+z[1]+'</span>';});
+  [[3,'critical'],[2,'caution'],[1,'attention'],[-1,'no data'],[0,'normal']].forEach(function(z){if(cnt[z[0]])h+='<span class="chip"><span class="dot d-'+lvKey(z[0])+'"></span>'+cnt[z[0]]+' '+z[1]+'</span>';});
   h+='</div>'+sortSeg()+'</div>';
   if(e.co2l>0||e.pfl>0){h+='<div class="envbanner">'+(e.co2l>0?IC.air.replace('<svg','<svg width="22" height="22"'):IC.sun.replace('<svg','<svg width="22" height="22"'))+'<span>'+(e.co2l?'<b>Cabin CO₂ '+f1(e.co2avg)+' mmHg</b> (1-hour average) · affects all crew. Check scrubber, increase ventilation.':'<b>Solar particle event</b> · '+f1(e.pfu,0)+' pfu (NOAA S'+(e.pfu>=1000?2:1)+'). Prepare shelter, review EVA schedule.')+'</span></div>';}
   h+='<div class="envstrip">';
@@ -1285,7 +1340,7 @@ function vCrew(){
   h+=taskTicker(t);
   h+='<div class="lensbar" role="group" aria-label="Metric lens"><span class="lb">LENS</span>';
   h+='<button class="lchip" data-act="lens" data-k="all" aria-pressed="'+(S.lens==='all')+'">All</button>';
-  LKEYS.forEach(function(k){h+='<button class="lchip" data-act="lens" data-k="'+k+'" aria-pressed="'+(S.lens===k)+'">'+MDEF[k].lens+'</button>';});
+  LKEYS.filter(function(k){return !MDEF[k].cond;}).forEach(function(k){h+='<button class="lchip" data-act="lens" data-k="'+k+'" aria-pressed="'+(S.lens===k)+'">'+MDEF[k].lens+'</button>';});
   if(S.lens!=='all'&&['hr','spo2','rr','temp','glu','dose'].indexOf(S.lens)>=0)h+='<button class="btn sm '+(S.compare?'pri':'')+'" data-act="compare">'+(S.compare?'Hide compare':'Compare crew')+'</button>';
   h+='</div>';
   if(S.compare&&S.lens!=='all')h+=compareCard(t);
@@ -1302,12 +1357,12 @@ function crewCard(x,t){
     h+=(['hr','spo2','rr','temp','glu','dose'].indexOf(lens)>=0?'<span style="width:100%">'+spark(p.id,lens,from,to,ll)+'</span>':'<span class="upd">'+(m.val?'Updated '+fmtAgo(t-m.val.t):'')+'</span>');
     return h+'</button>';
   }
-  var act=(l===2&&isLive())?'data-act="emer" data-id="'+p.id+'"':'data-act="open" data-id="'+p.id+'"';
+  var act=(l===3&&isLive())?'data-act="emer" data-id="'+p.id+'"':'data-act="open" data-id="'+p.id+'"';
   h+='<div class="card ccard k-'+lvKey(l)+'"><button class="cmain" '+act+' aria-label="'+p.name+', '+WORD[lvKey(l)]+'"><span class="ring g-'+lvKey(l)+'"><img src="'+p.img+'" alt=""></span>';
   h+='<span class="nm">'+p.name+'</span><span class="rl">'+p.role+' · <span class="tag">'+p.agency+'</span></span>';
   if(S.mode==='range'){h+='<span class="wir">WORST IN RANGE</span>'+lvw(l)+'</button>';var n=evCount(p.id,S.rf,S.rt);h+='<span class="why">'+(n?n+' alert'+(n>1?'s':'')+' in range':'No alerts in range')+'</span><span class="upd">Now: '+WORD[lvKey(st.lvl)]+'</span>';}
-  else{h+=lvw(l)+'</button>';h+=whyCarousel(p.id,cardIssues(p.id,st,t).concat(cardVitals(p.id,st,t)),t);var hv=st.m.hr.val,li=lastT(p.id,'hr',t);h+='<span class="upd">'+(!hasData(p.id)?'No readings yet':hv?(hv.src==='demo'?'<span class="demotag">DEMO</span> ':hv.imp?'Imported · ':'')+'Updated '+fmtAgo(t-hv.t)+(hv.ex?' · exercising':hv.sl?' · asleep':''):'Heart rate: '+(li?'last '+fmtAgo(t-li):'no reading'))+'</span>';}
-  if(l===2&&isLive())h+='<button class="btn sm" data-act="emer" data-id="'+p.id+'" style="border-color:var(--crit);color:#fff;background:#B3191E">Open Emergency Mode</button>';
+  else{h+=lvw(l)+'</button>';h+=whyCarousel(p.id,cardIssues(p.id,st,t).concat(cardVitals(p.id,st,t)),t);var hv=st.m.hr.val,li=lastT(p.id,'hr',t);h+='<span class="upd">'+(!hasData(p.id)?'No readings yet':hv?dtag(hv)+'Updated '+fmtAgo(t-hv.t)+(hv.ex?' · exercising':hv.sl?' · asleep':''):'Heart rate: '+(li?'last '+fmtAgo(t-li):'no reading'))+'</span>';}
+  if(l===3&&isLive())h+='<button class="btn sm" data-act="emer" data-id="'+p.id+'" style="border-color:var(--crit);color:#fff;background:#B3191E">Open Emergency Mode</button>';
   return h+'</div>';
 }
 function cardIssues(pid,st,t){
@@ -1379,9 +1434,9 @@ function compareCard(t){
   CREW.forEach(function(p,i){var pts=seriesOf(p.id,k,from,to,240);i=i%PAL.length;pts.forEach(function(q){if(q[1]!=null)all.push(q[1]);});series.push({pts:pts,color:PAL[i],w:2,end:true});});
   if(!all.length)return '<div class="card compare"><p class="muted">No data in this window.</p></div>';
   var lo=Math.min.apply(null,all),hi=Math.max.apply(null,all),pad=(hi-lo)*0.12+0.5,th=EN.COMMON[k],ths=[];
-  if(k==='hr')ths=[{v:th.cHi,l:1,label:'Caution 100'},{v:th.xHi,l:2,label:'Critical 130'}];
-  if(k==='spo2')ths=[{v:th.c,l:1,label:'Caution <94'},{v:th.x,l:2,label:'Critical ≤90'}];
-  if(k==='rr')ths=[{v:th.cHi,l:1,label:'Caution ≥21'}];
+  if(k==='hr')ths=[{v:th.cHi,l:1,label:'Attention 100'},{v:th.xHi,l:3,label:'Critical 130'}];
+  if(k==='spo2')ths=[{v:th.c,l:1,label:'Attention <94'},{v:th.x,l:3,label:'Critical ≤90'}];
+  if(k==='rr')ths=[{v:th.cHi,l:1,label:'Attention ≥21'}];
   var h='<div class="card compare"><div class="sec">COMPARE · '+MDEF[k].label.toUpperCase()+' · '+(S.mode==='range'?'SELECTED RANGE':'LAST 24 H')+'</div>';
   h+=chart({from:from,to:to,ylo:Math.floor(lo-pad),yhi:Math.ceil(hi+pad),series:series,th:ths,h:260,aria:'Compare '+MDEF[k].label});
   h+='<div class="legend">'+CREW.map(function(p,i){return '<span><i style="background:'+PAL[i%PAL.length]+'"></i>'+p.name+'</span>';}).join('')+'</div>';
@@ -1390,7 +1445,7 @@ function compareCard(t){
 }
 
 /* --- astronaut file --- */
-var SYS=[{id:'head',label:'Head and eyes',ks:['vision']},{id:'mind',label:'Mind and sleep',ks:['sleep','mood']},{id:'heart',label:'Heart',ks:['hr','bp']},{id:'lungs',label:'Lungs',ks:['spo2','rr']},{id:'abdomen',label:'Metabolism',ks:['glu']},{id:'muscle',label:'Bones and muscles',ks:['ex']},{id:'skin',label:'Temperature',ks:['temp']},{id:'blood',label:'Blood and immune',ks:['blood']}];
+var SYS=[{id:'head',label:'Head and eyes',ks:['vision','c_sans']},{id:'mind',label:'Mind and sleep',ks:['sleep','mood','sym']},{id:'heart',label:'Heart',ks:['hr','bp','c_af','c_orth']},{id:'lungs',label:'Lungs',ks:['spo2','rr']},{id:'abdomen',label:'Metabolism and kidneys',ks:['glu','fluid','c_kid']},{id:'muscle',label:'Bones and muscles',ks:['ex']},{id:'skin',label:'Temperature',ks:['temp']},{id:'blood',label:'Blood, immune and veins',ks:['blood','c_inf','c_vte']}];
 function sysLevel(st,s){var b=0;s.ks.forEach(function(k){var l=st.m[k].l;if(rank(l)>rank(b))b=l;});return b;}
 function zoneTip(st,z){var parts=z.ks.map(function(k){var m=st.m[k];return MDEF[k].label+': '+(m.val?fmtV(k,m.val)+(m.val.txt?'':' '+MDEF[k].unit):'no reading')+' · '+WORD[lvKey(m.l)];});return '<b>'+z.label+'</b>'+parts.map(esc).join('<br>');}
 /* where the face sits in each 320 px face image: [eye-midpoint x, eye-line y, eye distance + eye-to-mouth] */
@@ -1402,18 +1457,21 @@ function bodySvg(pid,st){
   var BS=430/824,BX=(260-392*BS)/2,BY=24,P=function(x,y){return [Math.round(BX+x*BS),Math.round(BY+y*BS)];};
   var V={cx:BX+192*BS,cy:BY+104*BS,rx:80*BS,ry:74*BS};
   var Z={mind:P(192,-20),head:P(300,92),lungs:P(96,262),heart:P(290,262),abdomen:P(196,392),muscle:P(140,610),skin:P(30,390),blood:P(362,368)};
-  var col=function(l){return l===2?'#FF4D4F':l===1?'#FFB020':l===-1?'#8F9AAE':'#3DDC97';};
+  var col=function(l){return l===3?'#FF4D4F':l===2?'#FF8A1F':l===1?'#F5D90A':l===-1?'#8F9AAE':'#3DDC97';};
   var dose=st.m.dose,dl=dose.l,uid='f'+pid;
   var s='<svg class="bodysvg" viewBox="0 0 260 470" role="img" aria-label="'+esc(p.name)+' in spacesuit, body map with 8 systems"><defs><clipPath id="'+uid+'v"><ellipse cx="'+V.cx+'" cy="'+V.cy+'" rx="'+V.rx+'" ry="'+V.ry+'"/></clipPath></defs>';
   s+='<ellipse cx="130" cy="244" rx="124" ry="222" fill="none" stroke="'+(dl>0?col(dl):'#38BDF8')+'" stroke-width="2" stroke-dasharray="5 7" opacity=".5"/>';
   s+='<g class="fig">';
   s+='<image href="assets/astronaut-body.webp" x="'+BX+'" y="'+BY+'" width="'+(392*BS)+'" height="430"/>';
   /* line the face up by its eyes: the same face size and eye line for every astronaut, centred in the visor */
-  var ff=FACEFIT[p.face]||[160,150,165],fs=1.482*V.rx/ff[2],FW=320*fs;
-  s+='<g clip-path="url(#'+uid+'v)"><ellipse cx="'+V.cx+'" cy="'+V.cy+'" rx="'+V.rx+'" ry="'+V.ry+'" fill="#0B1424"/><image href="'+p.face+'" x="'+(V.cx-ff[0]*fs).toFixed(2)+'" y="'+(V.cy-8.4*BS-ff[1]*fs).toFixed(2)+'" width="'+FW.toFixed(2)+'" height="'+FW.toFixed(2)+'"/></g>';
+  /* zoomed out: the face takes about 70% of the visor height; a soft oval fades the avatar's own helmet ring into the dark visor */
+  var ff=FACEFIT[p.face]||[160,150,165],fs=0.95*V.rx/ff[2],FW=320*fs,fx0=V.cx-ff[0]*fs,fy0=V.cy-2*BS-ff[1]*fs;
+  var mfx=fx0+ff[0]*fs,mfy=fy0+(ff[1]+0.28*ff[2])*fs,max=0.78*ff[2]*fs*1.25,may=0.98*ff[2]*fs*1.25;
+  s+='<defs><radialGradient id="'+uid+'g"><stop offset="0.62" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient><mask id="'+uid+'m" maskUnits="userSpaceOnUse"><ellipse cx="'+mfx.toFixed(2)+'" cy="'+mfy.toFixed(2)+'" rx="'+max.toFixed(2)+'" ry="'+may.toFixed(2)+'" fill="url(#'+uid+'g)"/></mask></defs>';
+  s+='<g clip-path="url(#'+uid+'v)"><ellipse cx="'+V.cx+'" cy="'+V.cy+'" rx="'+V.rx+'" ry="'+V.ry+'" fill="#0B1424"/><image href="'+p.face+'" x="'+fx0.toFixed(2)+'" y="'+fy0.toFixed(2)+'" width="'+FW.toFixed(2)+'" height="'+FW.toFixed(2)+'" mask="url(#'+uid+'m)"/></g>';
   s+='<image href="assets/visor-glare.webp" x="'+(V.cx-V.rx)+'" y="'+(V.cy-V.ry)+'" width="'+(2*V.rx)+'" height="'+(2*V.ry)+'" style="pointer-events:none"/>';
   SYS.forEach(function(z){var l=sysLevel(st,z),q=Z[z.id],c=col(l),sel=S.bodySel===z.id,tip=zoneTip(st,z);
-    s+='<g class="zone z'+(l===2?'2':'')+(sel?' sel':'')+'" data-act="zone" data-z="'+z.id+'" data-tip="'+esc(tip)+'" role="button" tabindex="0" aria-label="'+z.label+': '+WORD[lvKey(l)]+'">';
+    s+='<g class="zone z'+(l===3?'2':'')+(sel?' sel':'')+'" data-act="zone" data-z="'+z.id+'" data-tip="'+esc(tip)+'" role="button" tabindex="0" aria-label="'+z.label+': '+WORD[lvKey(l)]+'">';
     if(z.id==='mind')s+='<ellipse class="zc" cx="'+q[0]+'" cy="'+q[1]+'" rx="40" ry="9" fill="'+c+'" fill-opacity=".22" stroke="'+c+'" stroke-width="2.5"/><ellipse cx="'+q[0]+'" cy="'+q[1]+'" rx="48" ry="18" fill="transparent"/>';
     else s+='<circle class="zc" cx="'+q[0]+'" cy="'+q[1]+'" r="13" fill="'+c+'" fill-opacity="'+(l>0?.45:.25)+'" stroke="'+c+'" stroke-width="2.5"/><circle cx="'+q[0]+'" cy="'+q[1]+'" r="24" fill="transparent"/>';
     if(l>0&&z.id!=='mind')s+='<path d="M'+(q[0]+9)+' '+(q[1]-21)+' l7 -12 l7 12z" fill="'+c+'"/>';
@@ -1421,10 +1479,11 @@ function bodySvg(pid,st){
   s+='</g><text x="12" y="464" font-size="12" fill="#8FDcff">Radiation dose budget '+(dose.val?dose.val.v.toFixed(1):'—')+'%</text></svg>';
   return s;
 }
-var TESTMAP={hr:'ecg',bp:'bp',glu:'glu',sleep:'rt',mood:'rt',vision:'sans'};
+var TESTMAP={c_af:'ecg',hr:'ecg',bp:'bp',glu:'glu',sleep:'rt',mood:'rt',vision:'sans'};
 var NEXT={hr:['1-min ECG strip','1 min · smart shirt · no supplies','ecg'],spo2:['Check sensor fit and re-measure','1 min · no supplies',null],rr:['Check the cabin CO₂ panel','1 min',null],temp:['Re-check temperature in 1 hour','wearable sensor',null],bp:['Repeat cuff blood pressure','3 min · BP cuff','bp'],glu:['Fingerstick glucose check','2 min · glucometer','glu'],sleep:['3-min reaction test','3 min · no supplies','rt'],mood:['3-min reaction test','3 min · no supplies','rt'],ex:['Review the exercise plan','with planners',null],dose:['Review shielding plan','with flight surgeon',null]};
 function confidence(pid,k,m,t){
   var v=m.val;if(!v)return ['Low',['No recent reading']];
+  if(v.sim)return ['Low',['Simulated value (not measured)','Updated '+fmtAgo(t-v.t)]];
   var why=[],lvl='High';
   if(['hr','spo2','rr'].indexOf(k)>=0){why.push(MDEF[k].src.split(' · ')[0]);why.push('3 readings agree');why.push('Updated '+fmtAgo(t-v.t));if(t-v.t>5*MIN)lvl='Medium';}
   else if(k==='bp'){why.push('Single cuff reading');why.push('Taken by '+(v.by==='self'?'self':v.by));lvl='Medium';}
@@ -1460,7 +1519,7 @@ function vAstro(pid){
   }else h+='<p class="note">Tasks are shown in live mode.</p>';
   h+='</section>';
   h+='<section class="mcol"><div class="sec">METRICS'+(S.bodySel?' · '+SYS.filter(function(z){return z.id===S.bodySel;})[0].label.toUpperCase()+' <button class="linkbtn" data-act="zone" data-z="'+S.bodySel+'">Show all</button>':'')+'</div><div class="tiles">';
-  var ks=MKEYS.filter(function(k){return !S.bodySel||MDEF[k].sys===S.bodySel||(S.bodySel==='head'&&k==='vision');});
+  var ks=MKEYS.filter(function(k){return !MDEF[k].hidden;}).filter(function(k){return !S.bodySel||MDEF[k].sys===S.bodySel||(S.bodySel==='head'&&k==='vision');});
   var ord=ks.map(function(k){return {k:k,l:S.mode==='range'&&!MDEF[k].stat?rangeWorst(pid,k):st.m[k].l};}).sort(function(a,b){return rank(b.l)-rank(a.l);});
   var nom=ord.filter(function(o){return o.l===0;}),non=ord.filter(function(o){return o.l!==0;});
   non.forEach(function(o){h+=tile(pid,o.k,o.l,st,t);});
@@ -1476,13 +1535,24 @@ function issueCard(pid,it,st,t){
     h+='<div class="card issue i-n"><div class="row1">'+lvw(-1)+'</div><h3>'+(nd?'No readings yet':'Wearable not reporting'+(k2?' since '+hm(k2):''))+'</h3><p class="det">'+(nd?'Statuses stay grey (NO DATA) until there is a current reading. CHARM never shows missing data as green.':'Heart rate, SpO₂, breathing and temperature are grey, never shown as green.')+'</p><div class="nx"><div><span class="muted">Next step:</span> '+(nd?'add a measurement or import a file.':'check the watch, or enter readings by hand / import a backup file.')+'</div>'+(isLive()?'<button class="btn pri" data-act="entry" data-id="'+pid+'" data-k="hr">Enter readings</button><button class="btn" data-act="import">Import file</button>':'')+'</div></div>';
     return h;
   }
+  if(MDEF[k].cond){
+    h+='<div class="card issue i-'+it.l+'"><div class="row1">'+lvw(it.l)+'<span class="conf">Condition alert · '+esc(MDEF[k].label)+'</span></div><h3>'+esc(v.txt)+'</h3>';
+    if(v.why&&v.why.length)h+='<p class="det"><b>Found:</b> '+v.why.map(esc).join(' · ')+'</p>';
+    h+='<p class="det faint" style="font-size:13px">'+esc(c.why||'')+'</p><div class="nx"><div><span class="muted">Next step:</span> '+esc(v.next)+'</div>';
+    var ex={c_af:['ecg','test-ecg-'+pid,'Record a 1-min ECG'],c_orth:['ortho',null,'Repeat orthostatic test'],c_kid:['urine',null,'Log a urine check'],c_sans:['vision',null,'Log an eye exam'],c_vte:['ijv',null,'Log a neck-vein scan'],c_inf:['sym',null,'Update symptoms']}[k];
+    if(isLive()){if(it.l===3)h+='<button class="btn pri" data-act="emer" data-id="'+pid+'" style="background:#C9262B;border-color:#C9262B;color:#fff">Open Emergency Mode</button>';
+      if(ex)h+=ex[1]?'<button class="btn" data-act="go" data-to="'+ex[1]+'">'+ex[2]+'</button>':'<button class="btn" data-act="entry" data-id="'+pid+'" data-k="'+ex[0]+'">'+ex[2]+'</button>';}
+    h+='</div><p class="faint" style="font-size:12px;margin:8px 0 0">Rule '+esc(v.rule||'')+' · medic team thresholds (data/reference/charm_alert_rules.csv)</p>';
+    var akc=ackOf(pid,k);if(isLive())h+=akc?'<div class="ack">Acknowledged by '+akc.by+' at '+hm(akc.t)+'.</div>':'<button class="linkbtn" data-act="ack" data-id="'+pid+'" data-k="'+k+'">I\'ve seen this</button>';
+    return h+'</div>';
+  }
   var cf=confidence(pid,k,m,t),nx=NEXT[k];
   var title=k==='hr'&&v&&v.irr?'Irregular heart rhythm · '+fmtV(k,v)+' bpm':k==='sleep'?'Sleep '+fmtV(k,v)+' h last night'+(v.prev!=null?' (night before '+v.prev+' h)':''):MDEF[k].label+' '+fmtV(k,v)+' '+MDEF[k].unit;
-  h+='<div class="card issue i-'+it.l+'"><div class="row1">'+lvw(it.l)+'<span class="conf">Confidence: <b>'+cf[0]+'</b> · <button class="linkbtn" style="min-height:0" data-act="why" data-key="'+key+'">Why?</button></span></div>';
+  h+='<div class="card issue i-'+it.l+'"><div class="row1">'+lvw(it.l)+dtag(v)+'<span class="conf">Confidence: <b>'+cf[0]+'</b> · <button class="linkbtn" style="min-height:0" data-act="why" data-key="'+key+'">Why?</button></span></div>';
   h+='<h3>'+esc(title)+'</h3><p class="det">'+esc(c.why||'')+'</p>';
   if(S['why'+key])h+='<div class="why">'+cf[1].map(esc).join(' · ')+'</div>';
-  h+='<div class="nx"><div><span class="muted">Next step:</span> '+esc(it.l===2?c.x:c.c)+'</div>';
-  if(isLive()){if(it.l===2&&k==='hr')h+='<button class="btn pri" data-act="emer" data-id="'+pid+'" style="background:#C9262B;border-color:#C9262B;color:#fff">Open Emergency Mode</button>';
+  h+='<div class="nx"><div><span class="muted">Next step:</span> '+esc(it.l===3?c.x:c.c)+'</div>';
+  if(isLive()){if(it.l===3&&k==='hr')h+='<button class="btn pri" data-act="emer" data-id="'+pid+'" style="background:#C9262B;border-color:#C9262B;color:#fff">Open Emergency Mode</button>';
     else if(nx&&nx[2])h+='<button class="btn pri" data-act="go" data-to="test-'+nx[2]+'-'+pid+'">Start '+esc(nx[0].toLowerCase())+'</button>';}
   h+='<button class="btn sm ghost" data-act="metric" data-id="'+pid+'" data-k="'+k+'">Details</button></div>';
   var ak=ackOf(pid,k);
@@ -1492,10 +1562,10 @@ function issueCard(pid,it,st,t){
 function tile(pid,k,l,st,t){
   var m=st.m[k],v=m.val,d=MDEF[k],h='';
   h+='<button class="card tile t-'+lvKey(l)+'" data-act="metric" data-id="'+pid+'" data-k="'+k+'"><span class="tr"><span class="tn">'+d.label+'</span></span>';
-  h+='<span class="tv"><b class="tnum">'+(v?fmtV(k,v):'—')+'</b><span>'+(v&&!v.txt?d.unit:'')+'</span>'+lvw(l)+'</span>';
+  h+='<span class="tv'+(v&&v.txt&&d.stat?' txtv':'')+'"><b class="tnum">'+(v?esc(fmtV(k,v)):'—')+'</b><span>'+(v&&!v.txt?d.unit:'')+'</span>'+lvw(l)+'</span>';
   if(['hr','spo2','rr','temp','glu','dose'].indexOf(k)>=0)h+=spark(pid,k,S.mode==='range'?S.rf:Math.max(T0,t-24*H),S.mode==='range'?S.rt:t,l);
   var lr=v?null:EN.lastReading(RD[pid],k,t);
-  h+='<span class="tu">'+(v?(v.src==='demo'?'<span class="demotag">DEMO</span> ':v.imp?'Imported · ':'')+'Updated '+fmtAgo(t-v.t):lr?'Last reading '+fmtAgo(t-lr.t)+' · measure again':'No reading · measure now')+'</span></button>';
+  h+='<span class="tu">'+(v?dtag(v)+'Updated '+fmtAgo(t-v.t):lr?'Last reading '+fmtAgo(t-lr.t)+' · measure again':'No reading · measure now')+'</span></button>';
   return h;
 }
 
@@ -1550,9 +1620,9 @@ function vMatrix(){
   var t=viewT(),rng=S.mode==='range',list=crewSorted(t),h='';
   if(S.msort){var mk=S.msort;list.sort(function(a,b){var la=rng&&!MDEF[mk].stat?rangeWorst(a.p.id,mk):a.st.m[mk].l,lb=rng&&!MDEF[mk].stat?rangeWorst(b.p.id,mk):b.st.m[mk].l;return rank(lb)-rank(la)||byUrg(a,b);});}
   var c=crewCounts(t);
-  h+='<div class="ph"><div><h1>All crew · all metrics</h1><p>'+(rng?'Worst status between '+fmtT(S.rf)+' and '+fmtT(S.rt)+' · values at the end of the range':'Latest values · '+fmtT(t)+' GMT')+' · tap a cell to open it · tap a column to sort by it</p></div><span class="sp"></span><div class="sum">'+[[2,'critical'],[1,'caution'],[-1,'no data'],[0,'normal']].map(function(z){return c[z[0]]?'<span class="chip"><span class="dot d-'+lvKey(z[0])+'"></span>'+c[z[0]]+' '+z[1]+'</span>':'';}).join('')+'</div>'+sortSeg()+'</div>';
+  h+='<div class="ph"><div><h1>All crew · all metrics</h1><p>'+(rng?'Worst status between '+fmtT(S.rf)+' and '+fmtT(S.rt)+' · values at the end of the range':'Latest values · '+fmtT(t)+' GMT')+' · tap a cell to open it · tap a column to sort by it</p></div><span class="sp"></span><div class="sum">'+[[3,'critical'],[2,'caution'],[1,'attention'],[-1,'no data'],[0,'normal']].map(function(z){return c[z[0]]?'<span class="chip"><span class="dot d-'+lvKey(z[0])+'"></span>'+c[z[0]]+' '+z[1]+'</span>':'';}).join('')+'</div>'+sortSeg()+'</div>';
   h+='<div class="card mxwrap"><table class="mx"><thead><tr><th class="who">ASTRONAUT</th><th>OVERALL</th>';
-  MKEYS.forEach(function(k){var cc={2:0,1:0,'-1':0};list.forEach(function(x){var l=rng&&!MDEF[k].stat?rangeWorst(x.p.id,k):x.st.m[k].l;if(cc[l]!=null)cc[l]++;});
+  MKEYS.forEach(function(k){var cc={3:0,2:0,1:0,'-1':0};list.forEach(function(x){var l=rng&&!MDEF[k].stat?rangeWorst(x.p.id,k):x.st.m[k].l;if(cc[l]!=null)cc[l]++;});
     h+='<th><button data-act="msort" data-k="'+k+'" aria-pressed="'+(S.msort===k)+'" title="Sort by '+MDEF[k].label+'">'+esc(MDEF[k].short.toUpperCase())+'<span class="hc">'+badges(cc)+'</span></button></th>';});
   h+='</tr></thead><tbody>';
   list.forEach(function(x){var p=x.p,st=x.st;
@@ -1572,7 +1642,7 @@ function vMetric(pid,k){
   var l=S.mode==='range'&&!d.stat?rangeWorst(pid,k):m.l;
   h+='<div class="fhead"><button class="iconbtn" data-act="open" data-id="'+pid+'" aria-label="Back to '+p.name+'">'+IC.back+'</button>'+av(pid,st.lvl)+'<div><h1>'+d.label+'</h1><div class="muted">'+p.name+' · '+p.role+'</div></div><span class="sp"></span>'+pnav(pid,k)+'</div>';
   h+='<div class="mgrid"><div class="stack">';
-  h+='<div class="bigval"><div><span class="n tnum">'+(v?fmtV(k,v):'—')+'</span><span class="u">'+(v&&!v.txt?d.unit:'')+'</span></div><div>'+lvw(l,S.mode==='range'?' <span class="faint" style="font-family:var(--f-body);letter-spacing:0;font-weight:500">worst in range</span>':'')+'<div class="muted" style="font-size:13.5px;margin-top:6px">'+(v?(v.src==='demo'?'<span class="demotag">DEMO</span> ':'')+esc(srcLabel(v,k)||d.src)+' · '+fmtT(v.t):'No current reading')+(v&&v.ex?' · exercising (exercise limits apply)':v&&v.sl?' · asleep (sleep limits apply)':'')+'</div></div></div>';
+  h+='<div class="bigval"><div><span class="n tnum">'+(v?fmtV(k,v):'—')+'</span><span class="u">'+(v&&!v.txt?d.unit:'')+'</span></div><div>'+lvw(l,S.mode==='range'?' <span class="faint" style="font-family:var(--f-body);letter-spacing:0;font-weight:500">worst in range</span>':'')+'<div class="muted" style="font-size:13.5px;margin-top:6px">'+(v?dtag(v)+esc(srcLabel(v,k)||d.src)+' · '+fmtT(v.t):'No current reading')+(v&&v.ex?' · exercising (exercise limits apply)':v&&v.sl?' · asleep (sleep limits apply)':'')+'</div></div></div>';
   h+='<div class="card chartc">'+metricChart(pid,k,t)+'</div>';
   if(!d.stat){var rel=SYS.filter(function(z){return z.id===d.sys;})[0];var rk=(rel?rel.ks:[]).filter(function(x){return x!==k;});rk=rk.concat(k==='sleep'?['hr']:k==='hr'?['spo2','rr']:k==='rr'?['spo2']:['hr']).filter(function(x,i,a){return a.indexOf(x)===i&&x!==k;}).slice(0,3);
     h+='<div class="rel">'+rk.map(function(x){var mm=st.m[x];return '<button class="card tile t-'+lvKey(mm.l)+'" data-act="metric" data-id="'+pid+'" data-k="'+x+'" style="padding:12px 14px"><span class="tn" style="font-size:13px">'+MDEF[x].label+'</span><span class="tv"><b class="tnum" style="font-size:20px">'+fmtV(x,mm.val)+'</b><span>'+MDEF[x].unit+'</span></span>'+lvw(mm.l)+'</button>';}).join('');
@@ -1580,11 +1650,11 @@ function vMetric(pid,k){
     h+='</div>';}
   h+='<details class="card"><summary>Why it matters in space</summary><div class="in">'+esc(c.why||'')+'</div></details>';
   var evs=allEvents().filter(function(e){return e.pid===pid&&(e.k===k||(k==='bp'&&/Blood pressure/.test(e.text)))&&e.t<=t;}).slice(0,8);
-  h+='<details class="card" '+(evs.length?'open':'')+'><summary>Event history · '+evs.length+'</summary><div class="in">'+(evs.length?evs.map(function(e){return '<div style="padding:6px 0;border-bottom:1px solid var(--line)"><span class="tnum faint" style="font-family:var(--f-mono);font-size:13px">'+fmtT(e.t)+'</span> · '+esc(e.text)+(e.sub?' <span class="faint">'+esc(e.sub)+'</span>':'')+'</div>';}).join(''):'No events for this metric yet.')+'</div></details>';
+  h+='<details class="card" '+(evs.length?'open':'')+'><summary>Event history · '+evs.length+'</summary><div class="in">'+(evs.length?evs.map(function(e){return '<div style="padding:6px 0;border-bottom:1px solid var(--line)"><span class="tnum faint" style="font-family:var(--f-mono);font-size:13px">'+fmtT(e.t)+'</span> · '+(e.sim?dtag({sim:true}):'')+esc(e.text)+(e.sub?' <span class="faint">'+esc(e.sub)+'</span>':'')+'</div>';}).join(''):'No events for this metric yet.')+'</div></details>';
   h+='</div><div class="stack">';
   if(l>0&&!d.stat){
-    var steps=(l===2?c.x:c.c||'').split(/,\s*|\.\s+/).filter(Boolean).map(function(s){return s.replace(/\.$/,'');});
-    h+='<div class="card pad" style="border-top:4px solid '+(l===2?'var(--crit)':'var(--warn)')+'"><div class="sec c-'+l+'">WHAT TO DO</div><ol class="steps">';
+    var steps=(l===3?c.x:c.c||'').split(/,\s*|\.\s+/).filter(Boolean).map(function(s){return s.replace(/\.$/,'');});
+    h+='<div class="card pad" style="border-top:4px solid '+(l===3?'var(--crit)':l===2?'var(--warn)':'var(--att)')+'"><div class="sec c-'+l+'">WHAT TO DO</div><ol class="steps">';
     steps.forEach(function(s,i){h+='<li><span class="num">'+(i+1)+'</span><span class="tx">'+esc(s.charAt(0).toUpperCase()+s.slice(1))+'</span>'+(/ecg|measure|re-check/i.test(s)&&NEXT[k]&&NEXT[k][2]&&isLive()?'<button class="btn sm pri" data-act="go" data-to="test-'+NEXT[k][2]+'-'+pid+'">Start</button>':'')+(/schedule/i.test(s)&&isLive()?'<button class="btn sm" data-act="toast" data-msg="Added to '+p.name+'\'s schedule">Add to my schedule</button>':'')+'</li>';});
     h+='</ol><div class="src">Source: CHARM indicator playbook #'+(d.csv||'—')+' · needs medical review</div></div>';
   }
@@ -1603,28 +1673,28 @@ function metricChart(pid,k,t){
     if(!arr.length)return '<div class="sec">'+d.label.toUpperCase()+'</div><p class="muted">No '+d.label.toLowerCase()+' entries for '+esc(p.name)+' yet.</p>';
     var items=arr.map(function(r,i){var lv=levelOf(pid,k,{v:r.v,prev:i>0&&k==='sleep'?arr[i-1].v:null});return {v:r.v,l:lv,label:(k==='sleep'?'Night to ':'')+fmtDate(r.t)};});
     var o={items:items,aria:d.label+' by day'};
-    if(k==='sleep'){o.ylo=0;o.yhi=Math.max(9,Math.ceil(Math.max.apply(null,arr.map(function(r){return r.v;}))));o.band=baseline(pid,'sleep');o.th=[{v:th.c,l:1,label:'Caution <'+th.c+' h'},{v:th.x,l:2,label:'Critical <'+th.x+' h, 2 nights'}];}
-    if(k==='mood'){o.ylo=0;o.yhi=10;o.th=[{v:th.c,l:1,label:'Caution ≤'+th.c},{v:th.x,l:2,label:'Critical ≤'+th.x}];}
-    if(k==='ex'){o.ylo=0;o.yhi=Math.max(110,Math.ceil(Math.max.apply(null,arr.map(function(r){return r.v;}))/10)*10);o.th=[{v:th.c,l:1,label:'Caution <'+th.c+'%'}];}
+    if(k==='sleep'){o.ylo=0;o.yhi=Math.max(9,Math.ceil(Math.max.apply(null,arr.map(function(r){return r.v;}))));o.band=baseline(pid,'sleep');o.th=[{v:th.c,l:1,label:'Attention <'+th.c+' h'},{v:th.x,l:3,label:'Critical <'+th.x+' h, 2 nights'}];}
+    if(k==='mood'){o.ylo=0;o.yhi=10;o.th=[{v:th.c,l:1,label:'Attention ≤'+th.c},{v:th.x,l:3,label:'Critical ≤'+th.x}];}
+    if(k==='ex'){o.ylo=0;o.yhi=Math.max(110,Math.ceil(Math.max.apply(null,arr.map(function(r){return r.v;}))/10)*10);o.th=[{v:th.c,l:1,label:'Attention <'+th.c+'%'}];}
     return '<div class="hd"><b>'+d.label+' · '+(k==='ex'?'% of prescribed':'last '+arr.length+' entries')+'</b></div>'+bars(o);
   }
   if(k==='bp'){
     var to=Math.max(t,T0+H),from=to-7*D,rs=((RD[pid]||{}).bp||[]).filter(function(b){return b.t<=t&&b.t>=from;});
     if(!rs.length)return '<div class="sec">BLOOD PRESSURE</div><p class="muted">No cuff readings in the last 7 days.</p>';
     from=Math.min(rs[0].t-H,to-24*H);
-    var dots=[];rs.forEach(function(b){var l=levelOf(pid,'bp',{v:b.v,v2:b.v2});var c=l===2?'#FF4D4F':l===1?'#FFB020':'#3DDC97';dots.push({t:b.t,v:b.v,c:c,label:b.v+'/'+b.v2});dots.push({t:b.t,v:b.v2,c:c});});
-    return '<div class="hd"><b>Cuff readings · systolic and diastolic</b></div>'+chart({from:from,to:to,ylo:40,yhi:Math.max(160,th.sC+10),dots:dots,th:[{v:th.sC,l:1,label:'Caution systolic ≥'+th.sC},{v:th.sCL,l:1,label:'Caution systolic <'+th.sCL}],marker:S.mode==='point'?t:null,aria:'Blood pressure readings'});
+    var dots=[];rs.forEach(function(b){var l=levelOf(pid,'bp',{v:b.v,v2:b.v2});var c=l===3?'#FF4D4F':l===2?'#FF8A1F':l===1?'#F5D90A':'#3DDC97';dots.push({t:b.t,v:b.v,c:c,label:b.v+'/'+b.v2});dots.push({t:b.t,v:b.v2,c:c});});
+    return '<div class="hd"><b>Cuff readings · systolic and diastolic</b></div>'+chart({from:from,to:to,ylo:40,yhi:Math.max(160,th.sC+10),dots:dots,th:[{v:th.sC,l:1,label:'Attention systolic ≥'+th.sC},{v:th.sCL,l:1,label:'Attention systolic <'+th.sCL}],marker:S.mode==='point'?t:null,aria:'Blood pressure readings'});
   }
   var win=S.mrange,from2,to2;
   if(range){from2=S.rf;to2=S.rt;}else{to2=Math.max(t,T0+H);from2=to2-(win==='6h'?6*H:win==='3d'?3*D:win==='7d'?7*D:24*H);}
   var pts=seriesOf(pid,k,from2,to2,320),vs=[];pts.forEach(function(q){if(q[1]!=null){vs.push(q[2]);vs.push(q[3]);}});
   var bl=baseline(pid,k),ths=[];
-  if(k==='hr')ths=[{v:th.cHi,l:1,label:'Caution >'+th.cHi},{v:th.xHi,l:2,label:'Critical >'+th.xHi},{v:th.cLo,l:1,label:'Caution <'+th.cLo}];
-  if(k==='spo2')ths=[{v:th.c,l:1,label:'Caution <'+th.c},{v:th.x,l:2,label:'Critical ≤'+th.x}];
-  if(k==='rr')ths=[{v:th.cHi,l:1,label:'Caution ≥'+th.cHi},{v:th.xHi,l:2,label:'Critical ≥'+th.xHi},{v:th.cLo,l:1,label:'Caution ≤'+th.cLo}];
-  if(k==='temp')ths=[{v:th.cHi,l:1,label:'Caution ≥'+th.cHi},{v:th.cLo,l:1,label:'Caution ≤'+th.cLo}];
-  if(k==='glu')ths=[{v:th.cHi,l:1,label:'Caution >'+th.cHi},{v:th.cLo,l:1,label:'Caution <'+th.cLo}];
-  if(k==='dose')ths=[{v:th.c,l:1,label:'Caution '+th.c+'%'}];
+  if(k==='hr')ths=[{v:th.cHi,l:1,label:'Attention >'+th.cHi},{v:th.xHi,l:3,label:'Critical >'+th.xHi},{v:th.cLo,l:1,label:'Attention <'+th.cLo}];
+  if(k==='spo2')ths=[{v:th.c,l:1,label:'Attention <'+th.c},{v:th.x,l:3,label:'Critical ≤'+th.x}];
+  if(k==='rr')ths=[{v:th.cHi,l:1,label:'Attention ≥'+th.cHi},{v:th.xHi,l:3,label:'Critical ≥'+th.xHi},{v:th.cLo,l:1,label:'Attention ≤'+th.cLo}];
+  if(k==='temp')ths=[{v:th.cHi,l:1,label:'Attention ≥'+th.cHi},{v:th.cLo,l:1,label:'Attention ≤'+th.cLo}];
+  if(k==='glu')ths=[{v:th.cHi,l:1,label:'Attention >'+th.cHi},{v:th.cLo,l:1,label:'Attention <'+th.cLo}];
+  if(k==='dose')ths=[{v:th.c,l:1,label:'Attention '+th.c+'%'}];
   var lo=vs.length?Math.min.apply(null,vs):0,hi=vs.length?Math.max.apply(null,vs):1;
   ths.forEach(function(x){if(Math.abs(x.v-(lo+hi)/2)<(hi-lo)*1.2+8){lo=Math.min(lo,x.v);hi=Math.max(hi,x.v);}});
   if(bl){lo=Math.min(lo,bl[0]);hi=Math.max(hi,bl[1]);}
@@ -1636,10 +1706,10 @@ function metricChart(pid,k,t){
   var col=st2col(personAt(pid,t).m[k].l);
   if(!pts.length)return h2+'<p class="muted" style="padding:30px 0;text-align:center">No readings in this window.</p>';
   h2+=chart({from:from2,to:to2,ylo:k==='temp'?Math.floor((lo-pad)*10)/10:Math.floor(lo-pad),yhi:k==='temp'?Math.ceil((hi+pad)*10)/10:Math.ceil(hi+pad),series:[{pts:pts,color:col,env:k==='hr',end:true}],band:bl,th:ths,marker:S.mode==='point'?t:null,aria:d.label+' chart'});
-  h2+='<div class="legend"><span><i style="background:'+col+'"></i>'+d.label+(k==='hr'?' (band = min–max per point)':'')+'</span>'+(bl?'<span><i style="background:rgba(61,220,151,.4);height:8px"></i>Your baseline (last 7 days, at rest)</span>':'<span class="faint">Baseline appears after 12 resting readings</span>')+'<span><i style="background:#FFB020"></i>Caution</span><span><i style="background:#FF4D4F"></i>Critical</span></div>';
+  h2+='<div class="legend"><span><i style="background:'+col+'"></i>'+d.label+(k==='hr'?' (band = min–max per point)':'')+'</span>'+(bl?'<span><i style="background:rgba(61,220,151,.4);height:8px"></i>Your baseline (last 7 days, at rest)</span>':'<span class="faint">Baseline appears after 12 resting readings</span>')+'<span><i style="background:#F5D90A"></i>Attention</span><span><i style="background:#FF4D4F"></i>Critical</span></div>';
   return h2;
 }
-function st2col(l){return l===2?'#FF4D4F':l===1?'#FFB020':l===-1?'#8F9AAE':'#38BDF8';}
+function st2col(l){return l===3?'#FF4D4F':l===2?'#FF8A1F':l===1?'#F5D90A':l===-1?'#8F9AAE':'#38BDF8';}
 
 /* --- events --- */
 function vEvents(){
@@ -1650,13 +1720,13 @@ function vEvents(){
   h+='<div class="evf"><label class="sec" for="evp" style="margin:0">SHOW</label><select id="evp" data-on="evp"><option value="all">Everyone</option>'+CREW.map(function(p){return '<option value="'+p.id+'" '+(S.evp===p.id?'selected':'')+'>'+p.name+'</option>';}).join('')+'<option value="env" '+(S.evp==='env'?'selected':'')+'>Cabin and space weather</option></select><select id="evl" data-on="evl"><option value="all">All events</option><option value="alerts" '+(S.evl==='alerts'?'selected':'')+'>Alerts only</option><option value="crit" '+(S.evl==='crit'?'selected':'')+'>Critical only</option><option value="earth" '+(S.evl==='earth'?'selected':'')+'>Earth messages</option></select><span class="faint" style="font-size:13px">'+(S.mode==='range'?'In selected range':'Up to '+fmtT(t))+'</span></div>';
   var evs=allEvents().filter(function(e){if(e.t<from||e.t>to||e.t>now)return false;
     if(S.evp==='env'&&e.pid)return false;if(S.evp!=='all'&&S.evp!=='env'&&e.pid!==S.evp)return false;
-    if(S.evl==='alerts'&&!(e.type==='raise'||e.type==='nodata'))return false;if(S.evl==='crit'&&!(e.type==='raise'&&e.lv===2))return false;if(S.evl==='earth'&&e.src!=='earth')return false;return true;});
+    if(S.evl==='alerts'&&!(e.type==='raise'||e.type==='nodata'))return false;if(S.evl==='crit'&&!(e.type==='raise'&&e.lv===3))return false;if(S.evl==='earth'&&e.src!=='earth')return false;return true;});
   h+='<div class="card evlist">';
   if(!evs.length)h+='<div class="pad muted">No events match.</div>';
   evs.slice(0,120).forEach(function(e){
     var ic=e.pid&&CREWBY[e.pid]?av(e.pid,e.type==='raise'?e.lv:e.type==='nodata'?-1:null):'<span class="evicon">'+(e.k==='co2'?IC.air:e.k==='pfu'?IC.sun:e.src==='earth'?IC.earth:IC.bolt)+'</span>';
     var lvl=e.type==='raise'?lvw(e.lv):e.type==='nodata'?lvw(-1):e.type==='clear'?'<span class="lvw c-0" style="font-size:12px">CLEARED</span>':e.src==='earth'?'<span class="tag">EARTH</span>':e.type==='ack'?'<span class="tag">ACK</span>':'<span class="tag">LOG</span>';
-    h+='<button class="ev" data-act="evjump" data-t="'+e.t+'" data-id="'+(e.pid||'')+'" data-k="'+(e.k||'')+'"><span class="et">'+fmtT(e.t)+'<br>'+fmtDate(e.t)+'</span>'+ic+'<span class="ex">'+(e.pid&&CREWBY[e.pid]?'<b>'+CREWBY[e.pid].name+'</b> · ':'')+esc(e.text)+(e.sub?'<small>'+esc(e.sub)+'</small>':'')+'</span>'+lvl+'</button>';});
+    h+='<button class="ev" data-act="evjump" data-t="'+e.t+'" data-id="'+(e.pid||'')+'" data-k="'+(e.k||'')+'"><span class="et">'+fmtT(e.t)+'<br>'+fmtDate(e.t)+'</span>'+ic+'<span class="ex">'+(e.pid&&CREWBY[e.pid]?'<b>'+CREWBY[e.pid].name+'</b> · ':'')+(e.sim?dtag({sim:true}):'')+esc(e.text)+(e.sub?'<small>'+esc(e.sub)+'</small>':'')+'</span>'+lvl+'</button>';});
   h+='</div><p class="note" style="margin-top:10px">The server raises an alert as soon as a value crosses a limit; it clears only after 15 minutes back in range, so alerts don\'t flicker. Sensor readings use the median of the last 3. Nothing is ever deleted.</p>';
   return h;
 }
@@ -1666,7 +1736,7 @@ function statusGrid(t){
   var s='<svg class="chart" id="sgrid" viewBox="0 0 '+W+' '+Hh+'" role="img" aria-label="Status of each crew member over time" style="min-width:720px;cursor:pointer" data-act="gridjump">';
   for(var dd=dayStart(T0);dd<=now;dd+=D){if(dd>=T0)s+='<line x1="'+x(dd)+'" x2="'+x(dd)+'" y1="18" y2="'+(Hh-6)+'" stroke="rgba(125,170,235,.25)"/><text x="'+(x(dd)+6)+'" y="14" font-size="12" fill="#9DB0CB" font-weight="600">Day '+dayOf(dd)+' · '+fmtDate(dd)+'</text>';
     [6,12,18].forEach(function(hh){var xt=dd+hh*H;if(xt>T0&&xt<now)s+='<line x1="'+x(xt)+'" x2="'+x(xt)+'" y1="24" y2="'+(Hh-6)+'" stroke="rgba(125,170,235,.08)"/>';});}
-  var cols={'2':'#FF4D4F','1':'#FFB020','0':'rgba(61,220,151,.45)','-1':'rgba(143,154,174,.55)'};
+  var cols={'3':'#FF4D4F','2':'#FF8A1F','1':'#F5D90A','0':'rgba(61,220,151,.45)','-1':'rgba(143,154,174,.55)'};
   var rowsDef=CREW.filter(function(p){return TL[p.id];}).map(function(p){return {label:p.name,arr:TL[p.id].ov};}).concat([{label:'Cabin CO₂',arr:ENVTL.co2},{label:'Space weather',arr:ENVTL.pfu}]);
   var lastS=Math.min(NS-1,Math.floor((now-T0)/STEP));
   rowsDef.forEach(function(r,i){var y=30+i*rowH;s+='<text x="0" y="'+(y+18)+'" font-size="13" fill="#EAF1FB">'+esc(r.label)+'</text>';
@@ -1674,7 +1744,7 @@ function statusGrid(t){
   if(S.mode==='range')s+='<rect x="'+x(S.rf)+'" y="22" width="'+Math.max(2,x(S.rt)-x(S.rf))+'" height="'+(Hh-26)+'" fill="rgba(56,189,248,.12)" stroke="#38BDF8"/>';
   else s+='<line x1="'+x(t)+'" x2="'+x(t)+'" y1="20" y2="'+(Hh-4)+'" stroke="#8FDcff" stroke-width="2"/>';
   s+='<line x1="'+x(now)+'" x2="'+x(now)+'" y1="20" y2="'+(Hh-4)+'" stroke="#3DDC97" stroke-dasharray="3 3"/>';
-  return s+'</svg><div class="legend"><span><i style="background:#FF4D4F"></i>Critical</span><span><i style="background:#FFB020"></i>Caution</span><span><i style="background:rgba(61,220,151,.6)"></i>Normal</span><span><i style="background:rgba(143,154,174,.7)"></i>No data</span><span><i style="background:#8FDcff"></i>Viewing</span><span><i style="background:#3DDC97"></i>Now</span></div>';
+  return s+'</svg><div class="legend"><span><i style="background:#FF4D4F"></i>Critical</span><span><i style="background:#FF8A1F"></i>Caution</span><span><i style="background:#F5D90A"></i>Attention</span><span><i style="background:rgba(61,220,151,.6)"></i>Normal</span><span><i style="background:rgba(143,154,174,.7)"></i>No data</span><span><i style="background:#8FDcff"></i>Viewing</span><span><i style="background:#3DDC97"></i>Now</span></div>';
 }
 
 /* --- tests --- */
@@ -1724,19 +1794,19 @@ function vTest(k,pid){
   if(s.auto){h+='<div class="meter" style="margin:8px 0 6px"><i id="pm" style="width:'+RUN.prog+'%"></i></div><div class="muted" id="pmt">'+(RUN.prog>=100?'Reading received from cuff.':'Reading from cuff…')+'</div>';}
   if(s.record){h+='<canvas class="ecg" id="tecg" width="600" height="64" style="margin:6px 0"></canvas><div class="meter"><i id="pm" style="width:'+RUN.prog+'%"></i></div><div class="muted" id="pmt">'+(RUN.prog>=100?'Recording complete.':'Recording…')+'</div>';}
   if(s.input==='bp'){var v=RUN.vals;h+='<div class="fields"><div class="field"><label for="bps">Systolic</label><input id="bps" inputmode="numeric" type="number" value="'+(v.s||'')+'" data-on="val" data-f="s"></div><div class="field"><label for="bpd">Diastolic</label><input id="bpd" inputmode="numeric" type="number" value="'+(v.d||'')+'" data-on="val" data-f="d"></div><div class="field"><label for="bpp">Pulse</label><input id="bpp" inputmode="numeric" type="number" value="'+(v.p||'')+'" data-on="val" data-f="p"></div></div>';}
-  if(s.input==='ecg'){var ev=RUN.vals;h+='<div class="fields"><div class="field"><label for="ehr">Heart rate (bpm)</label><input id="ehr" inputmode="numeric" type="number" value="'+(ev.p||'')+'" data-on="val" data-f="p"></div><div class="field"><label for="erh">Rhythm</label><select id="erh" data-on="val" data-f="rhythm"><option value="">Choose…</option><option value="regular" '+(ev.rhythm==='regular'?'selected':'')+'>Regular</option><option value="irregular" '+(ev.rhythm==='irregular'?'selected':'')+'>Irregular</option></select></div></div>';}
+  if(s.input==='ecg'){var ev=RUN.vals;h+='<div class="fields"><div class="field"><label for="ehr">Heart rate (bpm)</label><input id="ehr" inputmode="numeric" type="number" value="'+(ev.p||'')+'" data-on="val" data-f="p"></div><div class="field"><label for="erh">Rhythm</label><select id="erh" data-on="val" data-f="rhythm"><option value="">Choose…</option><option value="regular" '+(ev.rhythm==='regular'?'selected':'')+'>Regular</option><option value="irregular" '+(ev.rhythm==='irregular'?'selected':'')+'>Irregular</option></select></div>'+(ev.rhythm==='irregular'?'<div class="field"><label for="epw">Repeating P waves?</label><select id="epw" data-on="val" data-f="pw"><option value="">Choose…</option><option value="seen" '+(ev.pw==='seen'?'selected':'')+'>P waves seen</option><option value="none" '+(ev.pw==='none'?'selected':'')+'>No P waves</option></select></div><div class="field"><label for="eun">Unstable?</label><select id="eun" data-on="val" data-f="un"><option value="no">No</option><option value="yes" '+(ev.un==='yes'?'selected':'')+'>Yes · fainting, chest pain, BP < 90 or confusion</option></select></div>':'')+'</div>';}
   if(s.input==='glu'){h+='<div class="fields"><div class="field"><label for="gv">Glucose (mg/dL)</label><input id="gv" inputmode="numeric" type="number" value="'+(RUN.vals.g||'')+'" data-on="val" data-f="g"></div></div>';}
-  h+='<div class="voice">'+IC.spk.replace('<svg','<svg width="22" height="22"')+'<span>'+(S.voice?'Charmy reads each step aloud':'Voice is off')+'</span><button class="btn sm" data-act="speakstep">Repeat</button><button class="btn sm" data-act="voice">'+(S.voice?'Mute':'Unmute')+'</button></div>';
+  h+='<div class="voice">'+IC.spk.replace('<svg','<svg width="22" height="22"')+'<span>'+(S.voice?'Charmy reads each step aloud':'Voice is off')+'</span><button class="btn sm" data-act="speakstep">Read this step</button><button class="btn sm" data-act="speakall">Read all steps aloud</button><button class="btn sm" data-act="voice">'+(S.voice?'Mute':'Unmute')+'</button></div>';
   var canNext=testCanNext(s);
   h+='</div></div><div class="navrow"><button class="btn" data-act="tstep" data-d="-1" '+(i===0?'disabled':'')+'>Back</button><button class="btn pri" data-act="tstep" data-d="1" '+(canNext?'':'disabled')+'>'+(s.btn||(s.input?'Save reading':'Next'))+'</button></div></div>';
   return h;
 }
-function testCanNext(s){var v=RUN.vals;return !(s.input==='bp'&&!(v.s&&v.d))&&!(s.input==='glu'&&!v.g)&&!(s.input==='ecg'&&!(v.p&&v.rhythm));}
+function testCanNext(s){var v=RUN.vals;return !(s.input==='bp'&&!(v.s&&v.d))&&!(s.input==='glu'&&!v.g)&&!(s.input==='ecg'&&!(v.p&&v.rhythm&&(v.rhythm==='regular'||v.pw)));}
 function resultView(k,pid){
   var h='<div class="card pad" style="max-width:640px;margin:0 auto;text-align:center">';
-  if(k==='bp'){var val={v:+RUN.vals.s,v2:+RUN.vals.d},l=levelOf(pid,'bp',val);h+='<div class="sec">RESULT</div><div class="bigval" style="justify-content:center"><span class="n tnum">'+val.v+'/'+val.v2+'</span><span class="u">mmHg</span></div>'+lvw(l)+'<p style="font-size:16px">'+(l===0?'Within your normal range.':l===1?'Outside the normal range. '+CSV[2].c:CSV[2].x)+'</p>';}
+  if(k==='bp'){var val={v:+RUN.vals.s,v2:+RUN.vals.d},l=levelOf(pid,'bp',val);h+='<div class="sec">RESULT</div><div class="bigval" style="justify-content:center"><span class="n tnum">'+val.v+'/'+val.v2+'</span><span class="u">mmHg</span></div>'+lvw(l)+'<p style="font-size:16px">'+(l===0?'Within your normal range.':l<3?'Outside the normal range. '+CSV[2].c:CSV[2].x)+'</p>';}
   if(k==='glu'){var g=+RUN.vals.g,l2=levelOf(pid,'glu',{v:g});h+='<div class="sec">RESULT</div><div class="bigval" style="justify-content:center"><span class="n tnum">'+g+'</span><span class="u">mg/dL</span></div>'+lvw(l2)+'<p style="font-size:16px">'+(l2===0?'Within range. Matches the continuous monitor.':CSV[0].c)+'</p>';}
-  if(k==='ecg'){var irr=RUN.vals.rhythm==='irregular';h+='<div class="sec">RESULT</div><h2 style="font-family:var(--f-disp);font-size:30px;margin:8px 0">Rhythm: '+(irr?'irregular':'regular')+'</h2>'+lvw(irr?2:0)+'<p style="font-size:16px">'+(irr?'An irregular rhythm is always CRITICAL. Saving sends it to the flight surgeon with priority.':'Regular rhythm on this strip.')+'</p>';}
+  if(k==='ecg'){var irr=RUN.vals.rhythm==='irregular',ex={irr:irr,noP:RUN.vals.pw==='none',sec:60,unstable:RUN.vals.un==='yes'},el=EN.examLevel('ecg',ex);h+='<div class="sec">RESULT</div><h2 style="font-family:var(--f-disp);font-size:30px;margin:8px 0">Rhythm: '+(irr?'irregular':'regular')+'</h2>'+lvw(el)+'<p style="font-size:16px">'+(el===3?'ECG meets the AF criterion with instability: urgent medical assessment.':el===2?'ECG meets the clinical AF criterion (60 s, irregular RR, no P waves). Medical review: rhythm, blood pressure, symptoms.':irr?'Irregular, but P waves are seen: not the AF criterion. Repeat and keep monitoring.':'Regular rhythm on this strip.')+'</p>';}
   h+='<p class="muted">Press Save to store it. It goes to the flight surgeon with the next Earth link.</p>'+(S.saveErr?'<div class="errbox">'+esc(S.saveErr)+'</div>':'')+'<div style="display:flex;gap:12px;justify-content:center;margin-top:14px"><button class="btn pri" data-act="testdone" '+(S.busy?'disabled':'')+'>'+(S.busy?'Saving…':'Save')+'</button><button class="btn" data-act="testagain">Measure again</button></div></div>';
   return h;
 }
@@ -1763,7 +1833,7 @@ function illus(kind,k,pid){
 /* --- earth --- */
 /* Earth outbox and inbox come from the server. Records leave the queue only after the ground acknowledges them. */
 function outbox(t){
-  return OUTBOX.filter(function(o){return o.t<=t;}).map(function(o){return {e:{t:o.t,text:o.text+(o.sub?' · '+o.sub:''),pid:o.pid},prio:o.prio===2,st:o.status==='acked'?'acknowledged':o.status==='sent'?'sent · waiting for ground':MISSION.link===false?'waiting for link':'queued'};})
+  return OUTBOX.filter(function(o){return o.t<=t;}).map(function(o){return {e:{t:o.t,text:o.text+(o.sub?' · '+o.sub:''),pid:o.pid},prio:o.prio||0,st:o.status==='acked'?'acknowledged':o.status==='sent'?'sent · waiting for ground':MISSION.link===false?'waiting for link':'queued'};})
     .sort(function(a,b){return (b.prio-a.prio)||(b.e.t-a.e.t);});
 }
 function outboxCount(t){return OUTBOX.filter(function(o){return o.status!=='acked'&&o.t<=t;}).length;}
@@ -1786,7 +1856,10 @@ function vEarth(){
   h+='<div class="ph"><div><h1>Earth link</h1><p>Every record goes to the flight surgeon automatically. It leaves the queue only after the ground confirms it.</p></div></div>';
   h+='<div class="two"><div class="stack"><div class="card pad"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span class="dot '+(e.link?'d-0':'d-n')+'"></span><b style="font-size:18px">'+(e.link?'Connected · one-way '+delayTxt():'Offline · records queue on board')+'</b></div><p class="muted" style="margin:8px 0 0">Distance from Earth: <b style="color:var(--ink)">'+distTxt()+'</b> · one-way '+fmtSec(oneWay())+' · round trip '+roundTxt()+'. Keep following the steps on board while you wait.</p></div>'+(S.env==='mars'?orbitCard(t):'');
   h+='<div class="card pad"><div class="tabs"><button data-act="etab" data-v="out" aria-pressed="'+(S.earthTab==='out')+'">To Earth · '+outboxCount(t)+' open</button><button data-act="etab" data-v="in" aria-pressed="'+(S.earthTab==='in')+'">From Earth</button></div>';
-  if(S.earthTab==='out'){var ob=outbox(t);if(!ob.length)h+='<p class="muted">Nothing sent yet. Every alert, log and message is queued here automatically.</p>';ob.slice(0,14).forEach(function(o){h+='<div class="qrow"><span class="prio '+(o.prio?'p2':'p0')+'">'+(o.prio?'CRITICAL':'ROUTINE')+'</span><span class="q">'+(o.e.pid&&CREWBY[o.e.pid]?'<b>'+CREWBY[o.e.pid].name+'</b> · ':'')+esc(o.e.text)+'<br><span class="faint tnum" style="font-size:12.5px">'+fmtT(o.e.t)+'</span></span><span class="'+(o.st==='acknowledged'?'c-0':'c-1')+'" style="font-size:13px">'+(o.st==='acknowledged'?'acknowledged ✓':o.st)+'</span></div>';});}
+  if(S.earthTab==='out'){var ob=outbox(t);var later=OUTBOX.filter(function(o){return o.t>t;}).length,nAll=ob.length,lim=S.obLim||25;
+    if(later)h+='<div class="envbanner" style="border-color:var(--cyan);background:var(--cyanbg);margin:10px 0">'+later+' record'+(later>1?'s are':' is')+' after the time you are viewing ('+fmtT(t)+'). <button class="btn sm" data-act="live">Back to live</button></div>';
+    if(nAll)h+='<p class="note" style="margin:10px 0 4px">'+nAll+' record'+(nAll>1?'s':'')+' · '+ob.filter(function(o){return o.prio===2;}).length+' critical · '+ob.filter(function(o){return o.prio===1;}).length+' alert · newest first, critical on top. Alerts found in imported files are summarised in one record per import; the full timeline is in <button class="linkbtn" data-act="go" data-to="events">Alerts and history</button>.</p>';
+    if(!ob.length)h+='<p class="muted">'+(later?'Nothing sent before this time.':'Nothing sent yet. Every alert, log and message is queued here automatically.')+'</p>';ob.slice(0,lim).forEach(function(o){h+='<div class="qrow"><span class="prio '+(o.prio===2?'p2':o.prio===1?'p1':'p0')+'">'+(o.prio===2?'CRITICAL':o.prio===1?'ALERT':'ROUTINE')+'</span><span class="q">'+(o.e.pid&&CREWBY[o.e.pid]?'<b>'+CREWBY[o.e.pid].name+'</b> · ':'')+esc(o.e.text)+'<br><span class="faint tnum" style="font-size:12.5px">'+fmtT(o.e.t)+'</span></span><span class="'+(o.st==='acknowledged'?'c-0':'c-1')+'" style="font-size:13px">'+(o.st==='acknowledged'?'acknowledged ✓':o.st)+'</span></div>';});if(nAll>lim)h+='<button class="btn sm" data-act="obmore" style="margin-top:10px">Show '+Math.min(50,nAll-lim)+' more ('+(nAll-lim)+' not shown)</button>';}
   else{var ib=INBOX.filter(function(x){return x.t<=t;});if(!ib.length)h+='<p class="muted">Nothing from Earth yet. Flight surgeon replies, lab results and threshold updates appear here when a ground station is connected.</p>';ib.forEach(function(x){h+='<div class="qrow"><span class="q">'+esc(x.text||'')+'<br><span class="faint tnum" style="font-size:12.5px">received '+fmtT(x.t)+'</span></span><span class="c-0" style="font-size:13px">received</span></div>';});}
   h+='</div></div><div class="stack"><div class="card pad"><div class="sec">MESSAGE FLIGHT SURGEON</div><p class="muted" style="margin:0">Text or a voice note. It is queued like everything else.</p><form class="compose" data-form="msg"><label for="msgin" style="position:absolute;width:1px;height:1px;overflow:hidden">Message</label><input id="msgin" placeholder="Type a message…" '+(isLive()?'':'disabled')+'><button class="btn pri" '+(isLive()?'':'disabled')+'>Queue message</button></form></div>';
   var lk=allEvents().filter(function(x){return x.type==='link';}).slice(0,6);
@@ -1795,6 +1868,18 @@ function vEarth(){
 }
 
 /* --- prefs --- */
+function rmBox(p){
+  var nR=ALLREAD.filter(function(r){return r.pid===p.id;}).length,nE=EVENTS.filter(function(e){return e.pid===p.id;}).length,all=S.rm.mode==='all';
+  var h='<form class="card pad mform rmbox" data-form="rmcrew" style="border-color:var(--crit);margin:6px 0 14px">';
+  h+='<div class="sec" style="color:var(--crit)">DELETE '+esc(p.name.toUpperCase())+'\'S DATA</div>';
+  h+='<div class="seg" role="group" aria-label="What to delete"><button type="button" data-act="rmmode" data-v="data" aria-pressed="'+!all+'">Delete health data only</button><button type="button" data-act="rmmode" data-v="all" aria-pressed="'+all+'">Remove from the crew</button></div>';
+  h+='<p class="muted" style="margin:10px 0">'+(all?esc(p.full)+' is removed from CHARM with all of their data. The name and photo disappear from every screen. You can add a crew member with the same name again later.':esc(p.full)+' stays in the crew with no data, ready for a new import. Use this to clear old or wrong imports.')+'</p>';
+  h+='<ul class="muted" style="margin:0 0 10px;padding-left:20px"><li>'+nR+' readings loaded on this screen (older ones are deleted too)</li><li>'+nE+' alerts and logs</li><li>Earth link records, the personal baseline and any limits set for '+esc(p.name)+'</li></ul>';
+  h+='<p class="note" style="margin:0 0 10px"><b>This cannot be undone.</b> One record that says what was deleted (no health data) is kept and sent to Earth.</p>';
+  h+='<label><span>Type <b>'+esc(p.name)+'</b> to confirm</span><input id="rmconf" autocomplete="off" maxlength="80"></label>';
+  h+='<div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="btn" data-act="rmcrew" data-id="'+p.id+'">Cancel</button><button class="btn" style="background:var(--crit);border-color:var(--crit);color:#fff" '+(S.busy?'disabled':'')+'>'+(all?'Remove '+esc(p.name):'Delete all data')+'</button></div></form>';
+  return h;
+}
 function vPrefs(){
   var h='<div class="ph"><div><h1>Settings</h1></div></div><div class="pgrid"><div class="pmenu">';
   [['thr','Alert thresholds'],['who','Who is using this device'],['crew','Crew'],['mission','Mission'],['disp','Display'],['demo','Demo'],['about','About']].forEach(function(x){h+='<button data-act="ptab" data-v="'+x[0]+'" aria-pressed="'+(S.prefTab===x[0])+'">'+x[1]+'</button>';});
@@ -1824,7 +1909,7 @@ function vPrefs(){
     h+='<div class="sec" style="margin-top:16px">CHANGE LOG</div>'+(tl.length?tl.map(function(x){return '<div class="qrow"><span class="q">'+(x.pid&&CREWBY[x.pid]?'<b>'+CREWBY[x.pid].name+'</b> · ':'')+esc(x.text)+(x.sub?' <span class="faint">'+esc(x.sub)+'</span>':'')+'</span><span class="tnum faint">'+fmtT(x.t)+'</span></div>';}).join(''):'<p class="muted">No changes yet. Everyone uses the CHARM common values.</p>');
   }
   if(tab==='who'){h+='<div class="sec">WHO IS USING THIS DEVICE</div><p class="muted" style="margin-top:0">There is no sign-in in this build. This choice only sets whose name goes on entries and logs, and opens the Crew Medical Officer tools. It is remembered on this device.</p><div class="whosel">'+[{id:'shared',name:'Shared display'}].concat(CREW).map(function(x){return '<button class="whob" data-act="signin" data-id="'+x.id+'" aria-pressed="'+(S.signed===x.id)+'">'+(x.id==='shared'?'<span class="av"></span>':av(x.id,null))+x.name+(isCMO(x.id)?' · CMO':'')+'</button>';}).join('')+'</div>';}
-  if(tab==='crew'){h+='<div class="sec">CREW · '+CREW.length+'</div>'+CREW.map(function(p){return '<div class="qrow">'+av(p.id,null)+'<span class="q"><b>'+esc(p.full)+'</b><br><span class="faint" style="font-size:12.5px">'+esc(p.role)+' · '+esc(p.agency)+'</span></span><button class="btn sm ghost" data-act="open" data-id="'+p.id+'">Open file</button></div>';}).join('');
+  if(tab==='crew'){h+='<div class="sec">CREW · '+CREW.length+'</div>'+CREW.map(function(p){return '<div class="qrow">'+av(p.id,null)+'<span class="q"><b>'+esc(p.full)+'</b><br><span class="faint" style="font-size:12.5px">'+esc(p.role)+' · '+esc(p.agency)+'</span></span><button class="btn sm ghost" data-act="open" data-id="'+p.id+'">Open file</button><button class="btn sm ghost" data-act="rmcrew" data-id="'+p.id+'" aria-expanded="'+!!(S.rm&&S.rm.pid===p.id)+'">Delete…</button></div>'+(S.rm&&S.rm.pid===p.id?rmBox(p):'');}).join('');
     h+='<div class="hr"></div><div class="sec">ADD A CREW MEMBER</div><form class="mform" data-form="addcrew"><div class="row"><label>Full name<input id="ncname" required maxlength="60" placeholder="e.g. Nathan Gagnon"></label><label>Agency<select id="ncag">'+['NASA','ESA','JAXA','CSA','ISRO','DLR','MBRSC','Other'].map(function(a){return '<option>'+a+'</option>';}).join('')+'</select></label></div><label>Role<input id="ncrole" maxlength="60" placeholder="e.g. Flight Engineer"></label><div><button class="btn pri" '+(S.busy?'disabled':'')+'>Add crew member</button></div></form><p class="note">Crew members are also created automatically when an imported file contains a new name.</p>';}
   if(tab==='disp'){h+='<div class="sec">LAYOUT</div><div class="seg" role="group" aria-label="Layout">'+[['laptop','Laptop'],['tablet','Tablet']].map(function(x){return '<button data-act="layout" data-v="'+x[0]+'" aria-pressed="'+((isTablet()?'tablet':'laptop')===x[0])+'">'+x[1]+'</button>';}).join('')+'</div><p class="note" style="margin:8px 0 16px">Tablet view: bigger buttons and text for touch and gloves, menu as an icon rail. Also switchable from the button next to the gear.</p>'+sw('night','Night mode','Dim red display for sleep periods, so crewmates are not woken.')+sw('reduce','Reduce motion','Stops pulsing rings, floating figures and slides.')+sw('autoRot','Rotate panels every 2.5 s','Status panels and the task list move on their own. Crew pages change only when you swipe or tap.');
     h+='<p class="note">Charmy\'s own settings (voice, speed, wake word) are in the gear inside Charmy\'s chat window.</p>';}
@@ -1867,7 +1952,7 @@ function ttPop(){
   if(!isLive())h+='<div class="hr"></div><button class="btn" data-act="live" style="width:100%">Back to live</button>';
   return h+'</div>';
 }
-function activeCrit(t){return CREW.filter(function(p){return personAt(p.id,t).lvl===2;});}
+function activeCrit(t){return CREW.filter(function(p){return personAt(p.id,t).lvl===3;});}
 function redRows(t){return activeCrit(t).map(function(p){var st=personAt(p.id,t),since=emAlertStart(p.id)||t;return '<div class="ralert">'+av(p.id,2)+'<div class="rt"><b>'+p.name+'</b> · <span class="c-2" style="font-weight:700">CRITICAL</span><div>'+esc(reasonOf(p.id,st,t))+' · since '+hm(since)+' ('+fmtDur(t-since)+')</div></div>'+(isLive()?'<button class="btn sm" data-act="emer" data-id="'+p.id+'" style="background:#C9262B;border-color:#C9262B;color:#fff">Open Emergency Mode</button>':'')+'<button class="btn sm" data-act="open" data-id="'+p.id+'">View file</button></div>';}).join('');}
 function redAlertPop(){
   var t=viewT(),n=activeCrit(t).length;
@@ -1884,14 +1969,15 @@ function accessModal(){var p=CREWBY[S.accessId];return '<div class="scrim" data-
 function symptomModal(){var p=CREWBY[S.symId];return '<div class="scrim" data-act="ovx"></div><div class="pop modal" role="dialog" aria-label="Log symptom" style="width:600px"><div class="pophd"><h2>Log a symptom · '+p.name+'</h2><button class="iconbtn" data-act="ovx" aria-label="Close">'+IC.x+'</button></div><div class="qchips">'+['Headache','Dizziness','Nausea','Chest pain','Vision change','Shortness of breath','Back pain','Other'].map(function(s){return '<button data-act="sym" data-v="'+s+'" style="height:52px;font-size:15px">'+s+'</button>';}).join('')+'</div><p class="note" style="margin-top:12px">Logged with time and linked to related metrics. Chest pain with normal vitals still opens a guided check.</p></div>';}
 
 /* manual measurement entry */
-var ENTRYK=[['hr','Heart rate','bpm'],['spo2','Blood oxygen (SpO₂)','%'],['rr','Respiratory rate','/min'],['temp','Body temperature','°C'],['bp','Blood pressure','mmHg'],['glu','Blood glucose','mg/dL'],['sleep','Sleep last night','hours'],['mood','Mood check-in','0–10'],['ex','Exercise completed','% of plan'],['dose','Radiation dose budget used','%'],['vision','Vision (SANS) test result',''],['blood','Blood panel result','']];
+var ENTRYK=[['sym','Symptom check',''],['ecg','ECG rhythm review',''],['ortho','Orthostatic BP test (lying, then standing)',''],['urine','Urine and kidney check',''],['ijv','Neck vein ultrasound (IJV)',''],['fluid','Fluid intake today','L'],['hr','Heart rate','bpm'],['spo2','Blood oxygen (SpO₂)','%'],['rr','Respiratory rate','/min'],['temp','Body temperature','°C'],['bp','Blood pressure','mmHg'],['glu','Blood glucose','mg/dL'],['sleep','Sleep last night','hours'],['mood','Mood check-in','0–10'],['ex','Exercise completed','% of plan'],['dose','Radiation dose budget used','%'],['vision','Eye exam (SANS)',''],['blood','Blood panel','']];
 var ENVK=[['co2','Cabin CO₂','mmHg'],['ctemp','Cabin temperature','°C'],['pfu','Proton flux ≥10 MeV (manual)','pfu']];
 function entryModal(){
   var en=S.entry,cab=en.pid==='cabin',list=cab?ENVK:ENTRYK,def=list.filter(function(x){return x[0]===en.k;})[0]||list[0],k=def[0],now=liveNow();
   var h='<div class="scrim" data-act="ovx"></div><div class="pop modal entry" role="dialog" aria-label="Add measurement" style="width:620px"><div class="pophd"><h2>Add measurement</h2><button class="iconbtn" data-act="ovx" aria-label="Close">'+IC.x+'</button></div><form data-form="entry">';
   h+='<div class="frow" style="margin-top:0"><label>Who<select data-on="entrywho" id="enwho">'+CREW.map(function(p){return '<option value="'+p.id+'" '+(p.id===en.pid?'selected':'')+'>'+esc(p.name)+' · '+esc(p.agency)+'</option>';}).join('')+'<option value="cabin" '+(cab?'selected':'')+'>Cabin environment</option></select></label><label>What<select data-on="entryk" id="enk">'+list.map(function(x){return '<option value="'+x[0]+'" '+(x[0]===k?'selected':'')+'>'+x[1]+'</option>';}).join('')+'</select></label></div>';
   if(k==='bp')h+='<div class="frow"><label>Systolic (mmHg)<input id="envv" type="number" inputmode="numeric" required></label><label>Diastolic (mmHg)<input id="envv2" type="number" inputmode="numeric" required></label></div>';
-  else if(k==='vision'||k==='blood')h+='<div class="frow"><label>Result<select id="envl"><option value="0">'+(k==='vision'?'No change from baseline':'In range')+' · NORMAL</option><option value="1">'+(k==='vision'?'Changed · repeat and image':'Out of range')+' · CAUTION</option><option value="2">Urgent · CRITICAL</option></select></label></div>';
+  else if(EXF[k])h+=examForm(k);
+  else if(false)h+='<div class="frow"><label>Result<select id="envl"><option value="0">'+(k==='vision'?'No change from baseline':'In range')+' · NORMAL</option><option value="1">'+(k==='vision'?'Changed · repeat and image':'Out of range')+' · CAUTION</option><option value="2">Urgent · CRITICAL</option></select></label></div>';
   else h+='<div class="frow"><label>'+def[1]+(def[2]?' ('+def[2]+')':'')+'<input id="envv" type="number" step="any" inputmode="decimal" required></label>'+(['hr','spo2','rr'].indexOf(k)>=0?'<label>Situation<select id="enctx"><option value="">At rest</option><option value="ex">During or right after exercise</option><option value="sleep">Asleep</option></select></label>':'')+'</div>';
   if(k==='hr')h+='<div class="frow"><label style="flex-direction:row;align-items:center;gap:10px;min-height:46px"><input type="checkbox" id="enirr" style="width:22px;height:22px;accent-color:var(--crit)"> Irregular rhythm seen on an ECG</label></div>';
   h+='<div class="frow"><label>Time (GMT)<input id="ent" type="datetime-local" value="'+isoDate(now)+'T'+hm(now)+'" max="'+isoDate(now)+'T'+hm(now)+'"></label></div>';
@@ -1900,6 +1986,23 @@ function entryModal(){
   h+='<div style="display:flex;gap:12px;margin-top:6px"><button type="button" class="btn" data-act="ovx">Cancel</button><button class="btn pri" style="flex:1" '+(S.busy?'disabled':'')+'>'+(S.busy?'Saving…':'Save measurement')+'</button></div></form></div>';
   return h;
 }
+/* exam forms: fields per exam (CHARM_Exact_Alert_Thresholds) */
+var YN=[['','—'],['no','No'],['yes','Yes']];
+var EXF={
+ sym:[['inf','Suspected infection (fever, chills, sore throat, cough, wound…)','yn'],['conf','Confusion or altered mental state','yn'],['faint','Fainted or nearly fainted','yn'],['chest','Chest pain or palpitations','yn']],
+ ecg:[['irr','Irregular RR intervals','yn'],['noP','No repeating P waves','yn'],['sec','Recording length (seconds)','n'],['unstable','Signs of instability (fainting, chest pain, BP < 90, confusion)','yn']],
+ ortho:[['s1','Lying or seated · systolic','n'],['d1','Lying or seated · diastolic','n'],['s2','Standing · systolic','n'],['d2','Standing · diastolic','n'],['min','Minutes after standing','n'],['syncope','Fainted during the test','yn']],
+ urine:[['vol','24-hour urine volume (L)','n'],['blood','Blood in urine (dipstick)','yn'],['us','Kidney ultrasound','sel',[['none','Not done / normal'],['stone','Stone seen'],['hydro','Hydronephrosis']]]],
+ ijv:[['vel','Left IJV peak flow velocity (cm/s)','n'],['retro','Retrograde (backward) flow','yn'],['thrombus','Thrombus seen','yn']],
+ vision:[['trt','Retinal thickness change ΔTRT vs baseline (µm)','n'],['frisen','Optic disc swelling · Frisén grade (0–5)','n'],['refr','Refraction shift (D, + = hyperopic)','n'],['folds','Chorioretinal folds','sel',[['none','None'],['any','Folds / peripapillary wrinkles'],['sharp','Sharp folds near the macula']]],['flat','Globe flattening','sel',[['none','None'],['present','Posterior flattening present'],['moderate','Moderate flattening']]]],
+ blood:[['hb','Hemoglobin (g/dL)','n'],['hct','Hematocrit (%)','n'],['wbc','White blood cells (×10³/µL)','n'],['plt','Platelets (×10³/µL)','n'],['lym','Lymphocytes (/µL)','n']]
+};
+function examForm(k){var h='<div class="xgrid">';EXF[k].forEach(function(f){var id='ex_'+f[0];
+  if(f[2]==='yn')h+='<label>'+f[1]+'<select id="'+id+'">'+YN.map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></label>';
+  else if(f[2]==='sel')h+='<label>'+f[1]+'<select id="'+id+'">'+f[3].map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></label>';
+  else h+='<label>'+f[1]+'<input id="'+id+'" type="number" step="any" inputmode="decimal"></label>';});
+  return h+'</div><p class="note" style="margin-top:4px">Leave a field empty if it was not measured. CHARM levels the result with the medic team\'s thresholds.</p>';}
+function readExam(k){var x={};EXF[k].forEach(function(f){var el=$('ex_'+f[0]);if(!el||el.value==='')return;if(f[2]==='yn')x[f[0]]=el.value==='yes';else if(f[2]==='sel')x[f[0]]=el.value;else{var v=parseFloat(el.value);if(!isNaN(v))x[f[0]]=v;}});return x;}
 function saveEntry(){
   var en=S.entry,cab=en.pid==='cabin',k=$('enk').value,tv=($('ent').value||'').split('T'),dp=tv[0].split('-'),tp=(tv[1]||'00:00').split(':');
   var t=Date.UTC(+dp[0],+dp[1]-1,+dp[2],+tp[0],+tp[1]);if(isNaN(t)){en.err='Check the time.';renderOv();return;}
@@ -1907,7 +2010,7 @@ function saveEntry(){
   if(cab){var e={k:k,t:t,v:v},er=EN.validateEnv(e,liveNow());if(er){en.err='Not saved: '+er+'.';renderOv();return;}
     S.busy=true;renderOv();api('addEnv',{src:'manual',items:[e]}).then(done,fail);return;}
   var r={pid:en.pid,k:k,t:t};
-  if(k==='vision'||k==='blood'){r.l=+$('envl').value;r.txt=$('envl').selectedOptions[0].textContent.split(' · ')[0];}
+  if(EXF[k]){r.x=readExam(k);if(!Object.keys(r.x).length){en.err='Fill in at least one field.';renderOv();return;}}
   else{r.v=v;if(k==='bp')r.v2=parseFloat($('envv2').value);var cx=$('enctx');if(cx&&cx.value)r.ctx=cx.value;var ir=$('enirr');if(ir&&ir.checked)r.irr=true;}
   var er2=EN.validateReading(r,liveNow());if(er2){en.err='Not saved: '+er2+'.';renderOv();return;}
   S.busy=true;renderOv();
@@ -1919,13 +2022,13 @@ function saveEntry(){
 /* import */
 var MAPS={
  NASA:{time_gmt:['time','GMT'],astronaut:['name',''],agency:['agency',''],role:['role',''],heart_rate:['hr','none'],spo2:['spo2','none'],resp_rate:['rr','none'],temp_c:['temp','none'],bp_systolic:['bps','none'],bp_diastolic:['bpd','none'],glucose_mgdl:['glu','none'],sleep_hours:['sleep','none'],
-   phase:['phase','baseline rows set the personal baseline'],mission_day:['mday','aligns dates to mission days'],radiation_dose_pct:['dose','none'],hemoglobin_g_dl:['hb','blood panel'],hematocrit_pct:['hct','blood panel'],wbc_k_per_ul:['wbc','blood panel'],platelets_k_per_ul:['plt','blood panel'],lymphocytes_per_ul:['lym','blood panel'],irregular_rhythm:['irr','heart rhythm flag'],context:['ctx','rest / exercise / sleep'],source:['ref','shown as the source'],note:['note','crew action → Alerts and history']},
+   phase:['phase','baseline rows set the personal baseline'],mission_day:['mday','aligns dates to mission days'],radiation_dose_pct:['dose','none'],fluid_intake_l:['fluid','none'],mood_0_10:['mood','none'],exercise_pct:['ex','none'],data_type:['dtype','real or simulated · SIM tag'],ecg_irregular:['x_ecg_irr','ECG review'],ecg_no_p_waves:['x_ecg_noP','ECG review'],ecg_seconds:['x_ecg_sec','ECG review'],ecg_unstable:['x_ecg_unstable','ECG review'],ortho_lying_sbp:['x_ortho_s1','orthostatic test'],ortho_lying_dbp:['x_ortho_d1','orthostatic test'],ortho_standing_sbp:['x_ortho_s2','orthostatic test'],ortho_standing_dbp:['x_ortho_d2','orthostatic test'],ortho_minutes:['x_ortho_min','orthostatic test'],syncope:['x_ortho_syncope','orthostatic test'],urine_24h_l:['x_urine_vol','urine check'],urine_blood:['x_urine_blood','urine check'],kidney_ultrasound:['x_urine_us','urine check'],ijv_velocity_cm_s:['x_ijv_vel','neck-vein ultrasound'],ijv_retrograde:['x_ijv_retro','neck-vein ultrasound'],ijv_thrombus:['x_ijv_thrombus','neck-vein ultrasound'],sans_delta_trt_um:['x_vision_trt','eye exam'],sans_frisen_grade:['x_vision_frisen','eye exam'],sans_refraction_shift_d:['x_vision_refr','eye exam'],sans_folds:['x_vision_folds','eye exam'],sans_globe_flattening:['x_vision_flat','eye exam'],symptom_suspected_infection:['x_sym_inf','symptom check'],symptom_confusion:['x_sym_conf','symptom check'],symptom_fainting:['x_sym_faint','symptom check'],symptom_chest_pain:['x_sym_chest','symptom check'],hemoglobin_g_dl:['hb','blood panel'],hematocrit_pct:['hct','blood panel'],wbc_k_per_ul:['wbc','blood panel'],platelets_k_per_ul:['plt','blood panel'],lymphocytes_per_ul:['lym','blood panel'],irregular_rhythm:['irr','heart rhythm flag'],context:['ctx','rest / exercise / sleep'],source:['ref','shown as the source'],note:['note','crew action → Alerts and history']},
  ESA:{timestamp_utc:['time','UTC'],crew_member:['name',''],agency:['agency',''],role:['role',''],HR_bpm:['hr','none'],SpO2_pct:['spo2','none'],Resp_rate:['rr','none'],BodyTemp_F:['temp','°F → °C'],SBP:['bps','none'],DBP:['bpd','none'],Glucose_mmolL:['glu','mmol/L → mg/dL'],Sleep_min:['sleep','minutes → hours']},
  JAXA:{DateTimeJST:['time','JST → GMT'],CrewName:['name',''],Agency:['agency',''],Role:['role',''],HeartRate:['hr','none'],SpO2:['spo2','none'],RespRate:['rr','none'],BodyTempC:['temp','none'],SysBP:['bps','none'],DiaBP:['bpd','none'],Glucose_mgdL:['glu','none'],SleepHour:['sleep','none']},
  CSA:{utc:['time','UTC'],crew:['name',''],agency:['agency',''],role:['role',''],hr:['hr','none'],spo2:['spo2','none'],rr:['rr','none'],core_temp_c:['temp','none'],sbp:['bps','none'],dbp:['bpd','none'],glucose:['glu','none'],sleep_h:['sleep','none']}
 };
-var MLBL={phase:'Phase',mday:'Mission day',dose:'Radiation dose budget',hb:'Hemoglobin',hct:'Hematocrit',wbc:'White blood cells',plt:'Platelets',lym:'Lymphocytes',irr:'Irregular rhythm',ctx:'Situation',ref:'Data source',note:'Crew note',time:'Timestamp',name:'Astronaut',agency:'Agency',role:'Role',hr:'Heart rate',spo2:'Blood oxygen (SpO₂)',rr:'Respiratory rate',temp:'Core body temperature',bps:'Blood pressure (systolic)',bpd:'Blood pressure (diastolic)',glu:'Blood glucose',sleep:'Sleep'};
-var PLAUS={hr:[25,230],spo2:[70,100],rr:[4,60],temp:[33,42.5],bps:[60,250],bpd:[30,160],glu:[30,500],sleep:[0,16]};
+var MLBL={dtype:'Real or simulated',mood:'Mood check-in',ex:'Exercise completion',fluid:'Fluid intake',phase:'Phase',mday:'Mission day',dose:'Radiation dose budget',hb:'Hemoglobin',hct:'Hematocrit',wbc:'White blood cells',plt:'Platelets',lym:'Lymphocytes',irr:'Irregular rhythm',ctx:'Situation',ref:'Data source',note:'Crew note',time:'Timestamp',name:'Astronaut',agency:'Agency',role:'Role',hr:'Heart rate',spo2:'Blood oxygen (SpO₂)',rr:'Respiratory rate',temp:'Core body temperature',bps:'Blood pressure (systolic)',bpd:'Blood pressure (diastolic)',glu:'Blood glucose',sleep:'Sleep'};
+var PLAUS={mood:[0,10],ex:[0,200],fluid:[0,15],hr:[25,230],spo2:[70,100],rr:[4,60],temp:[33,42.5],bps:[60,250],bpd:[30,160],glu:[30,500],sleep:[0,16]};
 function convert(k,how,v){if(how==='°F → °C')return (v-32)*5/9;if(how==='mmol/L → mg/dL')return v*18;if(how==='minutes → hours')return v/60;return v;}
 function parseTime(s,how){s=s.trim();if(!s)return NaN;if(!/[zZ]|[+-]\d\d:?\d\d$/.test(s))s=s.replace(' ','T')+'Z';var t=Date.parse(s);if(how==='JST → GMT')t-=9*H;return t;}
 function matchCrew(name){var f=name.trim().split(/\s+/)[0].toLowerCase();var hit=CREW.filter(function(p){return p.name.toLowerCase()===f||(p.full&&p.full.toLowerCase()===name.trim().toLowerCase());});return hit.length?hit[0].id:null;}
@@ -1939,6 +2042,7 @@ function analyzeCsv(fname,text,isSample){
   S.imp={name:fname,hdr:hdr,rows:rows,agency:best,detected:bs>0,sample:!!isSample,who:(CREW[0]||{}).id};
   checkImport();
 }
+function mlbl(k){if(MLBL[k])return MLBL[k];var a=k.split('_');return a[0]==='x'?(MDEF[a[1]]?MDEF[a[1]].label:a[1])+' · '+a.slice(2).join(' '):k;}
 function checkImport(){
   var im=S.imp,m=MAPS[im.agency],ci={};im.hdr.forEach(function(h,i){if(m[h])ci[m[h][0]]=i;});
   var people={},bad=0,good=0;
@@ -2003,8 +2107,8 @@ async function applyImport(im,progress){
     var t=importPlace(im,r,now);if(isNaN(t)||t>now+MIN)return;
     var P=per[pid]||(per[pid]={out:[],notes:[],base:{hr:[],sbp:[],dbp:[],rr:[],temp:[]},hrT:[],tmin:Infinity});
     if(t<P.tmin)P.tmin=t;
-    var ref=ci.ref!=null&&r[ci.ref]?r[ci.ref].slice(0,80):null,ctx=ci.ctx!=null?r[ci.ctx]:'',isBase=ci.phase!=null&&/^(baseline|pre)/i.test(r[ci.phase]||''),bp={};
-    ['hr','spo2','rr','temp','glu','bps','bpd','sleep','dose'].forEach(function(k){var v=num(r,k);if(v==null)return;v=convert(k,m[im.hdr[ci[k]]][1],v);if(k!=='dose'&&(v<PLAUS[k][0]||v>PLAUS[k][1]))return;
+    var ref=ci.ref!=null&&r[ci.ref]?r[ci.ref].slice(0,80):null,ctx=ci.ctx!=null?r[ci.ctx]:'',isSim=ci.dtype!=null&&/^sim/i.test(r[ci.dtype]||''),isBase=!isSim&&ci.phase!=null&&/^(baseline|pre)/i.test(r[ci.phase]||''),bp={},n0=P.out.length;
+    ['hr','spo2','rr','temp','glu','bps','bpd','sleep','dose','fluid','mood','ex'].forEach(function(k){var v=num(r,k);if(v==null)return;v=convert(k,m[im.hdr[ci[k]]][1],v);if(k!=='dose'&&(v<PLAUS[k][0]||v>PLAUS[k][1]))return;
       if(k==='bps'||k==='bpd'){bp[k]=Math.round(v);return;}
       if(k==='temp')v=Math.round(v*10)/10;if(k==='glu')v=Math.round(v);if(k==='sleep')v=Math.round(v*10)/10;
       var x={pid:pid,k:k,t:t,v:v};if(ref)x.ref=ref;if(k==='hr'&&ci.irr!=null&&/^(1|yes|true)$/i.test(r[ci.irr]||''))x.irr=true;
@@ -2012,8 +2116,13 @@ async function applyImport(im,progress){
       P.out.push(x);if(k==='hr')P.hrT.push(t);
       if(isBase&&(k==='hr'||k==='rr'||k==='temp'))P.base[k].push(v);});
     if(bp.bps&&bp.bpd){var xb={pid:pid,k:'bp',t:t,v:bp.bps,v2:bp.bpd};if(ref)xb.ref=ref;if(/^(rest|ex|sleep)$/.test(ctx))xb.ctx=ctx;P.out.push(xb);if(isBase){P.base.sbp.push(bp.bps);P.base.dbp.push(bp.bpd);}}
-    var bl=bloodPanel({hb:num(r,'hb'),hct:num(r,'hct'),wbc:num(r,'wbc'),plt:num(r,'plt'),lym:num(r,'lym')});
-    if(bl){var xx={pid:pid,k:'blood',t:t,l:bl.l,txt:bl.txt};if(ref)xx.ref=ref;P.out.push(xx);}
+    var bx={};['hb','hct','wbc','plt','lym'].forEach(function(f){var v=num(r,f);if(v!=null)bx[f]=v;});
+    if(Object.keys(bx).length){var xx={pid:pid,k:'blood',t:t,x:bx};if(ref)xx.ref=ref;P.out.push(xx);}
+    /* exam columns: x_<exam>_<field> */
+    var exs={};Object.keys(ci).forEach(function(c){var a=c.split('_');if(a[0]!=='x')return;var raw=r[ci[c]];if(raw===''||raw==null)return;var ek=a[1],f=a.slice(2).join('_'),spec=EN.EXAMF[ek]&&EN.EXAMF[ek][f];if(!spec)return;
+      var v=spec==='b'?/^(1|yes|true)$/i.test(raw):typeof spec[0]==='string'?raw:+raw;if(spec!=='b'&&typeof spec[0]!=='string'&&isNaN(v))return;(exs[ek]||(exs[ek]={}))[f]=v;});
+    Object.keys(exs).forEach(function(ek){var xe={pid:pid,k:ek,t:t,x:exs[ek]};if(ref)xe.ref=ref;P.out.push(xe);});
+    if(isSim)for(var q=n0;q<P.out.length;q++)P.out[q].sim=true;
     if(ci.note!=null&&r[ci.note])P.notes.push({pid:pid,t:t,text:r[ci.note].slice(0,240)});
   });
   var total=0;Object.keys(per).forEach(function(p){total+=per[p].out.length;});
@@ -2051,12 +2160,12 @@ var EMSTEPS={
       {id:'e3',h:'Watch blood oxygen and breathing for all crew.',p:'Anyone below 94% SpO₂ gets oxygen first.',end:true}]
 };
 var HAZ={fire:'Fire',press:'Pressure leak',air:'Toxic air',rad:'Radiation storm'};
-function emAlertStart(pid){var ev=allEvents().filter(function(e){return e.pid===pid&&e.type==='raise'&&e.lv===2&&e.t<=viewT();});return ev.length?ev[ev.length-1].t:null;}
+function emAlertStart(pid){var ev=allEvents().filter(function(e){return e.pid===pid&&e.type==='raise'&&e.lv===3&&e.t<=viewT();});return ev.length?ev[ev.length-1].t:null;}
 function emState(id){if(!S.emg[id])S.emg[id]={step:0,log:[],safe:{},opened:liveNow(),ecg:0};return S.emg[id];}
 function emFlow(id){if(HAZ[id])return EMSTEPS.env;var st=personAt(id,viewT());return st.m.hr.val&&st.m.hr.val.irr?EMSTEPS.hr:EMSTEPS.gen;}
 function emerView(){
   var id=S.emSel,isEnv=!!HAZ[id],t=viewT(),es=emState(id),flow=emFlow(id),step=flow[es.step]||flow[0],nm=isEnv?HAZ[id]:CREWBY[id].name;
-  var crit=CREW.filter(function(p){return personAt(p.id,t).lvl===2;}).map(function(p){return p.id;});if(crit.indexOf(id)<0&&!isEnv)crit.unshift(id);
+  var crit=CREW.filter(function(p){return personAt(p.id,t).lvl===3;}).map(function(p){return p.id;});if(crit.indexOf(id)<0&&!isEnv)crit.unshift(id);
   Object.keys(S.emg).forEach(function(k){if(HAZ[k]&&crit.indexOf(k)<0)crit.push(k);});
   var st=isEnv?null:personAt(id,t),start=isEnv?es.opened:(emAlertStart(id)||es.opened);
   var title=isEnv?'EMERGENCY · '+HAZ[id]+' · all crew':'CRITICAL · '+nm+' · '+(st.m.hr.val&&st.m.hr.val.irr?'Irregular heart rhythm':reasonOf(id,st,t));
@@ -2114,7 +2223,7 @@ function charmySettings(){
   h+='<div class="grpl">ANIMATION</div><div class="opts">'+Object.keys(CH_ANIM).map(function(k){return '<button data-act="chanim" data-v="'+k+'" aria-pressed="'+(S.chAnim===k)+'"'+dis+'>'+CH_ANIM[k]+'</button>';}).join('')+'</div>';
   h+='<div class="grpl">FACE</div><div class="opts">'+['auto'].concat(CH_EXPR).map(function(k){return '<button data-act="chexpr" data-v="'+k+'" aria-pressed="'+(S.chExpr===k)+'"'+dis+'>'+k.charAt(0).toUpperCase()+k.slice(1)+'</button>';}).join('')+'</div>';
   h+='<div class="grpl">WRITE AND SPEAK</div><div class="saybox"><label for="saytx" class="note">Message for Charmy</label><textarea id="saytx" data-on="saytx">'+esc(S.sayText)+'</textarea><div class="sayout" id="sayout" aria-live="polite"></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;flex-wrap:wrap"><label class="chk"><input type="checkbox" data-on="chvoice" '+(S.voice?'checked':'')+'> Speak out loud</label><span style="display:flex;gap:8px"><button class="btn sm stoptalk" data-act="stoptalk" style="height:40px">'+IC.stop+'Stop</button><button class="btn sm pri" data-act="chsay">Say it</button></span></div></div>';
-  h+='<div class="grpl">VOICE</div>'+sw('autoRead','Read answers aloud','Speak every answer in this chat. Critical alerts always sound.')+sw('brief','Short answers','One or two sentences, no detail lines.')+sw('wake','"Hi Charmy" wake word','Hands-free start. Needs a microphone (not available yet).');
+  h+='<div class="grpl">VOICE</div><p class="note" id="vstat" style="margin:0 0 8px">'+voiceStat()+'</p>'+sw('autoRead','Read answers aloud','Speak every answer in this chat. Critical alerts always sound.')+sw('brief','Short answers','One or two sentences, no detail lines.')+sw('wake','"Hi Charmy" wake word','Hands-free start. Needs a microphone (not available yet).');
   h+='<div class="toggle"><span>Speaking speed<small>How fast Charmy talks.</small></span><div class="seg">'+[[0.85,'Slow'],[1,'Normal'],[1.2,'Fast']].map(function(x){return '<button data-act="chrate" data-v="'+x[0]+'" aria-pressed="'+(S.rate===x[0])+'">'+x[1]+'</button>';}).join('')+'</div></div>';
   h+='<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn sm" data-act="chclear">Clear conversation</button><button class="btn sm pri" data-act="chset">Done</button></div><p class="note" style="margin-top:12px">Offline, Charmy answers from data saved on board. Free questions wait for the Earth link.</p></div>';
   return h;
@@ -2122,7 +2231,7 @@ function charmySettings(){
 function charmyPop(){
   var e=envAt(viewT()),off=e&&!e.link;
   var h='<div class="pop chpop" role="dialog" aria-label="Charmy, AI Assistant">';
-  h+='<div class="chbar"><span class="ttl"><i style="background:'+(off?'var(--nd)':'var(--ok)')+'"></i>CHARMY · AI ASSISTANT · '+(off?'OFFLINE':'ONLINE')+'</span><span class="wbtns"><button class="wb stop" data-act="stoptalk" aria-label="Stop talking" title="Stop talking">'+IC.stop+'</button><button class="wb" data-act="chset" aria-label="Charmy settings" title="Settings" aria-pressed="'+S.chSet+'">'+IC.gear+'</button><button class="wb" data-act="charmy" aria-label="Minimize Charmy" title="Minimize">'+IC.min+'</button><button class="wb close" data-act="chclose" aria-label="Close Charmy" title="Close">'+IC.x+'</button></span></div>';
+  h+='<div class="chbar"><span class="ttl"><i style="background:'+(off?'var(--nd)':'var(--ok)')+'"></i>CHARMY · AI ASSISTANT · '+(off?'OFFLINE':'ONLINE')+'<span class="vprog" id="vprog">'+voiceProg()+'</span></span><span class="wbtns"><button class="wb'+(S.voice?'':' voff')+'" data-act="voice" aria-pressed="'+S.voice+'" aria-label="'+(S.voice?'Turn Charmy\'s voice off':'Turn Charmy\'s voice on')+'" title="'+(S.voice?'Voice on':'Voice off')+'">'+IC.spk+'</button><button class="wb stop" data-act="stoptalk" aria-label="Stop talking" title="Stop talking">'+IC.stop+'</button><button class="wb" data-act="chset" aria-label="Charmy settings" title="Settings" aria-pressed="'+S.chSet+'">'+IC.gear+'</button><button class="wb" data-act="charmy" aria-label="Minimize Charmy" title="Minimize">'+IC.min+'</button><button class="wb close" data-act="chclose" aria-label="Close Charmy" title="Close">'+IC.x+'</button></span></div>';
   h+='<div class="chstage"><span class="chava" id="chslot">'+(CH?'':'<img class="cha" src="assets/charmy-3d.png" alt="">')+'</span><div class="chinfo"><b>Charmy <span class="talkwave" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><div class="ctx">'+(S.chSet?'Pick how I look and sound. Changes apply at once.':'You\'re looking at: <b style="color:var(--ink)">'+esc(charmyCtx())+'</b>'+(isLive()?'':' · '+fmtT(viewT())))+'</div>'+(off&&!S.chSet?'<div class="ctx c-n">Answers from saved data only.</div>':'')+'<button class="stoptalk" data-act="stoptalk">'+IC.stop+'Stop talking</button></div></div>';
   if(S.chSet)return h+charmySettings()+'</div>';
   h+='<div class="qchips" style="padding:12px 16px 4px">'+charmyChips().map(function(q){return '<button data-act="ask" data-q="'+esc(q)+'">'+esc(q)+'</button>';}).join('')+'</div><div class="chbody" id="chbody">';
@@ -2149,7 +2258,7 @@ function answer(q){
     var st=personAt(ctxPid,t),k2=r.k&&/why/.test(ql)?r.k:st.top;
     if(!k2){res.text=CREWBY[ctxPid].name+' is NORMAL. All metrics are in range.';return res;}
     var m=st.m[k2],c=CSV[MDEF[k2].csv]||{};
-    if(/do now|what should|next/.test(ql)){res.text=CREWBY[ctxPid].name+': '+(m.l===2?c.x:m.l===1?c.c:'nothing urgent.');var nx=NEXT[k2];if(nx&&nx[2]&&m.l>0){res.go='test-'+nx[2]+'-'+ctxPid;res.goLabel='Start '+nx[0].toLowerCase();}res.src='CHARM indicator playbook · needs medical review';return res;}
+    if(/do now|what should|next/.test(ql)){res.text=CREWBY[ctxPid].name+': '+(m.l===3?c.x:m.l>0?c.c:'nothing urgent.');var nx=NEXT[k2];if(nx&&nx[2]&&m.l>0){res.go='test-'+nx[2]+'-'+ctxPid;res.goLabel='Start '+nx[0].toLowerCase();}res.src='CHARM indicator playbook · needs medical review';return res;}
     if(m.l===-1){res.text=CREWBY[ctxPid].name+'\'s wearable is not reporting, so those metrics are grey (NO DATA). Reconnect the watch or import backup data.';return res;}
     var th=PROFILE[ctxPid][k2];
     res.text=MDEF[k2].label+' is '+fmtV(k2,m.val)+' '+MDEF[k2].unit+', which is '+WORD[lvKey(m.l)]+'. '+(k2==='hr'&&m.val.irr?'The ECG shows an irregular rhythm, which is always critical. ':'')+(k2==='sleep'?'Caution starts below '+th.c+' h; critical is below '+th.x+' h for 2 nights in a row. ':'')+(c.why||'');
@@ -2162,6 +2271,20 @@ function setTalking(on){S.talking=on;var a=$('app');if(a)a.classList.toggle('tal
 function speak(txt,o){
   o=o||{};var voice=o.voice!=null?o.voice:S.voice;
   if(!voice&&!o.onWrite)return;
+  var CV=window.charmyVoice;
+  if(voice&&CV){
+    var cr=!!(CH&&CH.crisis),n=0,typed=false,heard=false,started=false,ratio=Math.max(.4,Math.min(1.5,txt.length/Math.max(1,CV.clean(txt).length)));
+    var fin=function(){if(++n<2)return;setTalking(false);if(CH){try{CH.setTalking(false);(CH.crisis||CH.play(S.chAnim));}catch(x){}}if(o.onEnd)o.onEnd();};
+    var type=function(cps){if(started)return;started=true;setTalking(true);
+      if(CH){try{CH.say(txt,{speak:false,charsPerSecond:Math.max(6,cps*ratio),animation:cr?'crisis':(o.anim||'explain'),expression:cr?'serious':(S.chExpr==='auto'?(o.expr||null):S.chExpr),onWrite:o.onWrite,onEnd:function(){typed=true;if(!heard&&CH)try{CH.setTalking(true);}catch(x){}fin();}});return;}catch(err){}}
+      if(o.onWrite)o.onWrite(txt);typed=true;fin();};
+    var to=setTimeout(function(){type(14);},o.queue?600000:2500);
+    CV.speak(txt,{interrupt:!o.queue,rate:cr?Math.min(S.rate,.9):S.rate,
+      onStart:function(cps){clearTimeout(to);type(cps);},
+      onChunk:function(){if(CH)try{CH.setTalking(true);}catch(x){}},
+      onEnd:function(cut){clearTimeout(to);heard=true;if(cut&&CH&&started&&!typed){try{CH.stopSpeaking();}catch(x){}if(o.onWrite)o.onWrite(txt);typed=true;fin();}if(!started){started=true;if(o.onWrite)o.onWrite(txt);typed=true;fin();}else if(typed&&CH)try{CH.setTalking(false);}catch(x){}fin();}});
+    return;
+  }
   if(CH){
     try{var cr=!!CH.crisis;CH.say(txt,{speak:voice,rate:cr?Math.min(S.rate,.9):S.rate,charsPerSecond:voice?16:48,animation:cr?'crisis':(o.anim||'explain'),expression:cr?'serious':(S.chExpr==='auto'?(o.expr||null):S.chExpr),onWrite:o.onWrite,onEnd:function(){setTalking(false);try{(CH.crisis||CH.play(S.chAnim));}catch(x){}if(o.onEnd)o.onEnd();}});setTalking(true);}catch(err){setTalking(false);if(o.onEnd)o.onEnd();}
     return;
@@ -2173,6 +2296,7 @@ function speak(txt,o){
 }
 function stopTalk(){
   S.chat.forEach(function(m){m.typing=false;});
+  if(window.charmyVoice)try{charmyVoice.stop();}catch(x){}
   if(CH){try{CH.stopSpeaking();(CH.crisis||CH.play(S.chAnim));}catch(x){}}
   try{window.speechSynthesis.cancel();}catch(x){}
   setTalking(false);
@@ -2227,8 +2351,8 @@ function parseHash(){
 }
 function go(to){S.drawer=false;if(to==='test-sans-'+(to.split('-')[2]||'')){toast('Do on Medical Station','The SANS test needs the Medical Station camera. It is marked there for you.');return;}
   if(('#'+to)===location.hash){S.route=parseHash();renderAll();}else location.hash=to;}
-function canOpen(pid){return isCMO(S.signed)||S.signed===pid||S.unlocked[pid]||personAt(pid,viewT()).lvl===2;}
-function openFile(pid){if(!canOpen(pid)){S.accessId=pid;S.ov='access';renderOv();return;}if(personAt(pid,viewT()).lvl===2&&!isCMO(S.signed)&&S.signed!==pid&&!S.unlocked[pid]){S.unlocked[pid]=true;log({pid:pid,type:'crew',text:'File opened in emergency by '+whoName(),src:'crew'});}go('astro-'+pid);}
+function canOpen(pid){return isCMO(S.signed)||S.signed===pid||S.unlocked[pid]||personAt(pid,viewT()).lvl===3;}
+function openFile(pid){if(!canOpen(pid)){S.accessId=pid;S.ov='access';renderOv();return;}if(personAt(pid,viewT()).lvl===3&&!isCMO(S.signed)&&S.signed!==pid&&!S.unlocked[pid]){S.unlocked[pid]=true;log({pid:pid,type:'crew',text:'File opened in emergency by '+whoName(),src:'crew'});}go('astro-'+pid);}
 function whoName(){return S.signed==='shared'||!CREWBY[S.signed]?'shared display':CREWBY[S.signed].name;}
 window.addEventListener('hashchange',function(){S.route=parseHash();S.saveErr=null;if(S.route.v!=='test')RUN=null;S.bodySel=S.route.v==='astro'?S.bodySel:null;renderAll();$('view').scrollTop=0;});
 
@@ -2299,12 +2423,16 @@ document.addEventListener('click',function(e){
     case 'testwho': S.testWho=ds.id; renderView(); break;
     case 'tstep': RUN.step=Math.max(0,RUN.step+(+ds.d)); if(+ds.d>0)stepEnter(); renderView(); speakStep(); break;
     case 'speakstep': speakStep(); break;
-    case 'voice': S.voice=!S.voice; if(!S.voice)stopTalk(); renderAll(); break;
+    case 'speakall': if(S.route.v==='test'&&STEPS[S.route.k])speak(STEPS[S.route.k].map(function(s,i){return 'Step '+(i+1)+'. '+s.h+' '+s.p;}).join(' '),{voice:true}); break;
+    case 'voice': S.voice=!S.voice; lsSet('charm-voice',S.voice?'1':'0'); if(!S.voice)stopTalk(); renderAll(); break;
     case 'exittest': RUN=null; history.length>1?history.back():go('tests'); break;
     case 'testdone': if(!S.busy)saveTest(); break;
     case 'testagain': S.saveErr=null; startRun(RUN.k,RUN.pid); renderView(); break;
     case 'rtpad': rtTap(); break;
-    case 'etab': S.earthTab=ds.v; renderView(); break;
+    case 'etab': S.earthTab=ds.v; S.obLim=25; renderView(); break;
+    case 'obmore': S.obLim=(S.obLim||25)+50; renderView(); break;
+    case 'rmcrew': S.rm=S.rm&&S.rm.pid===ds.id?null:{pid:ds.id,mode:'data'}; renderView(); break;
+    case 'rmmode': if(S.rm){S.rm.mode=ds.v;renderView();} break;
     case 'ptab': S.prefTab=ds.v; renderView(); break;
     case 'thrpid': S.thrSel={};S.thrSel[ds.id]=true; renderView(); break;
     case 'thrsel': if(S.thrSel[ds.id])delete S.thrSel[ds.id];else S.thrSel[ds.id]=true; S.thrErr=''; renderView(); break;
@@ -2326,7 +2454,7 @@ document.addEventListener('click',function(e){
     case 'stoptalk': stopTalk(); break;
     case 'chclose': S.charmy=false; S.chSet=false; stopTalk(); renderOv(); break;
     case 'chvar': S.chVariant=ds.v; lsSet('charm-chvar',ds.v); if(CH)CH.setVariant(ds.v,S.chGender); renderOv(); break;
-    case 'chgen': S.chGender=ds.v; lsSet('charm-chgender',ds.v); if(CH)CH.setGender(ds.v); renderOv(); break;
+    case 'chgen': S.chGender=ds.v; lsSet('charm-chgender',ds.v); if(CH)CH.setGender(ds.v); if(window.charmyVoice)charmyVoice.setVoice(ds.v); renderOv(); break;
     case 'chcrisis': S.chCrisis=!S.chCrisis; syncCrisis(); renderOv(); break;
     case 'chanim': S.chAnim=ds.v; if(CH)CH.play(ds.v); renderOv(); break;
     case 'chexpr': S.chExpr=ds.v; if(CH)CH.setExpression(ds.v==='auto'?null:ds.v); renderOv(); break;
@@ -2349,6 +2477,9 @@ document.addEventListener('submit',function(e){
   if(k==='chat'){var i=$('chin');if(i.value.trim()){askCharmy(i.value.trim());}}
   if(k==='msg'){var m=$('msgin'),txt=m.value.trim();if(txt){api('message',{pid:CREWBY[S.signed]?S.signed:null,text:txt}).then(function(r){toast('Message queued',r&&r.queued?'Saved on this device; it goes out when the connection returns.':'Sends with the next link, routine priority.');},function(e){toast('Not sent',e.message);});m.value='';}}
   if(k==='entry')saveEntry();
+  if(k==='rmcrew'&&S.rm){var rp=CREWBY[S.rm.pid],cf=($('rmconf')&&$('rmconf').value||'').trim();if(!rp)return;if(cf.toLowerCase()!==rp.name.toLowerCase()&&cf.toLowerCase()!==(rp.full||'').toLowerCase()){toast('Not deleted','Type '+rp.name+' to confirm.');return;}
+    var md=S.rm.mode,nm2=rp.name;S.busy=true;renderView();api('removeCrew',{pid:rp.id,mode:md,confirm:cf}).then(function(r){S.busy=false;S.rm=null;if(md==='all'&&S.signed===rp.id){S.signed='shared';lsSet('charm-signed','shared');}if(md==='all'&&S.thrSel)delete S.thrSel[rp.id];if(md==='all'&&S.thrPid===rp.id)S.thrPid=null;
+      toast(md==='all'?nm2+' removed from the crew':nm2+'\'s data deleted','Deleted '+r.deleted.readings+' readings, '+r.deleted.events+' alerts and logs.');renderAll();},function(e){S.busy=false;renderView();toast('Not deleted',e.message);});return;}
   if(k==='addcrew'){var nm=$('ncname').value.trim();if(!nm)return;S.busy=true;renderView();api('addCrew',{name:nm,agency:$('ncag').value,role:$('ncrole').value.trim()}).then(function(r){S.busy=false;toast(r.existed?'Already in the crew':'Crew member added',nm);renderView();},function(e){S.busy=false;renderView();toast('Not added',e.message);});}
   if(k==='mission'){var ld=$('mslaunch').value.split('-');var lt=Date.UTC(+ld[0],+ld[1]-1,+ld[2]);if(isNaN(lt)){toast('Check the launch date','');return;}S.busy=true;renderView();api('setMission',{name:$('msname').value.trim(),env:$('msenv').value,launch:lt}).then(function(){S.busy=false;toast('Mission saved','Today is Mission Day '+EN.missionDay(liveNow(),lt)+'.');renderAll();},function(e){S.busy=false;renderView();toast('Not saved',e.message);});}
 });
@@ -2357,7 +2488,7 @@ document.addEventListener('change',function(e){
   if(on==='evp'){S.evp=el.value;renderView();}
   if(on==='evl'){S.evl=el.value;renderView();}
 
-  if(on==='chvoice'){S.voice=el.checked;if(!S.voice)stopTalk();}
+  if(on==='chvoice'){S.voice=el.checked;lsSet('charm-voice',S.voice?'1':'0');if(!S.voice)stopTalk();renderOv();}
   if(on==='impag'){S.imp.agency=el.value;S.imp.detected=true;checkImport();renderOv();}
   if(on==='impwho'){S.imp.who=el.value;checkImport();renderOv();}
   if(on==='imptime'){S.imp.tmode=el.value;renderOv();}
@@ -2396,7 +2527,11 @@ function emergencyOpen(){try{return !!S.emSel||(isLive()&&activeCrit(liveNow()).
 var LASTACT=0;
 function syncEmergency(){var open=emergencyOpen();lsSet('charm-emergency-open',open?'1':'0');if(open&&window.CHARM_INTRO&&window.CHARM_INTRO.active())window.CHARM_INTRO.close(true);
   if(Date.now()-LASTACT>5*60000&&document.visibilityState==='visible'){LASTACT=Date.now();lsSet('charm-last-active',String(LASTACT));}}
-function checkRed(){syncEmergency();if(!isLive()||S.emSel)return;var cs=activeCrit(liveNow()),nw=cs.filter(function(p){return !S.seenCrit[p.id];});cs.forEach(function(p){S.seenCrit[p.id]=1;});if(nw.length&&(!S.ov||S.ov==='tt')){S.ov='redalert';renderOv();if(S.voice)speak('Red alert. '+nw.map(function(p){return p.name;}).join(', ')+'.');}}
+function checkOrange(){if(!S.seenCau)S.seenCau={};var t=liveNow(),cau=CREW.filter(function(p){return personAt(p.id,t).lvl===2;}),ids={};cau.forEach(function(p){ids[p.id]=1;});Object.keys(S.seenCau).forEach(function(k){if(!ids[k])delete S.seenCau[k];});var nw=cau.filter(function(p){return !S.seenCau[p.id];});nw.forEach(function(p){S.seenCau[p.id]=1;});if(nw.length&&S.voice&&!S.emSel)speak('Caution. '+nw.map(function(p){return p.name;}).join(' and ')+(nw.length>1?' need':' needs')+' a check. Open Alerts for the next step.',{queue:true});}
+function voiceProg(){var c=window.charmyVoice;if(!c)return '';var s=c.status();return s.state==='loading'?'VOICE '+s.progress+'%':'';}
+function voiceStat(){var c=window.charmyVoice;if(!c)return 'Voice: browser voice.';var s=c.status(),v=s.voice==='male'?'male':'female';return s.state==='ready'?'Charmy\'s '+v+' voice is installed. It works offline.':s.state==='loading'?'Downloading Charmy\'s '+v+' voice: '+s.progress+'%. The browser voice is used until it finishes.':s.state==='failed'?'Charmy\'s '+v+' voice is not available on this device, so the browser voice is used.':'Voice: browser voice.';}
+function onVoiceStatus(s){var p=$('vprog');if(p)p.textContent=voiceProg();var v=$('vstat');if(v)v.textContent=voiceStat();var u=$('vunlock');if(u)u.classList.toggle('on',!!(s.needsUnlock&&S.voice));}
+function checkRed(){syncEmergency();if(!isLive()||S.emSel)return;var cs=activeCrit(liveNow()),nw=cs.filter(function(p){return !S.seenCrit[p.id];});cs.forEach(function(p){S.seenCrit[p.id]=1;});checkOrange();if(nw.length&&(!S.ov||S.ov==='tt')){S.ov='redalert';renderOv();if(S.voice)speak('Red alert. '+nw.map(function(p){return p.name;}).join(', ')+'.');}}
 /* scrubber drag */
 var raf=0;
 function trackAt(ev){var tr=$('track');if(!tr)return null;var r=tr.getBoundingClientRect();var f=clamp((ev.clientX-r.left)/r.width,0,1);return T0+f*Math.max(H,liveNow()-T0);}
@@ -2429,7 +2564,7 @@ function saveTest(){
   var k=RUN.k,pid=RUN.pid,t=liveNow(),v=RUN.vals,rs=[],txt='',mk=null;
   if(k==='bp'){rs.push({pid:pid,k:'bp',t:t,v:+v.s,v2:+v.d});if(+v.p)rs.push({pid:pid,k:'hr',t:t,v:+v.p});txt='Blood pressure '+v.s+'/'+v.d+' taken';mk='bp';}
   if(k==='glu'){rs.push({pid:pid,k:'glu',t:t,v:+v.g});txt='Fingerstick glucose '+v.g+' mg/dL';mk='glu';}
-  if(k==='ecg'){var r0={pid:pid,k:'hr',t:t,v:+v.p};if(v.rhythm==='irregular')r0.irr=true;rs.push(r0);txt='1-min ECG: '+v.rhythm+' rhythm, '+v.p+' bpm';mk='hr';}
+  if(k==='ecg'){rs.push({pid:pid,k:'hr',t:t,v:+v.p});rs.push({pid:pid,k:'ecg',t:t,x:{irr:v.rhythm==='irregular',noP:v.pw==='none',sec:60,unstable:v.un==='yes'}});txt='1-min ECG: '+v.rhythm+' rhythm'+(v.rhythm==='irregular'?(v.pw==='none'?', no P waves':', P waves seen'):'')+', '+v.p+' bpm';mk='c_af';}
   if(k==='rt'){var r=RUN.rt,avg=Math.round(r.trials.reduce(function(a,b){return a+b;},0)/r.trials.length);rs.push({pid:pid,k:'rt',t:t,v:avg});txt='Reaction test: '+avg+' ms';}
   for(var i=0;i<rs.length;i++){var er=EN.validateReading(rs[i],t);if(er){S.saveErr='Not saved: '+er+'.';renderView();return;}}
   S.busy=true;S.saveErr=null;renderView();
@@ -2508,6 +2643,9 @@ window.CHARM_BACKEND.start({
   inbox:function(l){INBOX=l;dataChanged();},
   status:function(st){CONN={mode:st.mode,project:st.project,online:st.online,error:st.error,pending:st.pending};renderTop();if(S.route.v==='prefs')renderView();}
 }).catch(function(e){CONN.error=e.message;renderAll();});
+(function(){var c=window.charmyVoice;if(!c)return;c.onStatus(function(s){try{onVoiceStatus(s);}catch(e){}});c.initCharmyVoice(null,S.chGender);
+var b=document.getElementById('vunlock');if(b)b.addEventListener('click',function(){c.unlock();});
+if(/backend=local/.test(location.search))window.__charmTest={speak:speak,stopTalk:stopTalk,S:S};})();
 })();
 </script>
 <script type="module">

@@ -37,7 +37,7 @@
   /* Every event also goes to the Earth outbox, except link changes and messages that came from Earth. */
   function outboxFor(ev) {
     if (ev.type === 'link' || ev.src === 'earth') return null;
-    var prio = typeof ev.prio === 'number' ? ev.prio : (ev.type === 'raise' && ev.lv === 2) || ev.type === 'emergency' ? 2 : ev.type === 'raise' || ev.type === 'nodata' ? 1 : 0;
+    var prio = typeof ev.prio === 'number' ? ev.prio : (ev.type === 'raise' && ev.lv === E.CRI) || ev.type === 'emergency' ? 2 : ev.type === 'raise' || ev.type === 'nodata' ? 1 : 0;
     return { t: ev.t, pid: ev.pid || null, text: ev.text, sub: ev.sub || null, prio: prio, status: 'queued', evId: ev.id || null };
   }
   async function emit(db, events) {
@@ -53,9 +53,11 @@
     if (!m) { m = { name: 'CHARM mission', env: 'mars', launch: dayStartUTC(now), link: true, created: now }; await db.setMission(m); }
     var crew = await db.listCrew();
     // Adds any built-in crew member who is missing (also on a database created before new crew were added)
-    var have = {}; crew.forEach(function (c) { have[c.id] = c; });
+    var have = {}, gone = {}; crew.forEach(function (c) { have[c.id] = c; });
+    (m.removed || []).forEach(function (id) { gone[id] = 1; }); // crew removed in Settings stay removed
     for (var i = 0; i < SEED_CREW.length; i++) {
       var sd = SEED_CREW[i], ex = have[sd.id];
+      if (!ex && gone[sd.id]) continue;
       if (!ex) await db.setCrew(sd.id, Object.assign({ created: now }, sd));
       else if (ex.img !== sd.img || ex.face !== sd.face) await db.setCrew(sd.id, Object.assign({}, ex, { img: sd.img, face: sd.face || null }));
     }
@@ -126,7 +128,10 @@
       if (r.ctx) x.ctx = r.ctx;
       if (r.txt) x.txt = str(r.txt, 60);
       if (typeof r.l === 'number') x.l = r.l;
+      if (r.x && typeof r.x === 'object') { x.x = {}; Object.keys(r.x).forEach(function (f) { if (r.x[f] != null) x.x[f] = r.x[f]; }); }
+      x.sc = E.SCALE; // 4-level scale (NORMAL / ATTENTION / CAUTION / CRITICAL)
       if (r.ref) x.ref = str(r.ref, 80);
+      if (r.sim) x.sim = true; // simulated filler: shown with a SIM tag, never used as a baseline
       if (d.batch) x.batch = str(d.batch, 80);
       ok.push(x);
     });
@@ -154,7 +159,8 @@
   };
   /*
    * Demo scenario: writes about 3 hours of records ending now, marked source "demo", for the video and judges.
-   * Sarah develops an irregular heart rhythm (CRITICAL), Marcus is short on sleep (CAUTION),
+   * Sarah develops a fast irregular heart rhythm (CRITICAL), Marcus is short on sleep (ATTENTION) and his
+   * orthostatic blood-pressure test shows a drop (CAUTION),
    * Elena's watch stops reporting (NO DATA), cabin CO₂ drifts up (CAUTION).
    */
   async function runDemo(db, meta) {
@@ -181,13 +187,14 @@
       out.push({ pid: pid, k: 'mood', t: Math.min(now - 2 * H, today6 + 2 * H), v: b.mood });
       out.push({ pid: pid, k: 'bp', t: Math.min(now - 2.5 * H, today6 + 1.5 * H), v: b.bp[0], v2: b.bp[1] });
       out.push({ pid: pid, k: 'ex', t: today6 - 12 * H, v: b.ex });
+      if (pid === 'marcus') out.push({ pid: pid, k: 'ortho', t: now - 50 * MIN, x: { s1: 124, d1: 81, s2: 100, d2: 69, min: 3, syncope: false } });
     });
     for (var t2 = t0; t2 <= now; t2 += 10 * MIN) {
       var x = (t2 - t0) / (3 * H);
       env.push({ k: 'co2', t: t2, v: Math.round((2.2 + 1.5 * Math.max(0, x - 0.35) / 0.65 + g() * 0.08) * 100) / 100 });
       if ((t2 - t0) % (30 * MIN) === 0) env.push({ k: 'ctemp', t: t2, v: Math.round((22.3 + g() * 0.2) * 10) / 10 });
     }
-    var rows = out.map(function (r) { var o = { pid: r.pid, k: r.k, t: r.t, v: r.v, src: 'demo', by: 'Demo scenario', created: meta.now, batch: 'demo-' + now }; if (r.v2 != null) o.v2 = r.v2; if (r.irr) o.irr = true; return o; });
+    var rows = out.map(function (r) { var o = { pid: r.pid, k: r.k, t: r.t, v: r.v, src: 'demo', by: 'Demo scenario', created: meta.now, batch: 'demo-' + now }; if (r.v2 != null) o.v2 = r.v2; if (r.irr) o.irr = true; if (r.x) o.x = r.x; o.sc = E.SCALE; return o; });
     await db.addReadings(rows);
     await db.addEnv(env.map(function (e) { return { k: e.k, t: e.t, v: e.v, src: 'demo', created: meta.now }; }));
     await emit(db, [{ t: meta.now, pid: null, type: 'crew', text: 'Demo scenario loaded by ' + (str(meta.by, 60) || 'crew'), sub: rows.length + ' demo readings for the last 3 hours, marked DEMO', src: 'crew' }]);
@@ -215,6 +222,11 @@
       var fin = E.transitions(pid, series, th, now, state, 'reading'); fin.events.forEach(function (e) { e.src = 'auto'; evs.push(e); });
       if (evs.length) await emit(db, evs.slice(-400));
       await db.setStatus(pid, fin.state); out += evs.length;
+      // one summary record goes to Earth, so the flight surgeon sees what the imported history contained
+      var raised = evs.filter(function (e) { return e.type === 'raise'; }), byLv = {};
+      raised.forEach(function (e) { byLv[e.lv] = (byLv[e.lv] || 0) + 1; });
+      var names = { 3: 'critical', 2: 'caution', 1: 'attention' }, parts = [3, 2, 1].filter(function (l) { return byLv[l]; }).map(function (l) { return byLv[l] + ' ' + names[l]; });
+      await emit(db, [{ t: meta.now, pid: pid, type: 'crew', text: 'Imported history checked · ' + (raised.length ? raised.length + ' alert' + (raised.length > 1 ? 's' : '') + ' (' + parts.join(', ') + ')' : 'no alerts'), sub: 'Full timeline in Alerts and history', src: 'crew', prio: byLv[3] ? 2 : raised.length ? 1 : 0, by: meta.by || null }]);
     }
     return { events: out };
   }
@@ -240,6 +252,7 @@
         var id = slug(name), n = 2; while (used[id]) id = slug(name) + (n++);
         var p = { id: id, name: name.split(/\s+/)[0], full: name, role: str(d.role, 60) || 'Crew member', agency: (str(d.agency, 12) || 'NASA').toUpperCase(), img: null, order: crew.length + 1, created: meta.now };
         await db.setCrew(id, p);
+        var mr = await db.getMission(); if (mr && mr.removed && mr.removed.indexOf(id) >= 0) { mr.removed = mr.removed.filter(function (x) { return x !== id; }); await db.setMission(mr); }
         await emit(db, [{ t: meta.now, pid: id, type: 'crew', text: 'New crew member added: ' + p.full, sub: p.role + ' · ' + p.agency + (d.via ? ' · ' + str(d.via, 80) : ''), src: 'crew' }]);
         return { id: id, existed: false };
       }
@@ -307,6 +320,26 @@
         return { ok: true, offsets: offs };
       }
       case 'replay': return replay(db, d, meta);
+      /*
+       * Delete an astronaut's data (mode 'data': readings, alerts, logs, baseline, limits; the crew member stays)
+       * or remove the astronaut from the system (mode 'all'). Irreversible, so the exact name must be typed.
+       * One audit record (without health data) is kept and sent to Earth.
+       */
+      case 'removeCrew': {
+        var rc = await crewDoc(db, d.pid); if (!rc) throw err('not-found', 'Unknown astronaut');
+        var mode = d.mode === 'all' ? 'all' : 'data';
+        if (str(d.confirm, 80).toLowerCase() !== String(rc.full || rc.name).toLowerCase() && str(d.confirm, 80).toLowerCase() !== String(rc.name).toLowerCase()) throw err('failed-precondition', 'Type the astronaut\'s name to confirm');
+        var n = await db.purge(rc.id);
+        if (mode === 'all') {
+          await db.deleteCrew(rc.id);
+          var mm2 = (await db.getMission()) || {}; mm2.removed = (mm2.removed || []).filter(function (x) { return x !== rc.id; }).concat([rc.id]); await db.setMission(mm2);
+        } else {
+          var keep = Object.assign({}, rc); delete keep.baseline; await db.setCrew(rc.id, keep);
+        }
+        var what = n.readings + ' readings, ' + n.events + ' alerts and logs, ' + n.outbox + ' Earth records';
+        await emit(db, [{ t: meta.now, pid: null, type: 'crew', text: (mode === 'all' ? 'Crew member removed from CHARM: ' : 'All health data deleted: ') + (rc.full || rc.name), sub: 'Deleted ' + what + (meta.by ? ' · by ' + meta.by : ''), src: 'crew', by: meta.by || null }]);
+        return { ok: true, mode: mode, deleted: n };
+      }
       default: throw err('invalid-argument', 'Unknown operation ' + op);
     }
   }

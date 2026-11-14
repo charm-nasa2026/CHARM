@@ -4,3 +4,4 @@ tools/node_modules/
 .firebase/
 firebase-debug*.log
 *.local
+.claude/settings.local.json

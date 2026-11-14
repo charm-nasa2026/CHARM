@@ -30,7 +30,7 @@
     catch (e) { db = FB.initializeFirestore(app, { localCache: FB.memoryLocalCache() }); }
     var fns = FB.getFunctions(app, 'us-central1');
     if (/[?&]emulator\b/.test(location.search)) { FB.connectFirestoreEmulator(db, location.hostname, 8080); FB.connectFunctionsEmulator(fns, location.hostname, 5001); }
-    apiFn = FB.httpsCallable(fns, 'api', { timeout: 120000 });
+    apiFn = FB.httpsCallable(fns, 'api', { timeout: 300000 });
     var since = Date.now() - 8 * D;
     var list = function (snap) { return snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); }); };
     var fail = function (name) { return function (e) { state.error = name + ': ' + e.message; emit('status', state); console.error(name, e); }; };

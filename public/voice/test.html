@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Charmy voice check</title>
+<style>
+:root{--bg:#0b1220;--fg:#e8eef8;--mut:#9fb0c8;--ok:#2fbf71;--bad:#ff5a5a;--line:#24324a}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif;padding:24px 16px;max-width:720px;margin:auto}
+h1{font-size:22px;margin:0 0 4px}p{color:var(--mut)}button{font:inherit;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:#16223a;color:var(--fg);cursor:pointer;margin:4px 6px 4px 0}
+textarea{width:100%;box-sizing:border-box;min-height:90px;background:#0f1a2e;color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+#log{white-space:pre-wrap;font:13px/1.5 ui-monospace,monospace;background:#0f1a2e;border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:12px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+</style></head><body>
+<h1>Charmy voice check</h1>
+<p>Checks that the self-hosted Piper voices load and speak in this browser. Click a voice, wait for the download, then press Speak.</p>
+<div><button id="f">Female (hifi_tts_92)</button><button id="m">Male (joe)</button></div>
+<textarea id="t">Hi, I'm Charmy. Your heart rate is 72 bpm and your blood pressure is 118/76 mmHg. SpO2 is 98%. Body temperature 36.6 °C.</textarea>
+<div><button id="s">Speak</button><button id="i">Speak (interrupt)</button><button id="x">Stop</button><button id="mu">Mute</button></div>
+<div id="log"></div>
+<script src="charmy-voice.js"></script>
+<script>
+var L=document.getElementById('log'),muted=false;function log(s,c){var d=document.createElement('div');if(c)d.className=c;d.textContent=new Date().toLocaleTimeString()+'  '+s;L.appendChild(d);}
+log('Voice files: '+JSON.stringify(charmyVoice.voices));
+var last='';charmyVoice.onStatus(function(s){var k=s.voice+' '+s.state+' '+s.progress;if(k===last)return;last=k;log(s.voice+': '+s.state+(s.state==='loading'?' '+s.progress+'%':'')+(s.error?' ('+s.error+')':''),s.state==='ready'?'ok':s.state==='failed'?'bad':'');});
+function go(v){charmyVoice.setVoice(v);}
+document.getElementById('f').onclick=function(){go('female');};document.getElementById('m').onclick=function(){go('male');};
+function say(intr){var t0=performance.now();charmyVoice.speak(document.getElementById('t').value,{interrupt:intr,onStart:function(cps,neural){log((neural?'Neural':'Browser fallback')+' voice started after '+Math.round(performance.now()-t0)+' ms',neural?'ok':'');window.__vstart={neural:neural,ms:performance.now()-t0};},onEnd:function(c){log(c?'stopped':'finished');window.__vend=true;}});}
+document.getElementById('s').onclick=function(){say(false);};document.getElementById('i').onclick=function(){say(true);};
+document.getElementById('x').onclick=function(){charmyVoice.stop();};
+document.getElementById('mu').onclick=function(e){muted=!muted;charmyVoice.setMuted(muted);e.target.textContent=muted?'Unmute':'Mute';};
+</script></body></html>

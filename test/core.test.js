@@ -73,11 +73,11 @@ test('demo scenario reproduces the story', async () => {
     const s = E.sortSeries(await db.readings(id, NOW - 4 * 24 * H, NOW));
     lv[id] = E.personStatus(s, E.profile(await db.getOverride(id)), NOW);
   }
-  assert.strictEqual(lv.sarah.lvl, 2); assert.ok(lv.sarah.m.hr.val.irr);
-  assert.strictEqual(lv.marcus.lvl, 1); assert.strictEqual(lv.marcus.top, 'sleep');
+  assert.strictEqual(lv.sarah.lvl, 3); assert.ok(lv.sarah.m.hr.val.irr);
+  assert.strictEqual(lv.marcus.lvl, 2); assert.strictEqual(lv.marcus.top, 'c_orth'); assert.strictEqual(lv.marcus.m.sleep.l, 1);
   assert.strictEqual(lv.elena.lvl, -1);
   assert.strictEqual(lv.john.lvl, 0);
-  assert.ok(db.events.some(e => e.pid === 'sarah' && e.type === 'raise' && e.lv === 2));
+  assert.ok(db.events.some(e => e.pid === 'sarah' && e.type === 'raise' && e.lv === 3));
   await C.tick(db, NOW + 5 * MIN);
   assert.ok(db.events.some(e => e.pid === 'elena' && e.type === 'nodata'));
   assert.ok(db.events.some(e => e.k === 'co2'));
@@ -127,7 +127,7 @@ test('setBaseline stores the baseline and alerts use personal limits', async () 
   const st = await db.getStatus('elena');
   assert.strictEqual(st.levels.hr || 0, 0);      // 104 is above 100 but inside her personal 113 limit
   await C.api(db, 'addReadings', { src: 'record', readings: [{ pid: 'elena', k: 'hr', t: NOW - 30000, v: 135 }] }, { now: NOW });
-  assert.strictEqual((await db.getStatus('elena')).levels.hr, 2);   // critical 130 is the same for everyone
+  assert.strictEqual((await db.getStatus('elena')).levels.hr, 3);   // critical 130 is the same for everyone
 });
 
 test('daily clinical records stay current for 26 hours; import replay logs raise and clear in the past', async () => {
@@ -143,4 +143,49 @@ test('daily clinical records stay current for 26 hours; import replay logs raise
   assert.ok(raise && clear && raise.t < clear.t && clear.t < NOW - 60 * 60000);
   assert.ok(ev.some(e => e.text === 'Rested, ECG recorded'));
   assert.strictEqual((await db.getStatus('john')).levels.hr, 0);
+});
+
+test('medic thresholds: exam results and condition alerts (4 levels)', () => {
+  const p = E.profile(), at = (list) => E.personStatus(E.sortSeries(list.map(r => Object.assign({ pid: 'x', t: NOW - 60000, src: 'manual', sc: 4 }, r))), p, NOW);
+  // AF: ECG >= 30 s irregular, no P waves -> CAUTION; with fainting -> CRITICAL
+  assert.strictEqual(at([{ k: 'ecg', x: { irr: true, noP: true, sec: 60 } }]).m.c_af.l, 2);
+  assert.strictEqual(at([{ k: 'ecg', x: { irr: true, noP: true, sec: 60 } }, { k: 'sym', x: { faint: true } }]).m.c_af.l, 3);
+  // orthostatic: systolic drop 20 within 3 min -> CAUTION; fainting -> CRITICAL
+  assert.strictEqual(at([{ k: 'ortho', x: { s1: 120, d1: 75, s2: 99, d2: 70, min: 3 } }]).m.c_orth.l, 2);
+  assert.strictEqual(at([{ k: 'ortho', x: { s1: 120, d1: 75, s2: 110, d2: 70, min: 3, syncope: true } }]).m.c_orth.l, 3);
+  // infection: SIRS 2 + suspected infection -> CAUTION; qSOFA 2 -> CRITICAL; no suspicion -> no condition alert
+  const v = [{ k: 'temp', v: 38.4 }, { k: 'hr', v: 104 }, { k: 'rr', v: 18 }];
+  assert.strictEqual(at(v).m.c_inf.l, 0);
+  assert.strictEqual(at(v.concat([{ k: 'sym', x: { inf: true } }])).m.c_inf.l, 2);
+  assert.strictEqual(at([{ k: 'rr', v: 24 }, { k: 'bp', v: 96, v2: 60 }, { k: 'sym', x: { inf: true } }]).m.c_inf.l, 3);
+  // kidney: fluid < 2.5 L -> ATTENTION; blood in urine -> CAUTION; stone -> CRITICAL
+  assert.strictEqual(at([{ k: 'fluid', v: 1.8 }]).m.c_kid.l, 1);
+  assert.strictEqual(at([{ k: 'urine', x: { blood: true } }]).m.c_kid.l, 2);
+  assert.strictEqual(at([{ k: 'urine', x: { us: 'stone' } }]).m.c_kid.l, 3);
+  // SANS: dTRT 20 -> ATTENTION, 55 -> CRITICAL; VTE: < 10 cm/s -> CAUTION, thrombus -> CRITICAL
+  assert.strictEqual(at([{ k: 'vision', x: { trt: 22 } }]).m.c_sans.l, 1);
+  assert.strictEqual(at([{ k: 'vision', x: { trt: 60 } }]).m.c_sans.l, 3);
+  assert.strictEqual(at([{ k: 'ijv', x: { vel: 8 } }]).m.c_vte.l, 2);
+  assert.strictEqual(at([{ k: 'ijv', x: { thrombus: true } }]).m.c_vte.l, 3);
+  // personal offsets move the orange infection-screen numbers too, never the red qSOFA
+  const pe = E.profile(null, { hr: { mean: 98, n: 13 } });
+  assert.strictEqual(pe.inf.hr, 105); assert.strictEqual(pe.hr.xHi, 130);
+});
+
+test('removeCrew: delete data keeps the person; remove deletes them and bootstrap does not bring them back', async () => {
+  const db = new MemDB(), now = Date.UTC(2026, 10, 14, 12);
+  await C.api(db, 'bootstrap', {}, { now });
+  await C.api(db, 'addReadings', { src: 'manual', readings: [{ pid: 'sarah', k: 'hr', t: now - 60000, v: 72 }, { pid: 'sarah', k: 'spo2', t: now - 60000, v: 98 }] }, { now });
+  await C.api(db, 'addReadings', { src: 'manual', readings: [{ pid: 'maya', k: 'hr', t: now - 60000, v: 160 }, { pid: 'david', k: 'hr', t: now - 60000, v: 70 }] }, { now });
+  await assert.rejects(C.api(db, 'removeCrew', { pid: 'sarah', mode: 'all', confirm: 'wrong' }, { now }));
+  let r = await C.api(db, 'removeCrew', { pid: 'maya', mode: 'data', confirm: 'Maya' }, { now });
+  assert.strictEqual(r.deleted.readings, 1);
+  assert.ok((await db.listCrew()).some((c) => c.id === 'maya'));
+  assert.ok(!db.readingsL.some((x) => x.pid === 'maya') && !db.events.some((x) => x.pid === 'maya') && !db.outboxL.some((x) => x.pid === 'maya'));
+  r = await C.api(db, 'removeCrew', { pid: 'sarah', mode: 'all', confirm: 'sarah' }, { now });
+  assert.strictEqual(r.deleted.readings, 2);
+  await C.api(db, 'bootstrap', {}, { now: now + 1000 });
+  assert.ok(!(await db.listCrew()).some((c) => c.id === 'sarah'));
+  assert.ok(db.outboxL.some((o) => /removed from CHARM: Sarah/.test(o.text)));
+  assert.ok(db.readingsL.some((x) => x.pid !== 'sarah'));
 });

@@ -37,6 +37,12 @@
   P.addOutbox = async function (arr) { var me = this; arr.forEach(function (o) { me.outboxL.push(Object.assign({ id: me.id('o') }, o)); }); this.changed('outbox'); };
   P.outbox = async function (statuses, limit) { return this.outboxL.filter(function (o) { return statuses.indexOf(o.status) >= 0; }).slice(0, limit || 500).map(function (o) { return Object.assign({}, o); }); };
   P.updateOutbox = async function (id, patch) { this.outboxL.forEach(function (o) { if (o.id === id) Object.assign(o, patch); }); this.changed('outbox'); };
+  P.purge = async function (pid) {
+    var me = this, n = {};
+    [['readings', 'readingsL'], ['events', 'events'], ['outbox', 'outboxL']].forEach(function (c) { var before = me[c[1]].length; me[c[1]] = me[c[1]].filter(function (x) { return x.pid !== pid; }); n[c[0]] = before - me[c[1]].length; });
+    delete this.status[pid]; delete this.overrides[pid]; this.changed('purge'); return n;
+  };
+  P.deleteCrew = async function (id) { delete this.crew[id]; this.changed('crew'); };
   P.addInbox = async function (arr) { var me = this; arr.forEach(function (o) { me.inbox.push(Object.assign({ id: me.id('i') }, o)); }); this.changed('inbox'); };
   return MemDB;
 });

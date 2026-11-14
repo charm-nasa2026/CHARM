@@ -30,7 +30,7 @@ python3 tools/build_crew_csv.py "<path to charm_db>" data
 | File | Story | Built from |
 |---|---|---|
 | `demo_sarah_red-alert.csv` | 35 h. Treadmill, then a **fast irregular heart rhythm at rest: CRITICAL** with SpO₂ and breathing CAUTION. The crew stops her, records an ECG, opens Emergency Mode, puts oxygen on and contacts the flight surgeon. Rhythm regular again → **back to NORMAL** | Sarah's real baseline (C3C_7352) + the CSA stream's 5-minute day pattern (sleep, work, exercise) |
-| `demo_marcus_caution.csv` | 27 h. **Short sleep 5.4 h: CAUTION**, then low fluids: **heart rate > 100 and BP 88/58: CAUTION**. He drinks 1 L of rehydration fluid and rests, gets a second litre, and Charmy schedules a full sleep period → **all back to NORMAL** | NASA bed-rest crew-average baseline + CSA stream pattern. The plasma-volume loss in weightlessness is from the NASA bed-rest data. |
+| `demo_marcus_caution.csv` | 27 h. **Short sleep 5.4 h: ATTENTION**, then low fluids: **heart rate > 100 and BP 88/58: CAUTION**. He drinks 1 L of rehydration fluid and rests, gets a second litre, and Charmy schedules a full sleep period → **all back to NORMAL** | NASA bed-rest crew-average baseline + CSA stream pattern. The plasma-volume loss in weightlessness is from the NASA bed-rest data. |
 
 The `note` column holds what the crew did. Each note appears in **Alerts and history** at its own time, between the alert and the recovery.
 
@@ -38,6 +38,7 @@ The `note` column holds what the crew did. Each note appears in **Alerts and his
 
 | File | Use |
 |---|---|
+| `charm_alert_rules.csv` | **The medic team's exact alert thresholds** (CHARM_Exact_Alert_Thresholds.pdf), 26 rules over 6 conditions: VTE, atrial fibrillation, orthostatic hypotension, infection (SIRS / qSOFA), kidney stones, SANS. Each row has the level (ATTENTION / CAUTION / CRITICAL), app message, next step, source and how CHARM implements it. |
 | `charm_reference_ranges.csv` | The team's reference ranges with sources (NEWS2, AHA/ACC, ADA, WHO, GLIM, AASM, NASA-STD-3001). Blood-panel levels in the app use them. |
 | `crew_average_baselines.csv` | Crew averages from 29 bed-rest volunteers before bed rest (HR 69, BP 116/70, breathing 16.9, temp 36.5), plus the offset cap and the gap to critical. |
 | `crew_personal_baselines.csv` | Each crew member's pre-mission average from `personal_baselines.csv`. |
@@ -58,8 +59,44 @@ The `note` column holds what the crew did. Each note appears in **Alerts and his
    - The CSA file uses **last row = now**.
 3. **Import the demo files** (default: last row = now). After an import, CHARM replays its alert rules over the imported time, so the red and yellow periods, the crew notes and the return to normal all show in Alerts and history and on the timeline.
 
+## Alert levels
+| Level | Colour | Meaning |
+|---|---|---|
+| NORMAL | green | no listed trigger met |
+| ATTENTION | yellow | one screening limit crossed |
+| CAUTION | orange | a medical criterion or a multi-signal pattern (condition alert) |
+| CRITICAL | red | urgent; limits never move with personal offsets |
+
+Personal offsets move the yellow limits and the orange infection-screen numbers; red stays fixed.
+
+## Simulated filler data (`crew-simulated/`)
+Values for the measurements each person's real file does **not** have, so every tile has a value. They never replace or overlap a real value.
+
+| File | Fills |
+|---|---|
+| `sarah_simulated.csv`, `maya_simulated.csv`, `david_simulated.csv` | SpO₂, sleep, glucose (daily), mood, exercise, radiation dose, fluid intake (David), WBC / platelets / lymphocytes, weekly ECG review, orthostatic test, urine check, 2-weekly neck-vein and eye exams, daily symptom check |
+| `marcus_simulated.csv`, `robert_simulated.csv`, `amara_simulated.csv` | All vital signs (their real files are Inspiration4 blood counts only), plus the same set as above (blood counts stay real) |
+| `john_simulated.csv` | Core temperature, glucose, sleep, mood, exercise, fluids, blood panel, exams (his base stream is CSA's simulated Bio-Monitor) |
+
+**Real-only (no filler on purpose): Elena and Mei.** Their tiles show NO DATA where there is no real measurement.
+
+**How the filler is built:**
+- **Anchors:** values are anchored to the person's real pre-mission baseline when one exists. Otherwise they use the NASA bed-rest crew average.
+- **Trend:** a slow drift over the mission (fluid shift, deconditioning).
+- **Mostly NORMAL:** results are mostly NORMAL, with a few realistic ATTENTION days, such as a short night or a low-fluid day.
+- **Reproducible:** the random numbers are seeded, so every build gives the same files.
+
+**How it's marked:**
+- Every row has `data_type = simulated`. In the app each value shows a **SIM** tag (real values show **REAL**), simulated chart lines are dashed, and confidence is shown as Low.
+- Simulated rows never set a personal baseline.
+- The demo files and John's CSA stream are also `simulated`.
+
+**Load order:** import the real crew file first, then that person's simulated file. Both use mission days.
+
 ## CHARM CSV columns
-`time_gmt, astronaut, agency, role, phase (baseline | mission | recovery), mission_day, heart_rate, spo2, resp_rate, temp_c, bp_systolic, bp_diastolic, glucose_mgdl, sleep_hours, radiation_dose_pct, weight_kg, fluid_intake_l, hemoglobin_g_dl, hematocrit_pct, wbc_k_per_ul, platelets_k_per_ul, lymphocytes_per_ul, irregular_rhythm (1), context (rest | ex | sleep), skin_temp_c, sim_label, source, note`
+`time_gmt, astronaut, agency, role, phase (baseline | mission | recovery), mission_day, heart_rate, spo2, resp_rate, temp_c, bp_systolic, bp_diastolic, glucose_mgdl, sleep_hours, radiation_dose_pct, weight_kg, fluid_intake_l, hemoglobin_g_dl, hematocrit_pct, wbc_k_per_ul, platelets_k_per_ul, lymphocytes_per_ul, irregular_rhythm (1), context (rest | ex | sleep), skin_temp_c, sim_label, ecg_irregular, ecg_no_p_waves, ecg_seconds, ecg_unstable, ortho_lying_sbp, ortho_lying_dbp, ortho_standing_sbp, ortho_standing_dbp, ortho_minutes, syncope, source, note`
+
+The importer also reads `urine_24h_l, urine_blood, kidney_ultrasound (none|stone|hydro), ijv_velocity_cm_s, ijv_retrograde, ijv_thrombus, sans_delta_trt_um, sans_frisen_grade, sans_refraction_shift_d, sans_folds (none|any|sharp), sans_globe_flattening (none|present|moderate), symptom_suspected_infection, symptom_confusion, symptom_fainting, symptom_chest_pain`. Yes/no columns take 1/0.
 
 `weight_kg`, `fluid_intake_l`, `skin_temp_c` and `sim_label` are kept in the files but not shown in the app yet. Skin temperature is not core temperature, so it is never used for fever alerts.
 

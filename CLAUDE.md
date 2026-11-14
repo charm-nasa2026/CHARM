@@ -12,7 +12,7 @@ Read README.md first. Key rules:
   - No agency logos.
   - The AI assistant is "Charmy" (never "bot").
   - No gamification.
-  - Status is always color + word (NORMAL / CAUTION / CRITICAL / NO DATA).
+  - Status is always color + word + shape (NORMAL / ATTENTION / CAUTION / CRITICAL / NO DATA). Levels in code: -1, 0, 1, 2, 3. Thresholds for the six conditions are in data/reference/charm_alert_rules.csv; keep engine.js in step with it.
   - Stale data is never green.
 - Never handle credentials. Deploy with the user's own `firebase login` (project charm-b9fd1).
 - Test locally: serve `public/` and open `index.html?backend=local`.

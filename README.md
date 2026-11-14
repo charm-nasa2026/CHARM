@@ -29,6 +29,9 @@ The server logic lives in `shared/engine.js` and `shared/core.js`. The browser u
 ## Laptop / tablet view
 The button next to the gear wheel switches between laptop and tablet view. Tablet view has bigger touch targets, a collapsed menu and fewer cards per row. The choice is saved on the device. On a touch screen narrower than 1400 px, tablet view turns on automatically.
 
+## Alert levels
+NORMAL (green) · ATTENTION (yellow, one screening limit) · CAUTION (orange, medical criterion or multi-signal condition) · CRITICAL (red, urgent). The six condition alerts and their numbers come from the medic team's `data/reference/charm_alert_rules.csv`, and the logic is in `shared/engine.js` (`conditions`, `examLevel`). New exam forms are under **Add measurement**: ECG review, orthostatic BP test, urine/kidney check, neck-vein ultrasound, eye exam, symptom check, fluid intake.
+
 ## Data (`data/`)
 Real crew files (NASA bed rest, Inspiration4, CSA stream), two demo scenarios (red alert, caution), and reference tables. Import them with **Import data**. See `data/README.md` for sources, the load order (set today to Mission Day 60 first) and the personal alert limits. Rebuild them with `python3 tools/build_crew_csv.py <charm_db folder> data`.
 

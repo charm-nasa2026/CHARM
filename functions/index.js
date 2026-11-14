@@ -56,11 +56,26 @@ const db = {
   addOutbox: (arr) => commitAll(arr.map((o) => (b) => b.set(col('outbox').doc(), clean(o)))),
   outbox: async (statuses, limit) => data(await col('outbox').where('status', 'in', statuses).limit(limit || 500).get()),
   updateOutbox: (id, patch) => col('outbox').doc(id).update(clean(patch)),
+  // deletes every document of one astronaut in a collection, 400 at a time
+  purge: async (pid) => {
+    const n = {};
+    for (const c of ['readings', 'events', 'outbox']) {
+      n[c] = 0;
+      for (;;) {
+        const snap = await col(c).where('pid', '==', pid).limit(400).get();
+        if (snap.empty) break;
+        const b = fs.batch(); snap.docs.forEach((d) => b.delete(d.ref)); await b.commit(); n[c] += snap.size;
+      }
+    }
+    await col('status').doc(pid).delete(); await col('overrides').doc(pid).delete();
+    return n;
+  },
+  deleteCrew: (id) => col('crew').doc(id).delete(),
   addInbox: (arr) => commitAll(arr.map((o) => (b) => b.set(col('inbox').doc(), clean(o))))
 };
 
 /* ---------- callable API ---------- */
-exports.api = onCall({ invoker: 'public', timeoutSeconds: 120, memory: '512MiB' }, async (req) => {
+exports.api = onCall({ invoker: 'public', timeoutSeconds: 300, memory: '512MiB' }, async (req) => {
   const body = req.data || {};
   if (typeof body.op !== 'string') throw new HttpsError('invalid-argument', 'Missing op');
   try {

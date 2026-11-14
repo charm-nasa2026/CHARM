@@ -19,9 +19,15 @@ OUT = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.path.dirname(__file_
 
 COLS = ['time_gmt', 'astronaut', 'agency', 'role', 'phase', 'mission_day',
         'heart_rate', 'spo2', 'resp_rate', 'temp_c', 'bp_systolic', 'bp_diastolic', 'glucose_mgdl', 'sleep_hours',
-        'radiation_dose_pct', 'weight_kg', 'fluid_intake_l',
+        'radiation_dose_pct', 'mood_0_10', 'exercise_pct', 'weight_kg', 'fluid_intake_l',
         'hemoglobin_g_dl', 'hematocrit_pct', 'wbc_k_per_ul', 'platelets_k_per_ul', 'lymphocytes_per_ul',
-        'irregular_rhythm', 'context', 'skin_temp_c', 'sim_label', 'source', 'note']
+        'irregular_rhythm', 'context', 'skin_temp_c', 'sim_label',
+        'ecg_irregular', 'ecg_no_p_waves', 'ecg_seconds', 'ecg_unstable',
+        'ortho_lying_sbp', 'ortho_lying_dbp', 'ortho_standing_sbp', 'ortho_standing_dbp', 'ortho_minutes', 'syncope',
+        'urine_24h_l', 'urine_blood', 'kidney_ultrasound', 'ijv_velocity_cm_s', 'ijv_retrograde', 'ijv_thrombus',
+        'sans_delta_trt_um', 'sans_frisen_grade', 'sans_refraction_shift_d', 'sans_folds', 'sans_globe_flattening',
+        'symptom_suspected_infection', 'symptom_confusion', 'symptom_fainting', 'symptom_chest_pain',
+        'data_type', 'source', 'note']
 
 # crew member -> source person
 CREW = {
@@ -221,9 +227,11 @@ def build_demos(sim, base):
         S0: note('Treadmill session started (scheduled exercise).'),
         S0 + 35: dict(note('Charmy: fast irregular heart rhythm at rest after exercise. Red alert to all crew. Sarah stopped and lay down; crew strapped her in.'),
                       bp_systolic='98', bp_diastolic='62'),
-        S0 + 40: note('1-minute ECG recorded with the smart shirt: irregular rhythm. Emergency Mode opened; flight surgeon notified with priority.'),
+        S0 + 40: dict(note('1-minute ECG reviewed: irregular RR intervals and no P waves (AF criterion). Emergency Mode opened; flight surgeon notified with priority.'),
+                      ecg_irregular='1', ecg_no_p_waves='1', ecg_seconds='60', ecg_unstable='0'),
         S0 + 50: note('Oxygen mask on, oral fluids. Flight surgeon (on the Earth link) confirmed: rest, keep monitoring, follow the cardiac checklist.'),
-        S0 + 75: dict(note('Repeat 1-minute ECG: regular rhythm again. Oxygen off.'), bp_systolic='104', bp_diastolic='64', temp_c='36.9'),
+        S0 + 75: dict(note('Repeat 1-minute ECG: regular rhythm again. Oxygen off.'), bp_systolic='104', bp_diastolic='64', temp_c='36.9',
+                      ecg_irregular='0', ecg_no_p_waves='0', ecg_seconds='60', ecg_unstable='0'),
         S0 + 120: dict(note('Rhythm stable for 45 minutes. Exercise paused for 24 h; repeat ECG before the next session (flight surgeon).'),
                        bp_systolic='105', bp_diastolic='63'),
     }
@@ -233,7 +241,7 @@ def build_demos(sim, base):
     d1 = demo_rows(win, ('Sarah', 'NASA', 'Flight Engineer'), hrb, base['C3_C3C_7352']['resp_rate']['mean'], start, ev, ex, src1)
     d1 = [r for r in d1 if r['time_gmt'] <= (start + dt.timedelta(minutes=S0 + 200)).strftime('%Y-%m-%dT%H:%M:00Z')]
 
-    # --- Demo 2: Marcus · CAUTION (short sleep, then low fluids: heart rate up, blood pressure down) -> fixed -> NORMAL
+    # --- Demo 2: Marcus · ATTENTION (short sleep, low fluids) + CAUTION (orthostatic BP drop) -> fixed -> NORMAL
     hrc, rrc = 69.0, 16.9          # crew average from the NASA bed-rest pre-phase (Marcus has no own vital-sign baseline)
     D0 = 7 * 60                    # day 1 13:00
     ev2 = [
@@ -247,9 +255,13 @@ def build_demos(sim, base):
         6 * 60: {'fluid_intake_l': '0.9', 'note': 'Fluid intake by midday: 0.9 L (plan: 2.5 L per day).'},
         D0 + 10: {'bp_systolic': '92', 'bp_diastolic': '60'},
         D0 + 30: dict(bp_systolic='88', bp_diastolic='58', note='Charmy: heart rate above 100 at rest and blood pressure low (caution). Likely low fluids: in weightlessness blood plasma volume already falls about 10%.'),
+        D0 + 35: dict(note('Orthostatic test: lying 116/74; standing 3 min 92/60 (drop 24/14; criterion met).'), ortho_lying_sbp='116', ortho_lying_dbp='74',
+                      ortho_standing_sbp='92', ortho_standing_dbp='60', ortho_minutes='3', syncope='0'),
         D0 + 40: note('Marcus drank 1 L of oral rehydration fluid and rested seated. Repeat blood pressure in 20 minutes (Charmy reminder).'),
         D0 + 60: {'bp_systolic': '96', 'bp_diastolic': '62'},
         D0 + 100: {'bp_systolic': '108', 'bp_diastolic': '68', 'note': 'Repeat blood pressure 108/68. Second litre of fluids during the afternoon.'},
+        D0 + 120: dict(note('Repeat orthostatic test: lying 116/73; standing 3 min 111/71. Back to NORMAL.'), ortho_lying_sbp='116', ortho_lying_dbp='73',
+                       ortho_standing_sbp='111', ortho_standing_dbp='71', ortho_minutes='3', syncope='0'),
         D0 + 150: {'bp_systolic': '114', 'bp_diastolic': '72', 'fluid_intake_l': '2.6'},
         15 * 60: dict(note='Charmy moved the evening tasks so Marcus gets a full 8-hour sleep period.'),
         24 * 60 + 60: dict(sleep_hours='7.8', note='Sleep 7.8 h. Sleep back to NORMAL.'),
@@ -263,6 +275,67 @@ def build_demos(sim, base):
     return d1, d2
 
 
+# ---------------- simulated filler (data/crew-simulated) ----------------
+SIM_FILL = ['sarah', 'maya', 'david', 'marcus', 'robert', 'amara', 'john']     # not elena, not mei: they stay real-only
+REAL_ONLY = ['elena', 'mei']
+MD_FROM, MD_TO = -15, 60          # mission days written (today = Day 60 when the launch is set 59 days back)
+
+
+def sim_fill(key, real_rows, base):
+    """Values only for measurements this person's real file does not have. Anchored to the person's real pre-mission
+    baseline when it exists, otherwise to the NASA bed-rest crew average. Seeded, so every build is identical.
+    Mostly NORMAL, with a few realistic ATTENTION days (a short night, a low-fluid day)."""
+    import random
+    name, agency, role, pid, src = CREW[key]
+    rnd = random.Random('charm-sim-' + key)
+    skip = {'time_gmt', 'astronaut', 'agency', 'role', 'phase', 'mission_day', 'source', 'note', 'data_type', 'context', 'sim_label', 'skin_temp_c'}
+    have = {c for r in real_rows for c in COLS if c not in skip and r.get(c) not in (None, '')}
+    b = base.get(pid, {})
+    def bl(k, dflt): return b[k]['mean'] if k in b and b[k]['n'] >= 3 else dflt
+    hr0, sb0, db0 = bl('heart_rate', 69 + rnd.uniform(-6, 6)), bl('systolic_bp', 116 + rnd.uniform(-6, 6)), bl('diastolic_bp', 70 + rnd.uniform(-4, 4))
+    rr0, tp0 = bl('resp_rate', 16.5), bl('body_temp', 36.6)
+    anchor = ('anchored to ' + src) if b and not pid.startswith('SIM') else 'anchored to the NASA bed-rest crew average'
+    out = []
+    g = lambda sd: rnd.gauss(0, sd)
+    def row(md, hhmm, **vals):
+        d = dt.date(2026, 1, 1) + dt.timedelta(days=md + 100)          # nominal date; import places rows by mission_day
+        r = {c: '' for c in COLS}
+        r.update(time_gmt=d.isoformat() + 'T' + hhmm + ':00Z', astronaut=name, agency=agency, role=role,
+                 phase='baseline' if md <= 0 else 'mission', mission_day=str(md), data_type='simulated', source='SIMULATED filler · ' + anchor)
+        r.update(vals); out.append(r)
+    for md in range(MD_FROM, MD_TO + 1):
+        day, fl = md - MD_FROM, max(0, md) / 60.0                       # slow drift over the mission
+        v = {}
+        if 'heart_rate' not in have: v['heart_rate'] = fmt(hr0 + 3 * fl + g(3), 0)
+        if 'bp_systolic' not in have: v['bp_systolic'] = fmt(sb0 - 3 * fl + g(4), 0); v['bp_diastolic'] = fmt(db0 - 1.5 * fl + g(3), 0)
+        if 'resp_rate' not in have: v['resp_rate'] = fmt(rr0 + g(0.8), 0)
+        if 'temp_c' not in have: v['temp_c'] = fmt(tp0 + 0.15 * fl + g(0.12), 1)
+        if 'spo2' not in have: v['spo2'] = fmt(min(100, 98 + g(0.7)), 0)
+        if 'sleep_hours' not in have:
+            v['sleep_hours'] = fmt(5.6 + rnd.uniform(0, 0.3) if day % 17 == 9 else 6.9 - 0.4 * fl + g(0.45), 1)
+        if v: row(md, '06:00', **v)
+        if 'glucose_mgdl' not in have: row(md, '06:30', glucose_mgdl=fmt(90 + 2 * fl + g(5), 0))
+        if md >= 1:
+            row(md, '08:00', mood_0_10=fmt(min(10, max(4, 7.5 - 0.8 * fl + g(0.8))), 0), symptom_suspected_infection='0', symptom_confusion='0',
+                symptom_fainting='0', symptom_chest_pain='0')
+            row(md, '19:00', exercise_pct=fmt(min(100, max(55, 92 + g(8))), 0))
+            if 'radiation_dose_pct' not in have: row(md, '12:00', radiation_dose_pct=fmt(md * 0.3, 2))   # ~1.8 mSv/day on a Mars transit = 0.3 % of 600 mSv
+        if day % 3 == 0 and 'fluid_intake_l' not in have:
+            row(md, '21:00', fluid_intake_l=fmt(2.2 + rnd.uniform(0, 0.2) if day % 19 == 7 else 2.9 + g(0.25), 1))
+        if md % 7 == 0:                                                    # weekly checks, normal results
+            row(md, '10:00', ecg_irregular='0', ecg_no_p_waves='0', ecg_seconds='60', ecg_unstable='0')
+            row(md, '10:15', ortho_lying_sbp=fmt(sb0 + g(3), 0), ortho_lying_dbp=fmt(db0 + g(2), 0), ortho_standing_sbp=fmt(sb0 - 6 + g(3), 0),
+                ortho_standing_dbp=fmt(db0 - 2 + g(2), 0), ortho_minutes='3', syncope='0')
+            row(md, '07:30', urine_24h_l=fmt(2.9 + g(0.25), 1), urine_blood='0', kidney_ultrasound='none')
+            if md % 14 == 0:
+                row(md, '11:00', ijv_velocity_cm_s=fmt(22 + g(3), 0), ijv_retrograde='0', ijv_thrombus='0')
+                row(md, '11:30', sans_delta_trt_um=fmt(max(0, 2 + 0.12 * max(0, md) + g(2)), 0), sans_frisen_grade='0',
+                    sans_refraction_shift_d=fmt(max(0, 0.004 * max(0, md) + g(0.05)), 2), sans_folds='none', sans_globe_flattening='none')
+            if 'wbc_k_per_ul' not in have:
+                row(md, '07:45', wbc_k_per_ul=fmt(6.2 + g(0.9), 1), platelets_k_per_ul=fmt(250 + g(30), 0), lymphocytes_per_ul=fmt(1900 + g(250), 0))
+    return sorted(out, key=lambda r: (int(r['mission_day']), r['time_gmt']))
+
+
 def baselines():
     base = collections.defaultdict(dict)
     with open(os.path.join(SRC, 'personal_baselines.csv'), encoding='utf-8-sig') as f:
@@ -273,8 +346,12 @@ def baselines():
     return base
 
 
-def write(path, rows, cols=COLS):
+def write(path, rows, cols=COLS, dtype=None):
     os.makedirs(os.path.dirname(path), exist_ok=True)
+    if dtype and 'data_type' in cols:
+        for r in rows:
+            r.setdefault('data_type', dtype)
+            if not r['data_type']: r['data_type'] = dtype
     for r in rows:
         for c in ('note', 'source'):
             if r.get(c):
@@ -295,10 +372,15 @@ def main():
     for key, fn in files.items():
         pid = CREW[key][3]
         rows = i4_file(key, obs[pid]) if pid.startswith('I4_') else csa_file(key, obs[pid]) if pid.startswith('SIM') else bedrest_file(key, obs[pid])
-        write(os.path.join(OUT, 'crew', fn), rows)
+        write(os.path.join(OUT, 'crew', fn), rows, dtype='simulated' if pid.startswith('SIM') else 'real')
     d1, d2 = build_demos(sim_series(obs['SIM_CSA-Astro-01']), base)
-    write(os.path.join(OUT, 'demo', 'demo_sarah_red-alert.csv'), d1)
-    write(os.path.join(OUT, 'demo', 'demo_marcus_caution.csv'), d2)
+    write(os.path.join(OUT, 'demo', 'demo_sarah_red-alert.csv'), d1, dtype='simulated')
+    write(os.path.join(OUT, 'demo', 'demo_marcus_caution.csv'), d2, dtype='simulated')
+    # simulated filler for the measurements each crew member is missing (Elena and Mei stay real-only)
+    for key in SIM_FILL:
+        pid = CREW[key][3]
+        real = i4_file(key, obs[pid]) if pid.startswith('I4_') else csa_file(key, obs[pid]) if pid.startswith('SIM') else bedrest_file(key, obs[pid])
+        write(os.path.join(OUT, 'crew-simulated', key + '_simulated.csv'), sim_fill(key, real, base), dtype='simulated')
 
     # reference tables
     os.makedirs(os.path.join(OUT, 'reference'), exist_ok=True)
