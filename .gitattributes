@@ -2,5 +2,7 @@
 data/raw/** filter=lfs diff=lfs merge=lfs -text
 # keep the README in data/raw as a normal text file
 data/raw/README.md !filter !diff !merge text
+# Charmy's voice models (about 63 MB each)
+public/voices/*.onnx filter=lfs diff=lfs merge=lfs -text
 # shell scripts keep LF endings so bash can run them after a Windows checkout
 *.sh text eol=lf
