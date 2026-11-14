@@ -1,0 +1,4 @@
+# Git LFS: the team's raw data files (large). Everything else in the repo is normal git.
+data/raw/** filter=lfs diff=lfs merge=lfs -text
+# keep the README in data/raw as a normal text file
+data/raw/README.md !filter !diff !merge text
