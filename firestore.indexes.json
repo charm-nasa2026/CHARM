@@ -1,0 +1,7 @@
+{
+  "indexes": [
+    { "collectionGroup": "readings", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "pid", "order": "ASCENDING" }, { "fieldPath": "t", "order": "ASCENDING" } ] },
+    { "collectionGroup": "env", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "k", "order": "ASCENDING" }, { "fieldPath": "t", "order": "DESCENDING" } ] }
+  ],
+  "fieldOverrides": []
+}

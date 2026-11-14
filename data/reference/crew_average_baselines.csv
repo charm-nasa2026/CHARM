@@ -1,0 +1,6 @@
+metric,crew_average,between_person_sd,n_people,offset_cap,gap_to_critical,source
+heart_rate,69.0,9.94,29,15,5,personal_baselines.csv (pre-bed-rest values; NASA bed rest C1/C3/C11)
+systolic_bp,116.0,7.6,29,11,5,personal_baselines.csv (pre-bed-rest values; NASA bed rest C1/C3/C11)
+diastolic_bp,69.98,6.64,29,10,5,personal_baselines.csv (pre-bed-rest values; NASA bed rest C1/C3/C11)
+resp_rate,16.89,0.96,29,1.4,2,personal_baselines.csv (pre-bed-rest values; NASA bed rest C1/C3/C11)
+body_temp,36.5,0.27,26,0.4,0.5,personal_baselines.csv (pre-bed-rest values; NASA bed rest C1/C3/C11)

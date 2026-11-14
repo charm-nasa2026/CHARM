@@ -1,0 +1,3 @@
+{ "name": "charm-tools", "private": true, "description": "Build helpers: bundles the Firebase web SDK into public/js/firebase.js",
+  "scripts": { "build": "node build.mjs" },
+  "devDependencies": { "esbuild": "0.24.0", "firebase": "13.3.0" } }

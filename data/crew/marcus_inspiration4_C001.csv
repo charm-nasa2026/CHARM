@@ -1,0 +1,8 @@
+time_gmt,astronaut,agency,role,phase,mission_day,heart_rate,spo2,resp_rate,temp_c,bp_systolic,bp_diastolic,glucose_mgdl,sleep_hours,radiation_dose_pct,weight_kg,fluid_intake_l,hemoglobin_g_dl,hematocrit_pct,wbc_k_per_ul,platelets_k_per_ul,lymphocytes_per_ul,irregular_rhythm,context,skin_temp_c,sim_label,source,note
+2021-06-16T08:00:00Z,Marcus,NASA,Commander,baseline,-91,,,,,,,,,,,,14.1,42.5,5.4,241,2241,,,,,Inspiration4 crew C001 · OSDR LSDS-7 · draw L-92 · blood drawn on Earth,
+2021-08-03T08:00:00Z,Marcus,NASA,Commander,baseline,-43,,,,,,,,,,,,14.9,45.1,5.5,237,1859,,,,,Inspiration4 crew C001 · OSDR LSDS-7 · draw L-44 · blood drawn on Earth,
+2021-09-13T08:00:00Z,Marcus,NASA,Commander,baseline,-2,,,,,,,,,,,,14.7,44.5,7.0,258,2667,,,,,Inspiration4 crew C001 · OSDR LSDS-7 · draw L-3 · blood drawn on Earth,
+2021-09-19T08:00:00Z,Marcus,NASA,Commander,recovery,4,,,,,,,,,,,,14.7,43.6,5.0,227,1640,,,,,Inspiration4 crew C001 · OSDR LSDS-7 · draw R+1 · blood drawn on Earth,
+2021-11-02T08:00:00Z,Marcus,NASA,Commander,recovery,48,,,,,,,,,,,,14.3,43.3,4.9,228,2146,,,,,Inspiration4 crew C001 · OSDR LSDS-7 · draw R+45 · blood drawn on Earth,
+2021-12-09T08:00:00Z,Marcus,NASA,Commander,recovery,85,,,,,,,,,,,,15.7,46.1,4.9,257,2171,,,,,Inspiration4 crew C001 · OSDR LSDS-7 · draw R+82 · blood drawn on Earth,
+2022-03-31T08:00:00Z,Marcus,NASA,Commander,recovery,197,,,,,,,,,,,,14.1,41.8,4.9,214,1847,,,,,Inspiration4 crew C001 · OSDR LSDS-7 · draw R+194 · blood drawn on Earth,

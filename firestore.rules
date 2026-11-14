@@ -1,0 +1,13 @@
+rules_version = '2';
+// CHARM: the app reads, only the server writes.
+// Every write goes through the `api` Cloud Function, which validates it and keeps the data append-only.
+// There is no sign-in in this hackathon build (team decision), so anyone with the link can READ the data.
+// Before real crew data is used, add Firebase Authentication and replace `true` with a role check.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{coll}/{docId} {
+      allow read: if coll in ['crew', 'mission', 'overrides', 'readings', 'env', 'status', 'events', 'outbox', 'inbox'];
+      allow write: if false;
+    }
+  }
+}
