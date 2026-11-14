@@ -32,6 +32,8 @@ The button next to the gear wheel switches between laptop and tablet view. Table
 ## Data (`data/`)
 Real crew files (NASA bed rest, Inspiration4, CSA stream), two demo scenarios (red alert, caution), and reference tables. Import them with **Import data**. See `data/README.md` for sources, the load order (set today to Mission Day 60 first) and the personal alert limits. Rebuild them with `python3 tools/build_crew_csv.py <charm_db folder> data`.
 
+Raw team data is in `data/raw` (Git LFS). Run `git lfs pull` after cloning.
+
 ## Startup intro (6 s)
 `public/assets/intro.mp4`: the C.H.A.R.M. clip, compressed to 3.2 MB at 1080p. It plays over the app while the app loads underneath.
 - **Shown** when this device has not opened CHARM in the last 8 hours. The device stores `charm-last-active` and refreshes it every 5 minutes while the app is open.
