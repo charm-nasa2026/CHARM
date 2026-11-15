@@ -35,6 +35,7 @@
     urine: { label: 'Urine and kidney check', short: 'Kidney', unit: '', dec: 0, stat: true },
     ijv: { label: 'Neck vein ultrasound (IJV)', short: 'Neck vein', unit: '', dec: 0, stat: true },
     sym: { label: 'Symptom check', short: 'Symptoms', unit: '', dec: 0, stat: true },
+    bone: { label: 'Bone turnover markers', short: 'Bone', unit: '', dec: 0, stat: true },
     /* condition-level alerts (CHARM_Exact_Alert_Thresholds, medic team). Computed from several signals; not entered directly. */
     c_inf: { label: 'Infection / systemic deterioration', short: 'Infection', unit: '', dec: 0, cond: true, hidden: true },
     c_af: { label: 'Atrial fibrillation / arrhythmia', short: 'Arrhythmia', unit: '', dec: 0, cond: true, hidden: true },
@@ -43,12 +44,13 @@
     c_sans: { label: 'SANS (eyes and optic disc)', short: 'SANS', unit: '', dec: 0, cond: true, hidden: true },
     c_vte: { label: 'Venous thrombosis (neck vein)', short: 'VTE', unit: '', dec: 0, cond: true, hidden: true },
     c_anem: { label: 'Fluid loss and space anemia', short: 'Anemia', unit: '', dec: 0, cond: true, hidden: true },
+    c_vol: { label: 'Circulation strain (shock index)', short: 'Shock index', unit: '', dec: 0, cond: true, hidden: true },
     rt: { label: 'Reaction time', short: 'Reaction', unit: 'ms', dec: 0, hidden: true }
   };
   var EXAMK = ['ecg', 'ortho', 'urine', 'ijv', 'sym'];
-  var CONDK = ['c_inf', 'c_af', 'c_orth', 'c_kid', 'c_sans', 'c_vte', 'c_anem'];
-  var MKEYS = ['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'fluid', 'wt', 'vision', 'blood'].concat(EXAMK).concat(CONDK);
-  var LKEYS = ['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'wt'].concat(CONDK); // what raises alerts
+  var CONDK = ['c_inf', 'c_af', 'c_orth', 'c_kid', 'c_sans', 'c_vte', 'c_anem', 'c_vol'];
+  var MKEYS = ['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'fluid', 'wt', 'vision', 'blood', 'bone'].concat(EXAMK).concat(CONDK);
+  var LKEYS = ['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'wt', 'bone', 'c_vol'].concat(CONDK.filter(function (k) { return k !== 'c_vol'; })); // what raises alerts (the first of equal levels is the headline: shock index before the infection screen)
   var RKEYS = MKEYS.filter(function (k) { return CONDK.indexOf(k) < 0; }).concat(['rt']); // every metric a reading can carry
   /* Alert levels. -1 NO DATA · 0 NORMAL (green) · 1 ATTENTION (yellow: one screening limit crossed)
      · 2 CAUTION (orange: medical criterion or multi-signal pattern) · 3 CRITICAL (red: urgent). */
@@ -92,7 +94,7 @@
   var FRESH = {
     hr: [15 * MIN, 6 * H], spo2: [15 * MIN, 6 * H], rr: [15 * MIN, 6 * H], temp: [30 * MIN, 8 * H], glu: [60 * MIN, 12 * H],
     bp: [40 * H, 40 * H], sleep: [36 * H, 36 * H], mood: [36 * H, 36 * H], ex: [48 * H, 48 * H], dose: [24 * H, 7 * D],
-    vision: [30 * D, 30 * D], blood: [21 * D, 21 * D], rt: [72 * H, 72 * H], fluid: [36 * H, 36 * H], wt: [8 * D, 8 * D],
+    vision: [30 * D, 30 * D], blood: [21 * D, 21 * D], bone: [120 * D, 120 * D], rt: [72 * H, 72 * H], fluid: [36 * H, 36 * H], wt: [8 * D, 8 * D],
     ecg: [7 * D, 7 * D], ortho: [7 * D, 7 * D], urine: [7 * D, 7 * D], ijv: [30 * D, 30 * D], sym: [24 * H, 24 * H]
   };
   var CONTINUOUS = { device: 1, demo: 1, import: 1 };
@@ -227,8 +229,9 @@
     ortho: { s1: [60, 250], d1: [30, 160], s2: [40, 250], d2: [20, 160], min: [0, 20], syncope: 'b', h1: [25, 230], h2: [25, 230] },
     urine: { vol: [0, 10], blood: 'b', us: ['none', 'stone', 'hydro'] },
     ijv: { vel: [0, 200], retro: 'b', thrombus: 'b' },
-    vision: { trt: [-100, 400], frisen: [0, 5], refr: [-10, 10], folds: ['none', 'any', 'sharp'], flat: ['none', 'present', 'moderate'], self: ['none', 'same', 'worse'] },
+    vision: { trt: [-100, 400], frisen: [0, 5], refr: [-10, 10], folds: ['none', 'any', 'sharp'], flat: ['none', 'present', 'moderate'], self: ['none', 'same', 'worse'], stable: 'b' },
     sym: { inf: 'b', conf: 'b', faint: 'b', chest: 'b' },
+    bone: { ntx: [0, 1000], oc: [0, 500], bsap: [0, 500], follow: 'b' },
     blood: { hb: [2, 25], hct: [10, 75], wbc: [0, 200], plt: [0, 3000], lym: [0, 50000] }
   };
   function validateExam(k, x) {
@@ -251,8 +254,10 @@
         return x.h1 && x.h2 && x.h2 - x.h1 >= 30 ? ATT : 0;
       case 'urine': if (x.us === 'stone' || x.us === 'hydro') return CRI; if (x.blood) return CAU; return x.vol != null && x.vol < 2.5 ? ATT : 0;
       case 'ijv': if (x.thrombus) return CRI; return (x.vel != null && x.vel < 10) || x.retro ? CAU : 0;
-      case 'vision': if ((x.trt != null && x.trt >= 55) || (x.frisen != null && x.frisen >= 1) || x.folds === 'sharp' || x.flat === 'moderate') return CRI;
-        return (x.trt != null && x.trt >= 20) || (x.refr != null && x.refr >= 0.75) || x.folds === 'any' || x.flat === 'present' || x.self === 'worse' ? ATT : 0;
+      case 'vision': var vc = (x.trt != null && x.trt >= 55) || (x.frisen != null && x.frisen >= 1) || x.folds === 'sharp' || x.flat === 'moderate';
+        var ve = [x.trt != null && x.trt >= 20, x.refr != null && x.refr >= 0.75, x.folds === 'any' || x.folds === 'sharp', x.flat === 'present' || x.flat === 'moderate'].filter(Boolean).length;
+        if (vc) return x.stable ? CAU : CRI; // scenario 3: an established finding reviewed as not rising is followed, not an emergency
+        return ve >= 2 ? CAU : ve || x.self === 'worse' ? ATT : 0;
       case 'sym': return x.inf || x.conf || x.faint || x.chest ? ATT : 0;
       case 'blood': var l = 0, up = function (v) { if (v > l) l = v; };
         if (x.wbc != null && (x.wbc > 12 || x.wbc < 4)) up(ATT);        // SIRS WBC criterion
@@ -271,7 +276,8 @@
       case 'ortho': return (x.s1 && x.d1 ? x.s1 + '/' + x.d1 : '?') + ' → ' + (x.s2 && x.d2 ? x.s2 + '/' + x.d2 : '?') + ' mmHg standing' + (x.h1 && x.h2 ? ' · HR ' + x.h1 + ' → ' + x.h2 : '') + (x.syncope ? ' · fainted' : '');
       case 'urine': if (x.vol != null) p.push(x.vol + ' L/24 h'); p.push(x.blood ? 'blood in urine' : 'no blood'); if (x.us && x.us !== 'none') p.push(x.us === 'stone' ? 'stone on ultrasound' : 'hydronephrosis'); return p.join(' · ');
       case 'ijv': if (x.vel != null) p.push(x.vel + ' cm/s'); if (x.retro) p.push('retrograde flow'); if (x.thrombus) p.push('thrombus seen'); return p.join(' · ') || 'Normal flow';
-      case 'vision': if (x.trt != null) p.push('ΔTRT ' + (x.trt > 0 ? '+' : '') + x.trt + ' µm'); if (x.frisen) p.push('Frisén ' + x.frisen); if (x.refr) p.push('refraction ' + (x.refr > 0 ? '+' : '') + x.refr + ' D'); if (x.folds && x.folds !== 'none') p.push(x.folds === 'sharp' ? 'sharp folds near macula' : 'folds'); if (x.flat && x.flat !== 'none') p.push(x.flat + ' globe flattening'); if (x.self === 'worse') p.push('self vision test worse than before flight'); else if (x.self === 'same') p.push('self vision test unchanged'); return p.join(' · ') || 'No change from baseline';
+      case 'vision': if (x.trt != null) p.push('ΔTRT ' + (x.trt > 0 ? '+' : '') + x.trt + ' µm'); if (x.frisen) p.push('Frisén ' + x.frisen); if (x.refr) p.push('refraction ' + (x.refr > 0 ? '+' : '') + x.refr + ' D'); if (x.stable) p.push('reviewed: not rising'); if (x.folds && x.folds !== 'none') p.push(x.folds === 'sharp' ? 'sharp folds near macula' : 'folds'); if (x.flat && x.flat !== 'none') p.push(x.flat + ' globe flattening'); if (x.self === 'worse') p.push('self vision test worse than before flight'); else if (x.self === 'same') p.push('self vision test unchanged'); return p.join(' · ') || 'No change from baseline';
+      case 'bone': if (x.ntx != null) p.push('NTX ' + x.ntx); if (x.oc != null) p.push('osteocalcin ' + x.oc); if (x.bsap != null) p.push('BSAP ' + x.bsap); if (x.follow) p.push('follow-up pending'); return p.join(' · ');
       case 'sym': if (x.inf) p.push('suspected infection'); if (x.conf) p.push('confusion'); if (x.faint) p.push('fainting'); if (x.chest) p.push('chest pain'); return p.length ? p.join(' · ') : 'No symptoms';
       case 'blood': if (x.hb != null) p.push('Hb ' + x.hb); if (x.wbc != null) p.push('WBC ' + x.wbc); if (x.plt != null) p.push('Plt ' + x.plt); if (x.lym != null) p.push('Lymph ' + x.lym); return p.join(' · ');
     }
@@ -315,6 +321,7 @@
     if (k === 'sleep' && i > 0 && r.t - arr[i - 1].t <= 36 * H) out.prev = arr[i - 1].v;
     if (k === 'wt') massTrend(arr, i, out);
     if (k === 'vision' && i > 0) out.prevX = arr[i - 1].x || null;
+    if (k === 'bone') { for (var bj = 0; bj <= i; bj++) if (arr[bj].x && typeof arr[bj].x.ntx === 'number') { out.ntx0 = arr[bj].x.ntx; break; } }
     if (k === 'blood') { for (var hj = 0; hj <= i; hj++) if (arr[hj].x && typeof arr[hj].x.hb === 'number') { out.hb0 = arr[hj].x.hb; out.hb0t = arr[hj].t; break; } }
     return out;
   }
@@ -333,6 +340,7 @@
 
   function levelOf(k, val, th) {
     if (!val) return -1;
+    if (k === 'bone') return boneLevel(val);
     if (MDEF[k] && MDEF[k].stat) return val.x ? examLevel(k, val.x) : typeof val.l === 'number' ? val.l : 0;
     if (!th) return 0;
     var v = val.v;
@@ -399,6 +407,13 @@
     return { level: level, abn: abn, norm: norm, text: fmtV(k, a) + (MDEF[k].unit ? ' ' + MDEF[k].unit : '') };
   }
   function demoLevels(k, th, t) { return [1, 2, 3].filter(function (l) { return !!demoReading(k, l, th, t); }); }
+  /* Bone turnover (scenario: chronic bone health). Demo rule, not a validated cutoff: urine NTX 30 % or more above the
+     first (pre-mission) value = ATTENTION, kept while clinician follow-up is pending. Markers alone never give BMD. */
+  function boneLevel(val) {
+    var x = val.x; if (!x) return typeof val.l === 'number' ? val.l : 0;
+    if (x.ntx != null && val.ntx0 && x.ntx >= val.ntx0 * 1.3) return ATT;
+    return x.follow ? ATT : 0;
+  }
   function hrLevel(v, val, th) { var sl = val.sl ? 10 : 0; if (val.ex) return v > 185 ? CRI : v > 170 ? ATT : 0; if (v < th.xLo - sl + 2 * (sl > 0) || v > th.xHi) return CRI; if (v < th.cLo - sl || v > th.cHi) return ATT; return 0; }
   function rank(l) { return l === CRI ? 4 : l === CAU ? 3 : l === ATT ? 2 : l === -1 ? 1 : 0; }
 
@@ -433,7 +448,7 @@
     // Scenario 3. CRITICAL: qSOFA >= 2 with an infection sign; ALERT: >= 2 SIRS signs, or temperature > 38.0 alone; WATCH: one sign, or 0.8 °C above own normal
     if (q.length >= 2 && (sy.inf || crit.length)) m.c_inf = cond(CRI, 'Infection with warning signs – urgent', q.concat(crit), '1) Lie down; a crewmate stays. 2) Vitals and SpO2 every 15 min. 3) Flight surgeon now. 4) Flight surgeon decides treatment from the medical kit.', 'INF-QSOFA');
     else if (crit.length >= 2 || fever) m.c_inf = cond(CAU, 'Signs of infection', crit, '1) Rest and drink. 2) Vitals and SpO2 every 4 h. 3) Mask, distance, clean shared surfaces. 4) Blood count if available. 5) Tell the CMO; flight surgeon reviews today. 6) Medication only per protocol.', 'INF-SIRS');
-    else if (crit.length === 1 || warm) m.c_inf = cond(ATT, 'Watch: one sign of infection', crit.length ? crit : ['temperature ' + tp + ' °C, 0.8 °C or more above own normal'], '1) Re-measure temperature, HR and RR in 4 h. 2) Rest and drink.', 'INF-WATCH');
+    else if (crit.length === 1 || warm || sy.inf) m.c_inf = cond(ATT, crit.length || warm ? 'Watch: one sign of infection' : 'Watch: symptoms of infection reported', crit.length ? crit : warm ? ['temperature ' + tp + ' °C, 0.8 °C or more above own normal'] : ['crew symptom check: suspected infection'], '1) Re-measure temperature, HR and RR in 4 h. 2) Rest and drink.', 'INF-WATCH');
     else m.c_inf = cond(0, 'No infection pattern', crit, 'Combine temperature, heart rate, breathing and WBC; log symptoms if infection is suspected.', 'INF-SCREEN');
     // 2. Atrial fibrillation: ECG review decides; resting HR > 100 alone is ATTENTION on the heart-rate metric
     var e = x('ecg'), el = e ? examLevel('ecg', e) : 0, unst = e && el >= CAU && (sy.faint || sy.chest || sy.conf || (sb != null && sb < 90));
@@ -459,8 +474,8 @@
     var vi = x('vision'), vl = vi ? examLevel('vision', vi) : (m.vision.l > 0 ? m.vision.l : 0), pv = m.vision.val && m.vision.val.prevX;
     var self2 = vi && vi.self === 'worse' && pv && pv.self === 'worse';
     if (self2 && vl < CAU) vl = CAU;
-    m.c_sans = vl ? cond(vl, vl === CRI ? 'Clinically concerning SANS finding' : self2 ? 'Vision is changing (possible SANS)' : vi && vi.self === 'worse' && vl === ATT ? 'Watch: vision test changed' : 'Earliest NASA SANS indication', [vi ? examText('vision', vi) : (m.vision.val && m.vision.val.txt) || 'Eye exam result'].concat(self2 ? ['worse on 2 tests in a row'] : []),
-      vl === CRI ? 'Ophthalmic medical review; follow the mission SANS protocol.' : self2 ? '1) Repeat the self vision test in 1 week. 2) Keep CO2 low in the sleep station. 3) Flight surgeon reviews; eye exam per NASA SANS schedule.' : vi && vi.self === 'worse' ? '1) Repeat the self vision test next week.' : 'Repeat OCT and eye exam; trend against baseline.', vl === CRI ? 'SANS-CONCERN' : self2 ? 'SANS-SELF2' : 'SANS-EARLY') : cond(0, 'No SANS finding', [], '', 'SANS');
+    m.c_sans = vl ? cond(vl, vl === CRI ? 'Clinically concerning SANS finding' : self2 ? 'Vision is changing (possible SANS)' : vl === CAU && vi && vi.stable ? 'SANS established – reviewed, not rising' : vl === CAU ? 'Two or more early SANS signs – suspected developing SANS' : vi && vi.self === 'worse' && vl === ATT ? 'Watch: vision test changed' : 'Earliest NASA SANS indication', [vi ? examText('vision', vi) : (m.vision.val && m.vision.val.txt) || 'Eye exam result'].concat(self2 ? ['worse on 2 tests in a row'] : []),
+      vl === CRI ? 'Ophthalmic medical review; follow the mission SANS protocol.' : self2 ? '1) Repeat the self vision test in 1 week. 2) Keep CO2 low in the sleep station. 3) Flight surgeon reviews; eye exam per NASA SANS schedule.' : vl === CAU && vi && vi.stable ? '1) Continue duty with optical correction. 2) OCT and refraction at set intervals. 3) Any new rise re-opens the alert.' : vl === CAU ? '1) Notify the CMO. 2) Plus-power or adjustable glasses; larger screen text. 3) Repeat OCT, refraction and fundus. 4) Send images to Earth.' : vi && vi.self === 'worse' ? '1) Repeat the self vision test next week.' : 'Repeat OCT and eye exam; trend against baseline.', vl === CRI ? 'SANS-CONCERN' : self2 ? 'SANS-SELF2' : vl === CAU ? 'SANS-2SIGNS' : 'SANS-EARLY') : cond(0, 'No SANS finding', [], '', 'SANS');
     // 6. Venous thrombosis (neck vein)
     var j = x('ijv'), jl = j ? examLevel('ijv', j) : 0;
     m.c_vte = jl ? cond(jl, jl === CRI ? 'Venous thrombus seen' : 'Neck-vein stasis or retrograde flow', [examText('ijv', j)],
@@ -474,6 +489,16 @@
       else if (hb0 && hb >= hb0 * 1.05 && loss.length) m.c_anem = cond(ATT, 'Watch: fluid loss – hemoglobin may look normal', ['hemoglobin ' + hb + ' (your first value ' + hb0 + ')'].concat(loss), '1) Drink to your fluid target. 2) Eat to your calorie and protein plan. 3) CHARM keeps the trend.', 'ANEM-CONC');
       else m.c_anem = cond(0, 'No anemia pattern', [], '', 'ANEM');
     } else m.c_anem = cond(0, 'No blood count', [], '', 'ANEM');
+    // Scenario 4 (dehydration): shock index = heart rate / systolic BP, both at rest and taken within 30 min.
+    // CRITICAL >= 1.3 · CAUTION >= 1.0 · ATTENTION >= 0.9, or >= 0.8 with a fluid deficit
+    var hv = m.hr.val, bv2 = m.bp.val;
+    if (hv && bv2 && !hv.ex && !bv2.ex && bv2.v > 0 && Math.abs(hv.t - bv2.t) <= 30 * MIN) {
+      var si = Math.round(hv.v / bv2.v * 100) / 100, sw = ['shock index ' + si.toFixed(2) + ' (HR ' + Math.round(hv.v) + ' ÷ systolic ' + Math.round(bv2.v) + ')'].concat(si >= 0.8 ? loss : []);
+      if (si >= 1.3) m.c_vol = cond(CRI, 'Shock index very high – possible low blood volume or shock', sw, '1) CMO to the astronaut now; ABC check. 2) Lie down, continuous HR, BP, RR, SpO2. 3) Rule out bleeding, infection, heart rhythm. 4) Fluids only per the approved protocol. 5) Flight surgeon now.', 'VOL-SHOCK');
+      else if (si >= 1.0) m.c_vol = cond(CAU, 'Shock index above 1 – the heart is working hard to hold blood pressure', sw, '1) Stop activity, rest secured. 2) Tell the CMO. 3) Oral rehydration if alert and not vomiting. 4) Repeat HR and BP in 5 min.', 'VOL-HIGH');
+      else if (si >= 0.9 || (si >= 0.8 && loss.length)) m.c_vol = cond(ATT, 'Watch: heart rate rising against blood pressure', sw, '1) Stop strenuous activity and rest. 2) Drink (oral rehydration). 3) Repeat HR and BP in 5 min.', 'VOL-WATCH');
+      else m.c_vol = cond(0, 'Shock index normal', sw, '', 'VOL');
+    } else m.c_vol = cond(0, 'No recent heart rate and blood pressure pair', [], '', 'VOL');
   }
   function hasAnyCurrent(st) { return LKEYS.some(function (k) { return !MDEF[k].cond && st.m[k].l >= 0; }); }
   /* The wearable counts as silent when its last heart-rate reading came from a sensor (not typed in) and is stale. */

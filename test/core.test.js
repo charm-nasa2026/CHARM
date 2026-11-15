@@ -336,3 +336,27 @@ test('alert scenario B: hemoglobin up while body mass falls is ATTENTION; down 1
   const lo = E.personStatus(E.sortSeries(base.concat([{ k: 'blood', t: NOW - 60000, x: { hb: 12.2 }, src: 'record' }])), E.profile(null, null, 'david'), NOW);
   assert.strictEqual(lo.m.c_anem.l, 2);          // 12.2: above 12 but David is male (limit 13) -> CAUTION
 });
+
+test('demo scenarios played live: the engine raises the medic team\'s levels by itself', async () => {
+  global.window = {}; require('../public/js/scenarios.js'); const SC = global.window.CHARM_SCENARIOS;
+  assert.deepStrictEqual(SC.map(s => s.id), ['pulm', 'dehy', 'sans', 'bone']);
+  // stage n -> worst level CHARM must reach (team: NORMAL 0, ALERT >= 1, CRITICAL 3). Dehydration step 8 has no new RR,
+  // so the last RR 24 still counts and qSOFA keeps it CRITICAL until step 9 brings a full set (conservative on purpose).
+  const want = { pulm: [0, 1, 2, 3, 3, 3, 2, 0], dehy: [1, 1, 1, 2, 3, 3, 3, 3, 1, 0], sans: [null, null, 1, 2, 3, 3, 3, 2, 2, 2, 2], bone: [0, 0, 1, 1, 1, 1, 1] };
+  for (const sc of SC) {
+    const db = new MemDB(); await C.api(db, 'bootstrap', {}, { now: NOW });
+    let t = NOW;
+    for (const st of sc.stages) {
+      t += 10000;
+      await C.api(db, 'demoStage', { pid: 'sarah', sid: sc.id, title: sc.title, n: st.n, of: sc.stages.length, label: st.label, code: st.code, stage: st.stage, rows: st.rows, earth: st.earth, clear: st.down }, { now: t, by: 'test' });
+      const rs = await db.readings('sarah', t - 4 * 24 * H, t), th = E.profile(null, null, 'sarah', (await db.getMission()).launch);
+      const lv = E.personStatus(E.sortSeries(rs), th, t).lvl, w = want[sc.id][st.n - 1];
+      if (w != null) assert.strictEqual(lv, w, sc.id + ' stage ' + st.n + ' (' + st.label + ')');
+    }
+    const m = await db.getMission(); assert.strictEqual(m.demoScenario.sid, sc.id);
+    assert.ok(db.readingsL.every(r => r.sim && r.src === 'scenario'));
+    if (sc.id === 'pulm' || sc.id === 'dehy') assert.ok(db.events.some(e => e.type === 'raise' && e.lv === 3), sc.id + ' raises a CRITICAL alert');
+    await C.api(db, 'demoStage', { stop: true }, { now: t + 1000, by: 'test' });
+    assert.strictEqual((await db.getMission()).demoScenario, null);
+  }
+});

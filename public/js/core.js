@@ -302,6 +302,34 @@
     await evaluate(db, pid, now, 'reading');
     return { ok: true, id: id, until: until, text: g.text };
   }
+  /*
+   * Demo scenario played live (Scenarios page, "Run live"): writes one stage of a medic-team scenario into the astronaut's
+   * file as readings (src 'scenario', sim: true), then runs the normal alert logic, so CHARM raises the alerts itself.
+   * Recovery stages (d.clear) also run three checks in a row, so alerts that are no longer met clear at once.
+   * d = { pid, sid, title, n, of, label, code, stage, rows: [{k, v, v2, x}], earth, clear } or { stop: true }.
+   * mission.demoScenario tells every open app which stage is running.
+   */
+  async function demoStage(db, d, meta) {
+    var now = meta.now, m0 = (await db.getMission()) || {}, cur = m0.demoScenario;
+    if (d.stop) {
+      await demoMission(db, { demoScenario: null });
+      if (cur) await emit(db, [{ t: now, pid: cur.pid, type: 'crew', text: 'DEMO SCENARIO stopped · ' + cur.title, sub: 'Stopped by ' + (meta.by || 'crew') + ' · the values stay in the history marked DEMO', src: 'crew', sim: true, prio: 0 }]);
+      return { ok: true };
+    }
+    var pid = str(d.pid, 40), c = await crewDoc(db, pid); if (!c) throw err('not-found', 'Unknown astronaut');
+    var n = Math.max(1, Math.min(40, Math.round(+d.n || 1))), title = str(d.title, 80) || 'Demo scenario', id = 'S' + now.toString(36);
+    // a live demo file for the same person would write normal values in between: stop it
+    var ds = await demoState(db); if (ds.live && ds.live.pid === pid) await demoLiveStop(db, meta);
+    var rows = (Array.isArray(d.rows) ? d.rows : []).slice(0, 20).map(function (r, i) { return demoRow(r || {}, pid, now, 'scenario', 'ds' + id + '-' + i, meta.by, now); });
+    rows.forEach(function (r) { var e = E.validateReading(r, now); if (e) throw err('invalid-argument', 'Stage ' + n + ': ' + e); });
+    if (rows.length) await db.addReadings(rows);
+    await demoMission(db, { demoScenario: { pid: pid, sid: str(d.sid, 20), title: title, n: n, of: Math.round(+d.of || n), label: str(d.label, 60), code: str(d.code, 12), earth: !!d.earth, by: meta.by || null, t: now, started: n === 1 || !cur ? now : (cur.started || now) } });
+    await emit(db, [{ id: 'dsn' + id, t: now, pid: pid, type: 'crew', text: 'DEMO SCENARIO · ' + title + ' · stage ' + n + ': ' + str(d.label, 60), sub: str(d.stage, 120) + (d.earth ? ' · Earth communication unavailable: onboard protocol active' : '') + ' · constructed demo values, not real data', src: 'crew', sim: true, prio: 0 }]);
+    await evaluate(db, pid, now, 'reading');
+    if (d.clear) for (var q = 0; q < 3; q++) await evaluate(db, pid, now, 'tick');
+    var stt = await db.getStatus(pid);
+    return { ok: true, rows: rows.length, levels: (stt && stt.levels) || {} };
+  }
   async function pumpDemo(db, now) {
     if (!db.getDemo) return { rows: 0 };
     var st = await demoState(db), lv = st.live, wrote = 0, ended = [], changed = false;
@@ -449,6 +477,7 @@
       case 'demoLiveStop': return demoLiveStop(db, meta);
       case 'demoAlert': return demoAlert(db, d, meta);
       case 'demoPump': return pumpDemo(db, meta.now);
+      case 'demoStage': return demoStage(db, d, meta);
       case 'setBaseline': {
         var bc = await crewDoc(db, d.pid); if (!bc) throw err('not-found', 'Unknown astronaut');
         var B = {}, lim = { hr: [25, 230], sbp: [60, 250], dbp: [30, 160], rr: [4, 60], temp: [33, 42.5] };
