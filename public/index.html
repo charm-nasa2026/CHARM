@@ -987,6 +987,7 @@ var MDEF={
  ortho:{label:'Orthostatic BP test',short:'Orthostatic',unit:'',dec:0,sys:'heart',src:'Cuff · lying then standing 3 min',csv:'o1',stat:true},
  urine:{label:'Urine and kidney check',short:'Kidney',unit:'',dec:0,sys:'abdomen',src:'24-h urine · dipstick · kidney ultrasound',csv:'k2',stat:true},
  ijv:{label:'Neck vein ultrasound (IJV)',short:'Neck vein',unit:'',dec:0,sys:'blood',src:'Doppler ultrasound · crew-operated',csv:'v1',stat:true},
+ well:{label:'Mood and wellbeing check',short:'Wellbeing',unit:'/5',dec:1,sys:'mind',src:'Daily check-in · 14 questions, 1 (very bad) to 5 (great) · notes',csv:'m1',stat:true},
  bone:{label:'Bone turnover markers',short:'Bone',unit:'',dec:0,sys:'muscle',src:'Urine NTX · blood osteocalcin and BSAP · lab',csv:'b1',stat:true},
  sym:{label:'Symptom check',short:'Symptoms',unit:'',dec:0,sys:'mind',src:'Crew report',csv:'s1',stat:true},
  c_inf:{label:'Infection / systemic deterioration',short:'Infection',unit:'',dec:0,sys:'blood',src:'Combined rule · SIRS and qSOFA',csv:'i0',cond:true,hidden:true},
@@ -1105,7 +1106,7 @@ function ackOf(pid,k){var ev=allEvents(),lastRaise=null,ack=null;for(var i=0;i<e
 var ROUTINE=[
  {id:'sleep',name:'Log last night\'s sleep',at:'07:00',dur:'~1 min',eq:['Watch or self-report'],k:'sleep',entry:'sleep'},
  {id:'bp',name:'Morning blood pressure check',at:'07:30',dur:'~3 min',eq:['BP cuff'],k:'bp',test:'bp'},
- {id:'mood',name:'Mood check-in',at:'08:00',dur:'~1 min',eq:['No supplies'],k:'mood',entry:'mood'},
+ {id:'mood',name:'Mood and wellbeing check',at:'08:00',dur:'~3 min',eq:['No supplies'],k:'well',entry:'well'},
  {id:'rt',name:'3-min reaction test',at:'09:00',dur:'~3 min',eq:['No supplies'],k:'rt',test:'rt'},
  {id:'ex',name:'Log today\'s exercise',at:'19:00',dur:'~1 min',eq:['Exercise device log'],k:'ex',entry:'ex'},
  {id:'sans',name:'Visual SANS test (weekly)',at:'10:00',dur:'~4 min',eq:['Camera','Amsler card'],k:'vision',station:true,weekday:1}
@@ -1510,7 +1511,7 @@ function compareCard(t){
 }
 
 /* --- astronaut file --- */
-var SYS=[{id:'head',label:'Head and eyes',ks:['vision','c_sans']},{id:'mind',label:'Mind and sleep',ks:['sleep','mood','sym']},{id:'heart',label:'Heart',ks:['hr','bp','c_af','c_orth','c_vol']},{id:'lungs',label:'Lungs',ks:['spo2','rr','c_resp']},{id:'abdomen',label:'Metabolism and kidneys',ks:['glu','fluid','c_kid']},{id:'muscle',label:'Bones and muscles',ks:['ex','wt','bone']},{id:'skin',label:'Temperature',ks:['temp']},{id:'blood',label:'Blood, immune and veins',ks:['blood','c_bleed','c_inf','c_vte','c_anem']}];
+var SYS=[{id:'head',label:'Head and eyes',ks:['vision','c_sans']},{id:'mind',label:'Mind and sleep',ks:['sleep','mood','well','sym']},{id:'heart',label:'Heart',ks:['hr','bp','c_af','c_orth','c_vol']},{id:'lungs',label:'Lungs',ks:['spo2','rr','c_resp']},{id:'abdomen',label:'Metabolism and kidneys',ks:['glu','fluid','c_kid']},{id:'muscle',label:'Bones and muscles',ks:['ex','wt','bone']},{id:'skin',label:'Temperature',ks:['temp']},{id:'blood',label:'Blood, immune and veins',ks:['blood','c_bleed','c_inf','c_vte','c_anem']}];
 function sysLevel(st,s){var b=0;s.ks.forEach(function(k){var l=st.m[k].l;if(rank(l)>rank(b))b=l;});return b;}
 function zoneTip(st,z){var parts=z.ks.map(function(k){var m=st.m[k];return MDEF[k].label+': '+(m.val?fmtV(k,m.val)+(m.val.txt?'':' '+MDEF[k].unit):'no reading')+' · '+WORD[lvKey(m.l)];});return '<b>'+z.label+'</b>'+parts.map(esc).join('<br>');}
 /* where the face sits in each 320 px face image: [eye-midpoint x, eye-line y, eye distance + eye-to-mouth] */
@@ -2343,7 +2344,7 @@ function accessModal(){var p=CREWBY[S.accessId];return '<div class="scrim" data-
 function symptomModal(){var p=CREWBY[S.symId];return '<div class="scrim" data-act="ovx"></div><div class="pop modal" role="dialog" aria-label="Log symptom" style="width:600px"><div class="pophd"><h2>Log a symptom · '+p.name+'</h2><button class="iconbtn" data-act="ovx" aria-label="Close">'+IC.x+'</button></div><div class="qchips">'+['Headache','Dizziness','Nausea','Chest pain','Vision change','Shortness of breath','Back pain','Other'].map(function(s){return '<button data-act="sym" data-v="'+s+'" style="height:52px;font-size:15px">'+s+'</button>';}).join('')+'</div><p class="note" style="margin-top:12px">Logged with time and linked to related metrics. Chest pain with normal vitals still opens a guided check.</p></div>';}
 
 /* manual measurement entry */
-var ENTRYK=[['sym','Symptom check',''],['ecg','ECG rhythm review',''],['ortho','Orthostatic BP test (lying, then standing)',''],['urine','Urine and kidney check',''],['ijv','Neck vein ultrasound (IJV)',''],['fluid','Fluid intake today','L'],['wt','Body mass','kg'],['hr','Heart rate','bpm'],['spo2','Blood oxygen (SpO₂)','%'],['rr','Respiratory rate','/min'],['temp','Body temperature','°C'],['bp','Blood pressure','mmHg'],['glu','Blood glucose','mg/dL'],['sleep','Sleep last night','hours'],['mood','Mood check-in','0–10'],['ex','Exercise completed','% of plan'],['dose','Radiation dose budget used','%'],['vision','Eye exam (SANS)',''],['blood','Blood panel','']];
+var ENTRYK=[['well','Mood and wellbeing check (1–5, NASA-style)',''],['sym','Symptom check',''],['ecg','ECG rhythm review',''],['ortho','Orthostatic BP test (lying, then standing)',''],['urine','Urine and kidney check',''],['ijv','Neck vein ultrasound (IJV)',''],['fluid','Fluid intake today','L'],['wt','Body mass','kg'],['hr','Heart rate','bpm'],['spo2','Blood oxygen (SpO₂)','%'],['rr','Respiratory rate','/min'],['temp','Body temperature','°C'],['bp','Blood pressure','mmHg'],['glu','Blood glucose','mg/dL'],['sleep','Sleep last night','hours'],['mood','Mood score only (quick, 0–10)','0–10'],['ex','Exercise completed','% of plan'],['dose','Radiation dose budget used','%'],['vision','Eye exam (SANS)',''],['blood','Blood panel','']];
 var ENVK=[['co2','Cabin CO₂','mmHg'],['ctemp','Cabin temperature','°C'],['pfu','Proton flux ≥10 MeV (manual)','pfu']];
 function entryModal(){
   var en=S.entry,cab=en.pid==='cabin',list=cab?ENVK:ENTRYK,def=list.filter(function(x){return x[0]===en.k;})[0]||list[0],k=def[0],now=liveNow();
@@ -2363,6 +2364,7 @@ function entryModal(){
 /* exam forms: fields per exam (CHARM_Exact_Alert_Thresholds) */
 var YN=[['','—'],['no','No'],['yes','Yes']];
 var EXF={
+ well:EN.WELLQ.map(function(q){return [q[0],q[1],'sc5'];}).concat([['note','Notes: anything else you want the crew medical officer or the flight surgeon to know','txt']]),
  sym:[['inf','Suspected infection (fever, chills, sore throat, cough, wound…)','yn'],['conf','Confusion or altered mental state','yn'],['faint','Fainted or nearly fainted','yn'],['chest','Chest pain','yn'],['palp','Palpitations (racing or fluttering heartbeat)','yn'],['dizzy','Dizziness','sel',[['none','None'],['mild','Mild lightheadedness'],['severe','Severe, cannot stay upright']]],['bleed','Bleeding (injury)','sel',[['none','None'],['ongoing','Bleeding, not yet controlled'],['controlled','Controlled (pressure, dressing or tourniquet)'],['active','Life-threatening: pulsing or soaking through']]],['airway','Breathing / airway','sel',[['none','No problem'],['irritation','Throat or eye irritation'],['wheeze','Cough and wheeze'],['moderate','Short of breath, speaks in phrases'],['severe','Cannot finish sentences']]],['expo','Airborne exposure (dust, fumes) reported','yn']],
  ecg:[['irr','Irregular RR intervals','yn'],['noP','No repeating P waves','yn'],['sec','Recording length (seconds)','n'],['unstable','Signs of instability (fainting, chest pain, BP < 90, confusion)','yn']],
  ortho:[['s1','Lying or seated · systolic','n'],['d1','Lying or seated · diastolic','n'],['s2','Standing · systolic','n'],['d2','Standing · diastolic','n'],['min','Minutes after standing','n'],['h1','Lying or seated · heart rate','n'],['h2','Standing · heart rate','n'],['syncope','Fainted during the test','yn']],
@@ -2371,12 +2373,14 @@ var EXF={
  vision:[['trt','Retinal thickness change ΔTRT vs baseline (µm)','n'],['frisen','Optic disc swelling · Frisén grade (0–5)','n'],['refr','Refraction shift (D, + = hyperopic)','n'],['folds','Chorioretinal folds','sel',[['none','None'],['any','Folds / peripapillary wrinkles'],['sharp','Sharp folds near the macula']]],['flat','Globe flattening','sel',[['none','None'],['present','Posterior flattening present'],['moderate','Moderate flattening']]],['self','Weekly self vision test vs before flight','sel',[['none','Not done'],['same','Same as before flight'],['worse','Worse than before flight']]]],
  blood:[['hb','Hemoglobin (g/dL)','n'],['hct','Hematocrit (%)','n'],['wbc','White blood cells (×10³/µL)','n'],['plt','Platelets (×10³/µL)','n'],['lym','Lymphocytes (/µL)','n']]
 };
-function examForm(k){var h='<div class="xgrid">';EXF[k].forEach(function(f){var id='ex_'+f[0];
-  if(f[2]==='yn')h+='<label>'+f[1]+'<select id="'+id+'">'+YN.map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></label>';
+function examForm(k){var h='<div class="xgrid"'+(k==='well'?' style="grid-template-columns:minmax(0,1fr)"':'')+'>';if(k==='well')h+='<p class="note" style="margin:0">Answer for today. 5 Great · 4 Good · 3 OK · 2 Bad · 1 Very bad. Same 5-point format as the mood questionnaire in NASA\'s Spaceflight Standard Measures. Your average also becomes the 0–10 mood score (2 × average).</p>';EXF[k].forEach(function(f){var id='ex_'+f[0];
+  if(f[2]==='sc5')h+='<label style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-direction:row;flex-wrap:wrap"><span>'+f[1]+'</span><select id="'+id+'" style="min-width:170px"><option value="">—</option>'+[5,4,3,2,1].map(function(n){return '<option value="'+n+'">'+n+' · '+EN.WELLW[n]+'</option>';}).join('')+'</select></label>';
+  else if(f[2]==='txt')h+='<label>'+f[1]+'<textarea id="'+id+'" rows="3" maxlength="600" style="width:100%;resize:vertical"></textarea></label>';
+  else if(f[2]==='yn')h+='<label>'+f[1]+'<select id="'+id+'">'+YN.map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></label>';
   else if(f[2]==='sel')h+='<label>'+f[1]+'<select id="'+id+'">'+f[3].map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></label>';
   else h+='<label>'+f[1]+'<input id="'+id+'" type="number" step="any" inputmode="decimal"></label>';});
   return h+'</div><p class="note" style="margin-top:4px">Leave a field empty if it was not measured. CHARM levels the result with the medic team\'s thresholds.</p>';}
-function readExam(k){var x={};EXF[k].forEach(function(f){var el=$('ex_'+f[0]);if(!el||el.value==='')return;if(f[2]==='yn')x[f[0]]=el.value==='yes';else if(f[2]==='sel')x[f[0]]=el.value;else{var v=parseFloat(el.value);if(!isNaN(v))x[f[0]]=v;}});return x;}
+function readExam(k){var x={};EXF[k].forEach(function(f){var el=$('ex_'+f[0]);if(!el||el.value==='')return;if(f[2]==='yn')x[f[0]]=el.value==='yes';else if(f[2]==='sel')x[f[0]]=el.value;else if(f[2]==='txt'){var tx=el.value.trim();if(tx)x[f[0]]=tx.slice(0,600);}else if(f[2]==='sc5')x[f[0]]=+el.value;else{var v=parseFloat(el.value);if(!isNaN(v))x[f[0]]=v;}});return x;}
 function saveEntry(){
   var en=S.entry,cab=en.pid==='cabin',k=$('enk').value,tv=($('ent').value||'').split('T'),dp=tv[0].split('-'),tp=(tv[1]||'00:00').split(':');
   var t=Date.UTC(+dp[0],+dp[1]-1,+dp[2],+tp[0],+tp[1]);if(isNaN(t)){en.err='Check the time.';renderOv();return;}
@@ -2387,8 +2391,9 @@ function saveEntry(){
   if(EXF[k]){r.x=readExam(k);if(!Object.keys(r.x).length){en.err='Fill in at least one field.';renderOv();return;}}
   else{r.v=v;if(k==='bp')r.v2=parseFloat($('envv2').value);var cx=$('enctx');if(cx&&cx.value)r.ctx=cx.value;var ir=$('enirr');if(ir&&ir.checked)r.irr=true;}
   var er2=EN.validateReading(r,liveNow());if(er2){en.err='Not saved: '+er2+'.';renderOv();return;}
+  var rs=[r];if(k==='well'){var wst=EN.wellStats(r.x);if(wst)rs.push({pid:r.pid,k:'mood',t:t,v:Math.round(wst.mean*2*10)/10});} // the check-in also gives the 0-10 mood score
   S.busy=true;renderOv();
-  api('addReadings',{src:'manual',readings:[r]}).then(function(res){if(res&&res.rejected&&res.rejected.length&&!res.saved){S.busy=false;en.err='Not saved: '+res.rejected[0].reason;renderOv();return;}done(res);},fail);
+  api('addReadings',{src:'manual',readings:rs}).then(function(res){if(res&&res.rejected&&res.rejected.length&&!res.saved){S.busy=false;en.err='Not saved: '+res.rejected[0].reason;renderOv();return;}done(res);},fail);
   function done(res){S.busy=false;S.ov=null;S.entry=null;renderAll();toast(res&&res.queued?'Saved on this device':'Measurement saved',res&&res.queued?'It syncs when the connection returns.':(cab?'Cabin':CREWBY[r.pid].name)+' · '+(cab?ENVK:ENTRYK).filter(function(x){return x[0]===k;})[0][1]+'.');}
   function fail(e){S.busy=false;en.err='Not saved: '+e.message;renderOv();}
 }

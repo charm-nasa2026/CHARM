@@ -336,3 +336,16 @@ test('demo scenarios played live: the engine raises the medic team\'s levels by 
     assert.strictEqual((await db.getMission()).demoScenario, null);
   }
 });
+
+test('mood and wellbeing check: 1-5 answers, levels and notes', () => {
+  assert.strictEqual(E.WELLQ.length >= 10, true);
+  const all = (n) => { const x = {}; E.WELLQ.forEach((q) => { x[q[0]] = n; }); return x; };
+  assert.strictEqual(E.examLevel('well', all(4)), 0);
+  assert.strictEqual(E.examLevel('well', Object.assign(all(4), { sleepq: 1 })), E.ATT === undefined ? 1 : 1);
+  assert.strictEqual(E.examLevel('well', all(2)), 2);
+  assert.strictEqual(E.examLevel('well', Object.assign(all(4), { hope: 1 })), 2);
+  const x = Object.assign(all(3), { note: 'Slept badly, noisy fan' });
+  assert.strictEqual(E.validateExam('well', x), null);
+  assert.ok(/Wellbeing 3.0 \/ 5/.test(E.examText('well', x)) && /noisy fan/.test(E.examText('well', x)));
+  assert.ok(E.validateExam('well', { mood: 6 }));
+});

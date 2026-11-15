@@ -36,6 +36,7 @@
     ijv: { label: 'Neck vein ultrasound (IJV)', short: 'Neck vein', unit: '', dec: 0, stat: true },
     sym: { label: 'Symptom check', short: 'Symptoms', unit: '', dec: 0, stat: true },
     bone: { label: 'Bone turnover markers', short: 'Bone', unit: '', dec: 0, stat: true },
+    well: { label: 'Mood and wellbeing check', short: 'Wellbeing', unit: '/5', dec: 1, stat: true },
     /* condition-level alerts (CHARM_Exact_Alert_Thresholds, medic team). Computed from several signals; not entered directly. */
     c_inf: { label: 'Infection / systemic deterioration', short: 'Infection', unit: '', dec: 0, cond: true, hidden: true },
     c_af: { label: 'Atrial fibrillation / arrhythmia', short: 'Arrhythmia', unit: '', dec: 0, cond: true, hidden: true },
@@ -51,8 +52,8 @@
   };
   var EXAMK = ['ecg', 'ortho', 'urine', 'ijv', 'sym'];
   var CONDK = ['c_inf', 'c_af', 'c_orth', 'c_kid', 'c_sans', 'c_vte', 'c_anem', 'c_vol', 'c_bleed', 'c_resp'];
-  var MKEYS = ['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'fluid', 'wt', 'vision', 'blood', 'bone'].concat(EXAMK).concat(CONDK);
-  var LKEYS = ['c_bleed', 'c_af', 'c_resp', 'c_vol'].concat(CONDK.filter(function (k) { return ['c_vol', 'c_bleed', 'c_af', 'c_resp'].indexOf(k) < 0; })).concat(['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'wt', 'bone']); // what raises alerts; the first of equal levels is the headline, so a condition that explains the numbers comes first // what raises alerts (the first of equal levels is the headline: shock index before the infection screen)
+  var MKEYS = ['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'fluid', 'wt', 'vision', 'blood', 'bone', 'well'].concat(EXAMK).concat(CONDK);
+  var LKEYS = ['c_bleed', 'c_af', 'c_resp', 'c_vol'].concat(CONDK.filter(function (k) { return ['c_vol', 'c_bleed', 'c_af', 'c_resp'].indexOf(k) < 0; })).concat(['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'wt', 'bone', 'well']); // what raises alerts; the first of equal levels is the headline, so a condition that explains the numbers comes first // what raises alerts (the first of equal levels is the headline: shock index before the infection screen)
   var RKEYS = MKEYS.filter(function (k) { return CONDK.indexOf(k) < 0; }).concat(['rt']); // every metric a reading can carry
   /* Alert levels. -1 NO DATA · 0 NORMAL (green) · 1 ATTENTION (yellow: one screening limit crossed)
      · 2 CAUTION (orange: medical criterion or multi-signal pattern) · 3 CRITICAL (red: urgent). */
@@ -96,7 +97,7 @@
   var FRESH = {
     hr: [15 * MIN, 6 * H], spo2: [15 * MIN, 6 * H], rr: [15 * MIN, 6 * H], temp: [30 * MIN, 8 * H], glu: [60 * MIN, 12 * H],
     bp: [40 * H, 40 * H], sleep: [36 * H, 36 * H], mood: [36 * H, 36 * H], ex: [48 * H, 48 * H], dose: [24 * H, 7 * D],
-    vision: [30 * D, 30 * D], blood: [21 * D, 21 * D], bone: [120 * D, 120 * D], rt: [72 * H, 72 * H], fluid: [36 * H, 36 * H], wt: [8 * D, 8 * D],
+    vision: [30 * D, 30 * D], blood: [21 * D, 21 * D], bone: [120 * D, 120 * D], well: [36 * H, 36 * H], rt: [72 * H, 72 * H], fluid: [36 * H, 36 * H], wt: [8 * D, 8 * D],
     ecg: [7 * D, 7 * D], ortho: [7 * D, 7 * D], urine: [7 * D, 7 * D], ijv: [30 * D, 30 * D], sym: [24 * H, 24 * H]
   };
   var CONTINUOUS = { device: 1, demo: 1, import: 1 };
@@ -234,6 +235,7 @@
     vision: { trt: [-100, 400], frisen: [0, 5], refr: [-10, 10], folds: ['none', 'any', 'sharp'], flat: ['none', 'present', 'moderate'], self: ['none', 'same', 'worse'], stable: 'b' },
     sym: { inf: 'b', conf: 'b', faint: 'b', chest: 'b', palp: 'b', dizzy: ['none', 'mild', 'severe'], bleed: ['none', 'ongoing', 'controlled', 'active'], airway: ['none', 'irritation', 'wheeze', 'moderate', 'severe'], expo: 'b' },
     bone: { ntx: [0, 1000], oc: [0, 500], bsap: [0, 500], follow: 'b' },
+    well: { mood: [1, 5], calm: [1, 5], energy: [1, 5], rested: [1, 5], focus: [1, 5], hope: [1, 5], temper: [1, 5], stress: [1, 5], sleepq: [1, 5], load: [1, 5], crew: [1, 5], ground: [1, 5], home: [1, 5], body: [1, 5], note: 's' },
     blood: { hb: [2, 25], hct: [10, 75], wbc: [0, 200], plt: [0, 3000], lym: [0, 50000] }
   };
   function validateExam(k, x) {
@@ -241,12 +243,23 @@
     for (var n in x) {
       var spec = f[n], v = x[n]; if (!spec) return 'unknown field ' + n; if (v == null) continue;
       if (spec === 'b') { if (typeof v !== 'boolean') return n + ' must be yes or no'; }
+      else if (spec === 's') { if (typeof v !== 'string' || v.length > 600) return n + ' must be text up to 600 characters'; }
       else if (typeof spec[0] === 'string') { if (spec.indexOf(v) < 0) return n + ' must be ' + spec.join(' / '); }
       else if (typeof v !== 'number' || !isFinite(v) || v < spec[0] || v > spec[1]) return 'implausible ' + n + ' ' + v;
     }
     return null;
   }
   /* Level of one exam result (CHARM_Exact_Alert_Thresholds). */
+  /* Mood and wellbeing check (Settings-free daily check-in). Same format as the mood questionnaires in NASA's Spaceflight
+     Standard Measures (POMS: 5-point ratings; plus visual-analogue items for stress, fatigue, conflict and sleep), with CHARM's
+     own wording: every item 1 = Very bad ... 5 = Great, plus free-text notes. The average also gives the 0-10 mood score (2 x average). */
+  var WELLQ = [['mood', 'Overall mood today', 'mood'], ['calm', 'How calm and relaxed do you feel?', 'calm'], ['energy', 'How energetic do you feel?', 'energy'],
+    ['rested', 'How rested do you feel (not tired)?', 'rest'], ['focus', 'How clear and focused is your thinking?', 'focus'], ['hope', 'How hopeful and positive do you feel?', 'hope'],
+    ['temper', 'How patient and even-tempered do you feel?', 'patience'], ['stress', 'How well are you handling stress today?', 'stress'], ['sleepq', 'How was last night\'s sleep?', 'sleep'],
+    ['load', 'How manageable is today\'s workload?', 'workload'], ['crew', 'How are things with the crew?', 'crew'], ['ground', 'How is communication with mission control?', 'mission control'],
+    ['home', 'How connected do you feel to family and home?', 'home'], ['body', 'How does your body feel (aches, nausea, headache)?', 'body']];
+  var WELLW = { 1: 'Very bad', 2: 'Bad', 3: 'OK', 4: 'Good', 5: 'Great' };
+  function wellStats(x) { var v = WELLQ.map(function (q) { return x[q[0]]; }).filter(function (n) { return typeof n === 'number'; }); if (!v.length) return null; var s = 0; v.forEach(function (n) { s += n; }); return { n: v.length, mean: Math.round(s / v.length * 10) / 10, low: WELLQ.filter(function (q) { return x[q[0]] != null && x[q[0]] <= 2; }), vbad: WELLQ.filter(function (q) { return x[q[0]] === 1; }) }; }
   function examLevel(k, x) {
     if (!x) return 0;
     switch (k) {
@@ -260,6 +273,8 @@
         var ve = [x.trt != null && x.trt >= 20, x.refr != null && x.refr >= 0.75, x.folds === 'any' || x.folds === 'sharp', x.flat === 'present' || x.flat === 'moderate'].filter(Boolean).length;
         if (vc) return x.stable ? CAU : CRI; // scenario 3: an established finding reviewed as not rising is followed, not an emergency
         return ve >= 2 ? CAU : ve || x.self === 'worse' ? ATT : 0;
+      case 'well': var ws = wellStats(x); if (!ws) return 0; // CAUTION: average 'Bad' or worse, or 'Very bad' on hope; WATCH: a 'Very bad' item, 3+ 'Bad' items or average 2.5 or less
+        if (ws.mean <= 2 || x.hope === 1) return CAU; if (ws.vbad.length || ws.low.length >= 3 || ws.mean <= 2.5) return ATT; return 0;
       case 'sym': if (x.bleed === 'active') return CRI; return x.inf || x.conf || x.faint || x.chest || x.palp || (x.dizzy && x.dizzy !== 'none') || x.bleed === 'controlled' || x.bleed === 'ongoing' || (x.airway && x.airway !== 'none') ? ATT : 0;
       case 'blood': var l = 0, up = function (v) { if (v > l) l = v; };
         if (x.wbc != null && (x.wbc > 12 || x.wbc < 4)) up(ATT);        // SIRS WBC criterion
@@ -279,6 +294,7 @@
       case 'urine': if (x.vol != null) p.push(x.vol + ' L/24 h'); p.push(x.blood ? 'blood in urine' : 'no blood'); if (x.us && x.us !== 'none') p.push(x.us === 'stone' ? 'stone on ultrasound' : 'hydronephrosis'); return p.join(' · ');
       case 'ijv': if (x.vel != null) p.push(x.vel + ' cm/s'); if (x.retro) p.push('retrograde flow'); if (x.thrombus) p.push('thrombus seen'); return p.join(' · ') || 'Normal flow';
       case 'vision': if (x.trt != null) p.push('ΔTRT ' + (x.trt > 0 ? '+' : '') + x.trt + ' µm'); if (x.frisen) p.push('Frisén ' + x.frisen); if (x.refr) p.push('refraction ' + (x.refr > 0 ? '+' : '') + x.refr + ' D'); if (x.stable) p.push('reviewed: not rising'); if (x.folds && x.folds !== 'none') p.push(x.folds === 'sharp' ? 'sharp folds near macula' : 'folds'); if (x.flat && x.flat !== 'none') p.push(x.flat + ' globe flattening'); if (x.self === 'worse') p.push('self vision test worse than before flight'); else if (x.self === 'same') p.push('self vision test unchanged'); return p.join(' · ') || 'No change from baseline';
+      case 'well': var w2 = wellStats(x); if (!w2) return x.note ? 'Notes only' : null; p.push('Wellbeing ' + w2.mean.toFixed(1) + ' / 5 (' + w2.n + ' answers)'); if (w2.low.length) p.push('low: ' + w2.low.map(function (q) { return q[2] + ' ' + WELLW[x[q[0]]].toLowerCase(); }).slice(0, 3).join('; ')); if (x.note) p.push('note: "' + x.note.slice(0, 80) + (x.note.length > 80 ? '…' : '') + '"'); return p.join(' · ');
       case 'bone': if (x.ntx != null) p.push('NTX ' + x.ntx); if (x.oc != null) p.push('osteocalcin ' + x.oc); if (x.bsap != null) p.push('BSAP ' + x.bsap); if (x.follow) p.push('follow-up pending'); return p.join(' · ');
       case 'sym': if (x.inf) p.push('suspected infection'); if (x.conf) p.push('confusion'); if (x.faint) p.push('fainting'); if (x.chest) p.push('chest pain'); if (x.palp) p.push('palpitations'); if (x.dizzy === 'mild') p.push('lightheaded'); if (x.dizzy === 'severe') p.push('severe dizziness'); if (x.bleed === 'active') p.push('bleeding, not controlled'); if (x.bleed === 'controlled') p.push('bleeding controlled'); if (x.bleed === 'ongoing') p.push('bleeding, not yet controlled'); if (x.airway && x.airway !== 'none') p.push({ irritation: 'throat or eye irritation', wheeze: 'cough and wheeze', moderate: 'short of breath, speaks in phrases', severe: 'severe breathing difficulty' }[x.airway]); if (x.expo) p.push('airborne exposure reported'); return p.length ? p.join(' · ') : 'No symptoms';
       case 'blood': if (x.hb != null) p.push('Hb ' + x.hb); if (x.wbc != null) p.push('WBC ' + x.wbc); if (x.plt != null) p.push('Plt ' + x.plt); if (x.lym != null) p.push('Lymph ' + x.lym); return p.join(' · ');
@@ -642,7 +658,7 @@
   return {
     MIN: MIN, H: H, D: D, MDEF: MDEF, MKEYS: MKEYS, LKEYS: LKEYS, RKEYS: RKEYS, ENVKEYS: ENVKEYS, COMMON: COMMON, THF: THF, PLAUS: PLAUS, FRESH: FRESH,
     freshFor: freshFor, profile: profile, MODEL: MODEL, modelBand: modelBand, demoReading: demoReading, demoLevels: demoLevels, DEMO_KEYS: DEMO_KEYS, examLevel: examLevel, examText: examText, validateExam: validateExam, EXAMF: EXAMF, EXAMK: EXAMK, CONDK: CONDK, ATT: ATT, CAU: CAU, CRI: CRI, SCALE: SCALE, personalOffsets: personalOffsets, CREW_AVG: CREW_AVG, checkProfile: checkProfile, validateReading: validateReading, validateEnv: validateEnv,
-    sortSeries: sortSeries, lastIdx: lastIdx, lastReading: lastReading, valueAt: valueAt, levelOf: levelOf, rank: rank,
+    WELLQ: WELLQ, WELLW: WELLW, wellStats: wellStats, sortSeries: sortSeries, lastIdx: lastIdx, lastReading: lastReading, valueAt: valueAt, levelOf: levelOf, rank: rank,
     personStatus: personStatus, wearableSilent: wearableSilent, fmtV: fmtV, WORD: WORD, transitions: transitions,
     envAt: envAt, envTransitions: envTransitions, missionDay: missionDay, shipGeom: shipGeom, TRANSFER_DAYS: TRANSFER_DAYS, oneWay: oneWay, clone: clone
   };
