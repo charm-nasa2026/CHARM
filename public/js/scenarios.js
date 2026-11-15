@@ -2,11 +2,11 @@
 window.CHARM_SCENARIOS = [
 {
 "id": "bleed",
-"title": "Severe Bleeding from a Deep Cut",
+"title": "Bleeding Emergency during a Mars Mission",
 "kind": "Emergency",
-"file": "severe_bleeding_scenario.csv",
-"sub": "Sarah · maintenance injury · life-threatening bleeding, tourniquet, monitoring for shock",
-"time": "Minutes 0 to 30, then hours, played as a demonstration sequence.",
+"file": "bleeding_emergency_scenario.csv",
+"sub": "Sarah · maintenance injury · crew-reported bleeding, falling blood pressure, emergency response and recovery",
+"time": "Named observation windows, not clock times.",
 "m": [
 [
 "hr",
@@ -31,40 +31,67 @@ window.CHARM_SCENARIOS = [
 "Respiratory rate",
 "/min",
 0
+],
+[
+"spo2",
+"SpO₂",
+"%",
+0
 ]
 ],
 "demo": [
-"Vital signs are simulated: each stage sits inside the ATLS hemorrhage class it names (class I: HR under 100, normal BP; class II: HR 100–120, normal systolic BP; class III: HR 120–140, falling BP).",
-"Steps follow Stop the Bleed (American College of Surgeons): pressure, wound packing, tourniquet 5–8 cm (2–3 in) above the wound, never on a joint, note the time.",
-"Shock index thresholds (0.9 and 1.0) are from published trauma research. Skin laceration and traumatic hypovolemic shock are conditions in NASA's Integrated Medical Model for long missions."
+"All numbers are simulated demo values from the medic team, not NASA participant recordings.",
+"Bleeding is a crew report, not a sensor reading: CHARM cannot detect bleeding or estimate blood loss. A normal SpO2 does not rule out serious blood loss, and hemoglobin can stay normal early, so no lab values are shown.",
+"First-aid steps added to the action cards follow Stop the Bleed (American College of Surgeons): firm pressure, packing, a tourniquet 5-8 cm above an arm or leg wound, never on a joint, and the time noted.",
+"Stage 5 is CRITICAL because of continuing bleeding with systolic pressure 86 and near-fainting, not because of the heart rate alone."
 ],
-"whatif": {
-"title": "If shock develops (any time)",
-"what": "Sarah becomes pale, sweaty and confused; the pulse is fast and weak.",
-"key": "HR above 120 | Systolic BP falling (below 90) | RR above 30 | Shock index 1.0 or more",
-"assess": "Signs of ATLS class III shock (30–40% of blood volume). Treat as an emergency even if the bleeding looks controlled.",
-"actions": "Lie her flat with legs raised and keep her warm; Oxygen if indicated by the protocol; Flight surgeon now",
-"basis": "ATLS class III: 30–40% loss, HR 120–140, decreased BP. Shock index above 1 is linked to about four times the mortality."
-},
 "stages": [
 {
 "label": "NORMAL",
-"stage": "1. Baseline",
-"what": "Sarah is doing maintenance on a cabin panel. She feels well.",
-"key": "HR 68 | BP 118/76 | RR 14 | SpO2 98%",
-"assess": "Vital signs at her personal baseline.",
-"checks": "Routine monitoring.",
-"labs": "None.",
-"actions": "Continue work; wear gloves for panel work.",
-"equip": "Wearable vital-sign sensors.",
+"code": "NORMAL",
+"stage": "Baseline · Before incident",
+"what": "Sarah feels well during a routine Mars transit shift.",
+"symptoms": "No symptoms.",
+"key": "HR 68 bpm · BP 118/76 mmHg · RR 14/min · SpO2 98%",
+"report": [
+[
+"Bleeding observed?",
+"No"
+],
+[
+"Bleeding",
+"No bleeding"
+],
+[
+"Control",
+"Not applicable"
+],
+[
+"Symptoms",
+"No symptoms."
+],
+[
+"Sources",
+"Wearable/resting HR; BP cuff; symptoms and bleeding from crew report."
+]
+],
+"alertTitle": "No active alert",
+"basis": "Stable personal baseline; no reported bleeding or warning symptoms.",
+"trend": "Stable",
+"assess": "Routine baseline. Nothing indicates a bleeding event.",
+"checks": "Continue routine HR and BP monitoring; confirm previously recorded baseline.",
+"labs": "No laboratory tests indicated.",
+"actions": "Continue normal activity and routine monitoring.",
+"firstaid": "",
+"equip": "Wearable HR monitor; BP cuff; pulse oximeter if available.",
 "treat": "None.",
-"basis": "Sarah's baseline from the medic team's scenarios.",
 "v": {
 "hr": 68.0,
 "sbp": 118.0,
 "dbp": 76.0,
 "rr": 14.0,
-"spo2": 98.0
+"spo2": 98.0,
+"si": 0.58
 },
 "rows": [
 {
@@ -83,269 +110,72 @@ window.CHARM_SCENARIOS = [
 "k": "bp",
 "v": 118.0,
 "v2": 76.0
+},
+{
+"k": "sym",
+"x": {
+"bleed": "none",
+"dizzy": "none",
+"inf": false,
+"conf": false
+}
 }
 ],
 "earth": false,
-"branch": false,
 "n": 1,
-"code": "NORMAL",
 "down": true
 },
 {
-"label": "CRITICAL",
-"stage": "2. 0 min: injury",
-"what": "A sharp panel edge cuts deep into her left forearm. Bright red blood pulses out and floats away as droplets.",
-"key": "Bleeding: active | HR 96 | BP 120/80 | RR 18 | SpO2 98% | Shock index 0.80",
-"assess": "Life-threatening bleeding: blood is pulsing from the wound. Vital signs are still normal (ATLS class I, under 15% of blood volume), but they will not stay normal. Act before they change.",
-"checks": "Find the exact bleeding point; check that she is awake and talking.",
-"labs": "None now. Bleeding control comes first.",
-"actions": "Put on gloves and eye protection; Anchor Sarah and yourself with foot loops; Press gauze firmly on the wound with both hands; Call the crew: bleeding kit and tourniquet now",
-"equip": "Gloves, eye protection, gauze, bleeding-control kit with tourniquet.",
-"treat": "Bleeding control only. No medication is needed for this step.",
-"basis": "Stop the Bleed (American College of Surgeons): pulsing blood = life-threatening bleeding; apply pressure. ATLS class I: under 15% blood loss, HR under 100, normal BP.",
-"v": {
-"hr": 96.0,
-"sbp": 120.0,
-"dbp": 80.0,
-"rr": 18.0,
-"spo2": 98.0,
-"si": 0.8
-},
-"rows": [
-{
-"k": "hr",
-"v": 96.0
-},
-{
-"k": "rr",
-"v": 18.0
-},
-{
-"k": "spo2",
-"v": 98.0
-},
-{
-"k": "bp",
-"v": 120.0,
-"v2": 80.0
-},
-{
-"k": "sym",
-"x": {
-"bleed": "active",
-"inf": false,
-"conf": false
-}
-}
+"label": "ATTENTION",
+"code": "ATTENTION",
+"stage": "Bleeding reported · Initial crew report",
+"what": "Sarah reports visible external bleeding after an accidental equipment-related injury during maintenance.",
+"symptoms": "Localized discomfort; awake, responsive, and speaking normally.",
+"key": "HR 82 bpm · BP 118/74 mmHg · RR 16/min · SpO2 98%",
+"report": [
+[
+"Bleeding observed?",
+"Yes (crew report)"
 ],
-"earth": false,
-"branch": false,
-"n": 2,
-"code": "CRITICAL",
-"down": false
-},
-{
-"label": "CRITICAL",
-"stage": "3. 1–3 min: still bleeding",
-"what": "Blood soaks through the gauze despite pressure. Sarah is anxious and breathing faster.",
-"key": "Bleeding: active | HR 112 | BP 116/88 | RR 22 | SpO2 98% | Shock index 0.97",
-"assess": "Bleeding continues despite pressure. Heart rate 100–120 with normal systolic pressure fits ATLS class II (15–30% of blood volume). A tourniquet is needed now.",
-"checks": "Is blood still coming through the dressing?; Heart rate and blood pressure.",
-"labs": "None now.",
-"actions": "Keep pressing while a crewmate opens the tourniquet; Pack the wound with hemostatic gauze if a tourniquet is delayed; Do not lift the dressing to look",
-"equip": "Tourniquet, hemostatic gauze, BP monitor, pulse oximeter.",
-"treat": "Bleeding control only.",
-"basis": "Stop the Bleed: bleeding that continues despite pressure is life-threatening; pack the wound. ATLS class II: 15–30% loss, HR 100–120, normal systolic BP.",
-"v": {
-"hr": 112.0,
-"sbp": 116.0,
-"dbp": 88.0,
-"rr": 22.0,
-"spo2": 98.0,
-"si": 0.97
-},
-"rows": [
-{
-"k": "hr",
-"v": 112.0
-},
-{
-"k": "rr",
-"v": 22.0
-},
-{
-"k": "spo2",
-"v": 98.0
-},
-{
-"k": "bp",
-"v": 116.0,
-"v2": 88.0
-},
-{
-"k": "sym",
-"x": {
-"bleed": "active",
-"inf": false,
-"conf": false
-}
-}
+[
+"Bleeding",
+"Visible bleeding reported by crew; quantity not measured"
 ],
-"earth": false,
-"branch": false,
-"n": 3,
-"code": "CRITICAL",
-"down": false
-},
-{
-"label": "ALERT",
-"stage": "4. 3–5 min: tourniquet on",
-"what": "The tourniquet is placed above the wound and tightened. The bleeding stops.",
-"key": "Bleeding: controlled | HR 108 | BP 114/82 | RR 20 | SpO2 98% | Shock index 0.95",
-"assess": "Bleeding controlled. Heart rate over 100 and shock index above 0.9 show real blood loss (ATLS class II). Watch for shock.",
-"checks": "Bleeding stopped?; Heart rate and blood pressure every 5 minutes; Awake and talking?",
-"labs": "Hemoglobin and hematocrit if an onboard analyzer is available (a first value may still look normal).",
-"actions": "Place the tourniquet 5–8 cm above the wound, not on a joint; Twist the windlass until the bleeding stops; Lock the windlass; Write down the time; Do not loosen it without the flight surgeon",
-"equip": "Tourniquet, marker or tablet for the time, BP monitor, pulse oximeter, analyzer if available.",
-"treat": "No medication decision by CHARM. Fluids only per the approved mission protocol.",
-"basis": "Stop the Bleed: tourniquet 2–3 inches above the wound, never on a joint, tighten until bleeding stops, note the time. Shock index above 0.9 is linked to worse outcomes.",
-"v": {
-"hr": 108.0,
-"sbp": 114.0,
-"dbp": 82.0,
-"rr": 20.0,
-"spo2": 98.0,
-"si": 0.95
-},
-"rows": [
-{
-"k": "hr",
-"v": 108.0
-},
-{
-"k": "rr",
-"v": 20.0
-},
-{
-"k": "spo2",
-"v": 98.0
-},
-{
-"k": "bp",
-"v": 114.0,
-"v2": 82.0
-},
-{
-"k": "sym",
-"x": {
-"bleed": "controlled",
-"inf": false,
-"conf": false
-}
-}
+[
+"Control",
+"Crew begins approved first-aid bleeding-control measures"
 ],
-"earth": false,
-"branch": false,
-"n": 4,
-"code": "ALERT",
-"down": true
-},
-{
-"label": "ALERT",
-"stage": "5. Earth unavailable",
-"what": "The flight surgeon cannot answer in real time: the signal delay is too long.",
-"key": "Live values keep streaming to CHARM.",
-"assess": "CHARM keeps the onboard bleeding protocol and reassessment running until Earth answers. Loss of the link does not change the status.",
-"checks": "Keep all live monitoring.",
-"labs": "Use the results you have.",
-"actions": "Follow the onboard bleeding protocol; Record every step with its time",
-"equip": "CHARM tablet plus the same equipment.",
-"treat": "Continue the plan already authorized for the mission.",
-"basis": "—",
-"v": {},
-"rows": [],
-"earth": true,
-"branch": false,
-"n": 5,
-"code": "ALERT",
-"down": false
-},
-{
-"label": "ALERT - MONITORING",
-"stage": "6. 15–30 min: monitoring",
-"what": "Sarah rests, anchored. The tourniquet holds. She drinks small sips.",
-"key": "Bleeding: controlled | HR 98 | BP 116/78 | RR 18 | SpO2 98% | Shock index 0.84",
-"assess": "Heart rate back under 100 and shock index under 0.9: the circulation is coping. Still watch closely.",
-"checks": "Heart rate and blood pressure every 15 minutes; Tourniquet time; Fingers below the tourniquet stay pale and cool (expected)",
-"labs": "Repeat hemoglobin if available.",
-"actions": "Keep her warm and anchored; Small sips of fluid if she is fully awake and not nauseous; Check the tourniquet time every 15 minutes",
-"equip": "BP monitor, pulse oximeter, blanket, fluid pouch.",
-"treat": "Fluids only per the approved protocol. CHARM does not choose or dose fluids or drugs.",
-"basis": "ATLS class I–II range: HR under 100 with normal BP.",
-"v": {
-"hr": 98.0,
-"sbp": 116.0,
-"dbp": 78.0,
-"rr": 18.0,
-"spo2": 98.0,
-"si": 0.84
-},
-"rows": [
-{
-"k": "hr",
-"v": 98.0
-},
-{
-"k": "rr",
-"v": 18.0
-},
-{
-"k": "spo2",
-"v": 98.0
-},
-{
-"k": "bp",
-"v": 116.0,
-"v2": 78.0
-},
-{
-"k": "sym",
-"x": {
-"bleed": "controlled",
-"inf": false,
-"conf": false
-}
-}
+[
+"Symptoms",
+"Localized discomfort; awake, responsive, and speaking normally."
 ],
-"earth": false,
-"branch": false,
-"n": 6,
-"code": "ALERT",
-"down": true
-},
-{
-"label": "ALERT - STABLE",
-"stage": "7. 1–2 h: wound care",
-"what": "The flight surgeon answers with the plan for the wound and the tourniquet.",
-"key": "Bleeding: controlled | HR 86 | BP 118/76 | RR 16 | SpO2 98%",
-"assess": "Stable. Wound care and the tourniquet plan follow the flight surgeon's instructions.",
-"checks": "Vital signs every 30 minutes; Dressing dry?",
-"labs": "Repeat hemoglobin per the flight surgeon.",
-"actions": "Follow the flight surgeon's wound plan; Document the tourniquet time and the wound care",
-"equip": "Wound care kit, dressings, tablet.",
-"treat": "Wound closure and any medication only on the flight surgeon's instructions.",
-"basis": "—",
+[
+"Sources",
+"Bleeding status and symptoms: crew-reported; vitals: monitor/cuff."
+]
+],
+"alertTitle": "ATTENTION - External Bleeding Reported",
+"basis": "Crew-confirmed bleeding; initially stable vital signs compared with baseline.",
+"trend": "New event",
+"assess": "Reported bleeding requires assessment even when vital signs remain near baseline.",
+"checks": "Crew medical assessment of ongoing bleeding and response to basic control measures; repeat BP, HR, RR and symptoms.",
+"labs": "None routinely at this early stage; consider only if medically indicated and available.",
+"actions": "Alert the Crew Medical Officer; use approved first-aid bleeding-control steps; pause maintenance and reassess.; Put on gloves and eye protection (blood floats); Press firmly on the wound with gauze and both hands; Do not lift the dressing to look",
+"firstaid": "Put on gloves and eye protection (blood floats); Press firmly on the wound with gauze and both hands; Do not lift the dressing to look",
+"equip": "First-aid dressings and gloves, if available; wearable monitor; BP cuff.",
+"treat": "Use trained-crew first aid and mission protocol; do not infer injury severity from pulse alone.",
 "v": {
-"hr": 86.0,
+"hr": 82.0,
 "sbp": 118.0,
-"dbp": 76.0,
+"dbp": 74.0,
 "rr": 16.0,
-"spo2": 98.0
+"spo2": 98.0,
+"si": 0.69
 },
 "rows": [
 {
 "k": "hr",
-"v": 86.0
+"v": 82.0
 },
 {
 "k": "rr",
@@ -358,50 +188,77 @@ window.CHARM_SCENARIOS = [
 {
 "k": "bp",
 "v": 118.0,
-"v2": 76.0
+"v2": 74.0
 },
 {
 "k": "sym",
 "x": {
-"bleed": "controlled",
+"bleed": "ongoing",
+"dizzy": "none",
 "inf": false,
 "conf": false
 }
 }
 ],
 "earth": false,
-"branch": false,
-"n": 7,
-"code": "ALERT",
-"down": true
+"n": 2,
+"down": false
 },
 {
-"label": "NORMAL / RESOLVED",
-"stage": "8. Next day: recovered",
-"what": "The wound is dressed and Sarah is back on light duty.",
-"key": "Bleeding: none | HR 74 | BP 118/76 | RR 14 | SpO2 98%",
-"assess": "Back to her baseline. Keep watching the wound for infection.",
-"checks": "Daily wound check; Temperature.",
-"labs": "Hemoglobin follow-up if it was low.",
-"actions": "Return to light duty after clearance; Report fever, redness or swelling at once",
-"equip": "Routine monitoring.",
-"treat": "Follow-up per the flight surgeon.",
-"basis": "—",
+"label": "CAUTION",
+"code": "CAUTION",
+"stage": "Bleeding persists · Repeat assessment",
+"what": "The crew reports that bleeding has not yet been fully controlled.",
+"symptoms": "Fatigue and increased awareness of heartbeat; remains oriented.",
+"key": "HR 101 bpm · BP 114/72 mmHg · RR 20/min · SpO2 98%",
+"report": [
+[
+"Bleeding observed?",
+"Yes (crew report)"
+],
+[
+"Bleeding",
+"Ongoing bleeding reported; not quantitatively measured"
+],
+[
+"Control",
+"Not yet controlled"
+],
+[
+"Symptoms",
+"Fatigue and increased awareness of heartbeat; remains oriented."
+],
+[
+"Sources",
+"Bleeding and symptoms: crew report; HR: wearable; BP: cuff."
+]
+],
+"alertTitle": "CAUTION - Persistent Bleeding and Rising Heart Rate",
+"basis": "Continued bleeding plus rising resting HR; trends require crew assessment.",
+"trend": "Worsening",
+"assess": "Persistent visible bleeding with a rising heart rate raises concern for evolving blood loss. No definitive loss volume or shock diagnosis is inferred.",
+"checks": "Urgent Crew Medical Officer reassessment; repeat HR, BP, RR, mentation and bleeding-control status.",
+"labs": "CBC / hemoglobin only if medical officer indicates and onboard assay is available; do not delay control for labs.",
+"actions": "Continue authorized control measures; maintain close observations; escalate if bleeding persists or symptoms develop.; Keep firm pressure; If blood soaks through: pack the wound with gauze and press, or for an arm or leg place a tourniquet 5-8 cm above the wound, never on a joint, if the kit has one; Write down the time a tourniquet goes on",
+"firstaid": "Keep firm pressure; If blood soaks through: pack the wound with gauze and press, or for an arm or leg place a tourniquet 5-8 cm above the wound, never on a joint, if the kit has one; Write down the time a tourniquet goes on",
+"equip": "Approved bleeding-control first-aid kit, HR monitor, BP cuff; analyzer only if available.",
+"treat": "Crew medical protocol directs control and escalation; CHARM does not choose invasive procedures or drugs.",
 "v": {
-"hr": 74.0,
-"sbp": 118.0,
-"dbp": 76.0,
-"rr": 14.0,
-"spo2": 98.0
+"hr": 101.0,
+"sbp": 114.0,
+"dbp": 72.0,
+"rr": 20.0,
+"spo2": 98.0,
+"si": 0.89
 },
 "rows": [
 {
 "k": "hr",
-"v": 74.0
+"v": 101.0
 },
 {
 "k": "rr",
-"v": 14.0
+"v": 20.0
 },
 {
 "k": "spo2",
@@ -409,22 +266,382 @@ window.CHARM_SCENARIOS = [
 },
 {
 "k": "bp",
-"v": 118.0,
-"v2": 76.0
+"v": 114.0,
+"v2": 72.0
 },
 {
 "k": "sym",
 "x": {
-"bleed": "none",
+"bleed": "ongoing",
+"dizzy": "none",
 "inf": false,
 "conf": false
 }
 }
 ],
 "earth": false,
-"branch": false,
-"n": 8,
+"n": 3,
+"down": false
+},
+{
+"label": "CAUTION",
+"code": "CAUTION",
+"stage": "Symptomatic deterioration · Close reassessment",
+"what": "Bleeding persists and Sarah becomes lightheaded while resting.",
+"symptoms": "Lightheadedness, weakness and paleness reported by crew; awake and responsive.",
+"key": "HR 115 bpm · BP 104/68 mmHg · RR 23/min · SpO2 98%",
+"report": [
+[
+"Bleeding observed?",
+"Yes (crew report)"
+],
+[
+"Bleeding",
+"Continued bleeding reported"
+],
+[
+"Control",
+"Still not confirmed controlled"
+],
+[
+"Symptoms",
+"Lightheadedness, weakness and paleness reported by crew; awake and responsive."
+],
+[
+"Sources",
+"Bleeding, pallor, lightheadedness: crew-assessed; vitals: device/cuff."
+]
+],
+"alertTitle": "CAUTION - Possible Circulatory Compromise",
+"basis": "Persistent bleeding + weakness/lightheadedness + faster HR + falling BP relative to baseline.",
+"trend": "Deteriorating",
+"assess": "Multiple signs suggest worsening circulatory status; urgent hands-on medical assessment is necessary.",
+"checks": "Frequent vital-sign reassessment, responsiveness and bleeding status; assess for further deterioration.",
+"labs": "Laboratory testing only when available and appropriate; initial normal hemoglobin would not exclude acute loss.",
+"actions": "Urgent Crew Medical Officer involvement; continue authorized bleeding control; closely observe Sarah; prepare emergency response.; Keep the pressure or the tourniquet on; Keep Sarah lying down, anchored and warm",
+"firstaid": "Keep the pressure or the tourniquet on; Keep Sarah lying down, anchored and warm",
+"equip": "First-aid bleeding-control supplies; BP cuff; HR monitor; pulse oximeter if available.",
+"treat": "Escalate under approved medical protocol; no autonomous therapy or medication advice.",
+"v": {
+"hr": 115.0,
+"sbp": 104.0,
+"dbp": 68.0,
+"rr": 23.0,
+"spo2": 98.0,
+"si": 1.11
+},
+"rows": [
+{
+"k": "hr",
+"v": 115.0
+},
+{
+"k": "rr",
+"v": 23.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 104.0,
+"v2": 68.0
+},
+{
+"k": "sym",
+"x": {
+"bleed": "ongoing",
+"dizzy": "mild",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"n": 4,
+"down": false
+},
+{
+"label": "CRITICAL",
+"code": "CRITICAL",
+"stage": "Hemodynamic instability · Critical event",
+"what": "Sarah becomes too dizzy to continue her tasks. Bleeding is still an active concern.",
+"symptoms": "Severe weakness and near-fainting; requires immediate crew assessment.",
+"key": "HR 132 bpm · BP 86/56 mmHg · RR 28/min · SpO2 98%",
+"report": [
+[
+"Bleeding observed?",
+"Yes (crew report)"
+],
+[
+"Bleeding",
+"Uncontrolled or incompletely controlled bleeding reported"
+],
+[
+"Control",
+"Emergency crew response active"
+],
+[
+"Symptoms",
+"Severe weakness and near-fainting; requires immediate crew assessment."
+],
+[
+"Sources",
+"Bleeding and symptoms: clinical crew report; vital signs: monitors/cuff."
+]
+],
+"alertTitle": "CRITICAL - Bleeding with Low Blood Pressure",
+"basis": "Continuing bleeding + SBP 86 mmHg + marked tachycardia + severe symptoms.",
+"trend": "Critical deterioration",
+"assess": "Potential hemorrhage-related circulatory instability. An urgent emergency medical response is required; this is not a diagnosis derived from HR alone.",
+"checks": "Immediate trained-crew ABC and circulation assessment; continuous/repeated BP, HR, RR, responsiveness and bleeding-control checks.",
+"labs": "Do not delay emergency response for CBC or other laboratory measurements.",
+"actions": "Activate the mission medical emergency protocol; notify responding crew; continue first-aid control led by trained crew; document observations.; Keep the pressure or the tourniquet on; Lie her flat and keep her warm",
+"firstaid": "Keep the pressure or the tourniquet on; Lie her flat and keep her warm",
+"equip": "Approved emergency first-aid kit; BP/HR monitor; mission-specified medical supplies if available.",
+"treat": "Only trained crew and the Crew Medical Officer may direct emergency care according to authorized protocol; no doses or procedures selected by CHARM.",
+"v": {
+"hr": 132.0,
+"sbp": 86.0,
+"dbp": 56.0,
+"rr": 28.0,
+"spo2": 98.0,
+"si": 1.53
+},
+"rows": [
+{
+"k": "hr",
+"v": 132.0
+},
+{
+"k": "rr",
+"v": 28.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 86.0,
+"v2": 56.0
+},
+{
+"k": "sym",
+"x": {
+"bleed": "ongoing",
+"dizzy": "severe",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"n": 5,
+"down": false
+},
+{
+"label": "CRITICAL",
+"code": "CRITICAL",
+"stage": "Earth link unavailable · During critical response",
+"what": "Communication with Earth becomes unavailable while crew medical care is underway.",
+"symptoms": "Ongoing critical event; no new symptom assessment documented at this step.",
+"key": "Last known from Stage 5: HR 132 bpm, BP 86/56 mmHg, RR 28/min, SpO2 98%. LAST KNOWN ONLY; NOT LIVE.",
+"report": [
+[
+"Bleeding observed?",
+"Yes (crew report)"
+],
+[
+"Bleeding",
+"Last known: bleeding was not confirmed controlled at Stage 5"
+],
+[
+"Control",
+"Current control status awaiting fresh crew report"
+],
+[
+"Symptoms",
+"Ongoing critical event; no new symptom assessment documented at this step."
+],
+[
+"Sources",
+"Only communication and prior-stage information supplied; new vitals intentionally absent."
+]
+],
+"alertTitle": "CRITICAL - Earth Link Unavailable; Onboard Protocol Active",
+"basis": "Prior critical medical state persists pending reassessment; Earth-link outage is a separate communication event.",
+"trend": "Critical carried forward; no new numeric sample",
+"assess": "No new measurements are supplied. Local guidance and incident log remain accessible; last-known readings must never be displayed as live.",
+"checks": "Continue actual onboard monitoring and obtain fresh crew clinical assessments; mark stale or unavailable values clearly.",
+"labs": "No new laboratory values supplied; do not invent results.",
+"actions": "Keep cached mission-approved guidance available; record all crew actions locally and maintain emergency response; sync later if technically supported.",
+"firstaid": "",
+"equip": "Local CHARM interface; offline protocol copy; onboard monitoring and approved emergency supplies.",
+"treat": "Continue trained-crew medical care per approved onboard protocol even without ground contact.",
+"v": {},
+"rows": [],
+"earth": true,
+"n": 6,
+"down": false
+},
+{
+"label": "CAUTION - RECOVERING",
+"code": "CAUTION",
+"stage": "Bleeding controlled - observation · After protocol-led care",
+"what": "Crew reports bleeding is now controlled following authorized care and Sarah is less dizzy.",
+"symptoms": "Reduced lightheadedness and fatigue; awake and communicating.",
+"key": "HR 100 bpm · BP 108/70 mmHg · RR 20/min · SpO2 98%",
+"report": [
+[
+"Bleeding observed?",
+"Yes (crew report)"
+],
+[
+"Bleeding",
+"Crew confirms bleeding currently controlled"
+],
+[
+"Control",
+"Controlled by trained crew; watch for recurrence"
+],
+[
+"Symptoms",
+"Reduced lightheadedness and fatigue; awake and communicating."
+],
+[
+"Sources",
+"Control confirmed by crew; symptoms reported; fresh vitals simulated."
+]
+],
+"alertTitle": "CAUTION - Stabilizing; Continue Monitoring",
+"basis": "Control reported; BP, HR and symptoms improving, but recent critical instability requires observation.",
+"trend": "Improving, not resolved",
+"assess": "Improving signs following crew-led treatment do not mean automatic medical clearance.",
+"checks": "Repeat BP/HR/RR, assess bleeding recurrence, mental state and symptoms; follow medical-officer plan.",
+"labs": "CBC / hemoglobin trend if clinician requests and an onboard test is genuinely available.",
+"actions": "Continue observation and documentation; confirm bleeding remains controlled; do not return to full duty yet.",
+"firstaid": "",
+"equip": "Wearable, BP cuff, first-aid kit, optional laboratory device if present.",
+"treat": "Continue clinician-directed follow-up; CHARM does not select treatment.",
+"v": {
+"hr": 100.0,
+"sbp": 108.0,
+"dbp": 70.0,
+"rr": 20.0,
+"spo2": 98.0,
+"si": 0.93
+},
+"rows": [
+{
+"k": "hr",
+"v": 100.0
+},
+{
+"k": "rr",
+"v": 20.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 108.0,
+"v2": 70.0
+},
+{
+"k": "sym",
+"x": {
+"bleed": "controlled",
+"dizzy": "mild",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"n": 7,
+"down": true
+},
+{
+"label": "NORMAL - FOLLOW-UP",
 "code": "NORMAL",
+"stage": "Recovery and medical follow-up · Later clinical follow-up",
+"what": "Repeated crew assessments show stable vital signs near Sarah's demo baseline and no recurrent bleeding.",
+"symptoms": "Dizziness resolved; feels well; Crew Medical Officer follow-up remains planned.",
+"key": "HR 78 bpm · BP 116/74 mmHg · RR 16/min · SpO2 98%",
+"report": [
+[
+"Bleeding observed?",
+"Yes (crew report)"
+],
+[
+"Bleeding",
+"No recurrent bleeding on repeat crew checks"
+],
+[
+"Control",
+"Stable, confirmed on repeat assessment"
+],
+[
+"Symptoms",
+"Dizziness resolved; feels well; Crew Medical Officer follow-up remains planned."
+],
+[
+"Sources",
+"Repeat crew report + simulated vital signs."
+]
+],
+"alertTitle": "NORMAL - Stable; Follow-Up Required",
+"basis": "Stable repeat readings, symptoms resolved and crew-confirmed continued bleeding control.",
+"trend": "Stable follow-up",
+"assess": "Return toward baseline after medical review. The simulation resolves the urgent alert, but only an authorized clinician can clear return to duty.",
+"checks": "Scheduled reassessment and symptom check; document bleeding-control and injury follow-up.",
+"labs": "Any follow-up blood testing only if clinically indicated and available.",
+"actions": "Complete incident documentation; continue planned check-ins; medical officer decides return-to-duty readiness.",
+"firstaid": "",
+"equip": "Routine HR/BP monitoring; follow-up first-aid supplies as directed.",
+"treat": "Follow the Crew Medical Officer's aftercare plan; no autonomous clearance.",
+"v": {
+"hr": 78.0,
+"sbp": 116.0,
+"dbp": 74.0,
+"rr": 16.0,
+"spo2": 98.0,
+"si": 0.67
+},
+"rows": [
+{
+"k": "hr",
+"v": 78.0
+},
+{
+"k": "rr",
+"v": 16.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 116.0,
+"v2": 74.0
+},
+{
+"k": "sym",
+"x": {
+"bleed": "none",
+"dizzy": "none",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"n": 8,
 "down": true
 }
 ]
@@ -929,6 +1146,768 @@ window.CHARM_SCENARIOS = [
 }
 ],
 "earth": false,
+"n": 8,
+"down": true
+}
+]
+},
+{
+"id": "air",
+"title": "Airborne Exposure / Respiratory Emergency",
+"kind": "Emergency",
+"file": "airborne_allergy_emergency_scenario.csv",
+"sub": "Sarah · cabin air-filter seal fails · possible allergic or irritant airway reaction, severe breathing difficulty and recovery",
+"time": "Named observation windows, not clock times.",
+"m": [
+[
+"hr",
+"Heart rate",
+"bpm",
+0
+],
+[
+"rr",
+"Respiratory rate",
+"/min",
+0
+],
+[
+"spo2",
+"SpO₂",
+"%",
+0
+],
+[
+"bp",
+"Blood pressure",
+"mmHg",
+0
+],
+[
+"temp",
+"Temperature",
+"°C",
+1
+]
+],
+"prov": "Stage 1 HR, BP, RR and temperature are rounded pre-bed-rest means of NASA NLSP CFT70 ground bed-rest analog subject C11_CFT70_8072 (CRF_CFT70_VITALS_8072, DOI 10.83263/wjw1-ta27; HR 76.4, BP 118.2/74.4, RR 16.4, 36.62 °C), a ground study, not flight data. SpO2 is synthetic in every stage; all stage 2-8 values and the incident are synthetic.",
+"demo": [
+"The exposure and the symptoms are crew reports. CHARM cannot detect or identify an allergen and does not diagnose allergy, asthma or anaphylaxis: \"possible allergic or irritant airway reaction\" until the Crew Medical Officer assesses it.",
+"Severity follows the NAEPP asthma-exacerbation grades: moderate = speaks in phrases, heart rate 100-120; severe = cannot finish sentences, heart rate over 120, breathing over 30/min.",
+"CHARM's own breathing-rate rule (NEWS2: 25/min or more) already raises a CRITICAL alert at stage 4, one stage before the scenario's authored CRITICAL."
+],
+"stages": [
+{
+"label": "NORMAL",
+"code": "NORMAL",
+"stage": "Pre-incident reference · Before filter-maintenance event",
+"what": "Sarah feels well before routine equipment servicing in the Mars transit vehicle.",
+"symptoms": "None reported.",
+"key": "HR 76 bpm · BP 118/74 mmHg · RR 16/min · SpO2 98% · 36.6 °C",
+"report": [
+[
+"Cabin incident",
+"No incident reported."
+],
+[
+"Environment evidence",
+"Not sampled; no airborne-allergen measurement."
+],
+[
+"Suspected trigger",
+"Airborne particles released from damaged filter seal; suspected allergy or irritant trigger, unconfirmed"
+],
+[
+"Breathing",
+"None"
+],
+[
+"Skin and eyes",
+"None"
+],
+[
+"Diagnosis",
+"No confirmed allergy, asthma, anaphylaxis, microbial species or specific allergen; clinical assessment needed"
+]
+],
+"prov": {
+"hr": "NASA ground analog mean",
+"bp": "NASA ground analog mean",
+"rr": "NASA ground analog mean",
+"spo2": "synthetic",
+"temp": "NASA ground analog mean"
+},
+"alertTitle": "No active alert",
+"basis": "Rounded NASA analog baseline means for HR, BP, RR, temperature; demonstration-only SpO2.",
+"assess": "Reference resting vital-sign profile; no crew-reported respiratory symptoms.",
+"checks": "Confirm baseline identity and sensor quality; continue routine monitoring.",
+"labs": "None indicated.",
+"actions": "Continue routine work and standard observations.",
+"equip": "Wearable HR tracker; BP cuff; respiratory-rate measurement; pulse oximeter if available.",
+"treat": "No treatment.",
+"v": {
+"hr": 76.0,
+"sbp": 118.0,
+"dbp": 74.0,
+"rr": 16.0,
+"spo2": 98.0,
+"temp": 36.6
+},
+"rows": [
+{
+"k": "temp",
+"v": 36.6
+},
+{
+"k": "hr",
+"v": 76.0
+},
+{
+"k": "rr",
+"v": 16.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 118.0,
+"v2": 74.0
+},
+{
+"k": "sym",
+"x": {
+"airway": "none",
+"expo": false,
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"restored": false,
+"link": "ONLINE",
+"n": 1,
+"down": true
+},
+{
+"label": "ATTENTION",
+"code": "ATTENTION",
+"stage": "Air-filter incident reported · Minutes after maintenance starts",
+"what": "A filter-cartridge seal fails during maintenance; the crew observes a small dust cloud within the closed cabin. Sarah is nearby.",
+"symptoms": "Sneezing, itchy eyes and mild throat irritation; speaking normally.",
+"key": "HR 88 bpm · BP 118/74 mmHg · RR 18/min · SpO2 98% · 36.6 °C",
+"report": [
+[
+"Cabin incident",
+"Crew reports an air-filter seal failure and visible dust release."
+],
+[
+"Environment evidence",
+"Visual crew observation only; particle type and allergen status unknown."
+],
+[
+"Suspected trigger",
+"Airborne particles released from damaged filter seal; suspected allergy or irritant trigger, unconfirmed"
+],
+[
+"Breathing",
+"Mild throat irritation; no breathing difficulty"
+],
+[
+"Skin and eyes",
+"Itchy eyes; no widespread rash"
+],
+[
+"Diagnosis",
+"No confirmed allergy, asthma, anaphylaxis, microbial species or specific allergen; clinical assessment needed"
+]
+],
+"prov": {
+"hr": "synthetic",
+"bp": "synthetic",
+"rr": "synthetic",
+"spo2": "synthetic",
+"temp": "synthetic"
+},
+"alertTitle": "Possible Airborne Exposure - Assess Symptoms",
+"basis": "Crew-reported dust release + symptoms; HR/RR remain close to baseline.",
+"assess": "Crew-reported airborne-particle event with new upper-airway symptoms; allergic or irritant cause is unconfirmed.",
+"checks": "Crew Medical Officer symptom review; repeat HR, BP, RR, SpO2; check breathing and speech; log exposure.",
+"labs": "No immediate lab test confirms an allergen; consider evaluation only if directed by mission clinician.",
+"actions": "Report incident to medical and environmental officers; leave affected work area if feasible; follow approved cabin-contamination response.",
+"equip": "Available vital-sign monitors; authorized cabin environmental monitoring if present.",
+"treat": "Use the mission-approved response only; no app-selected medication.",
+"v": {
+"hr": 88.0,
+"sbp": 118.0,
+"dbp": 74.0,
+"rr": 18.0,
+"spo2": 98.0,
+"temp": 36.6
+},
+"rows": [
+{
+"k": "temp",
+"v": 36.6
+},
+{
+"k": "hr",
+"v": 88.0
+},
+{
+"k": "rr",
+"v": 18.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 118.0,
+"v2": 74.0
+},
+{
+"k": "sym",
+"x": {
+"airway": "irritation",
+"expo": true,
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"restored": false,
+"link": "ONLINE",
+"n": 2,
+"down": false
+},
+{
+"label": "CAUTION",
+"code": "CAUTION",
+"stage": "Wheezing and cough · First repeat check",
+"what": "Sarah has continuing symptoms despite leaving the immediate maintenance task.",
+"symptoms": "Repeated cough, wheezing, chest tightness; awake and able to speak in full sentences.",
+"key": "HR 103 bpm · BP 116/72 mmHg · RR 21/min · SpO2 96% · 36.6 °C",
+"report": [
+[
+"Cabin incident",
+"Filter incident remains under environmental assessment."
+],
+[
+"Environment evidence",
+"No verified allergen identity or concentration."
+],
+[
+"Suspected trigger",
+"Airborne particles released from damaged filter seal; suspected allergy or irritant trigger, unconfirmed"
+],
+[
+"Breathing",
+"Wheezing and cough; mild shortness of breath"
+],
+[
+"Skin and eyes",
+"Itchy eyes continue"
+],
+[
+"Diagnosis",
+"No confirmed allergy, asthma, anaphylaxis, microbial species or specific allergen; clinical assessment needed"
+]
+],
+"prov": {
+"hr": "synthetic",
+"bp": "synthetic",
+"rr": "synthetic",
+"spo2": "synthetic",
+"temp": "synthetic"
+},
+"alertTitle": "Respiratory Symptoms Worsening - Clinical Review",
+"basis": "Symptoms + HR >100 bpm at rest + RR above personal reference.",
+"assess": "Wheezing plus increasing HR and RR suggest possible bronchospasm; cause remains uncertain.",
+"checks": "Urgent Crew Medical Officer assessment; repeat respiratory observations and SpO2; evaluate effort, ability to speak, and sensor quality.",
+"labs": "No infection or allergy biomarker is automatically inferred; optional tests only if available and clinician-ordered.",
+"actions": "Pause work; arrange direct medical assessment and repeat checks; use approved respiratory-response protocol.",
+"equip": "HR monitor, BP cuff, pulse oximeter, medical kit if onboard; no assumptions about specific medicines.",
+"treat": "Trained clinician/crew decides care from approved mission protocol; the app supports triage only.",
+"v": {
+"hr": 103.0,
+"sbp": 116.0,
+"dbp": 72.0,
+"rr": 21.0,
+"spo2": 96.0,
+"temp": 36.6
+},
+"rows": [
+{
+"k": "temp",
+"v": 36.6
+},
+{
+"k": "hr",
+"v": 103.0
+},
+{
+"k": "rr",
+"v": 21.0
+},
+{
+"k": "spo2",
+"v": 96.0
+},
+{
+"k": "bp",
+"v": 116.0,
+"v2": 72.0
+},
+{
+"k": "sym",
+"x": {
+"airway": "wheeze",
+"expo": true,
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"restored": false,
+"link": "ONLINE",
+"n": 3,
+"down": false
+},
+{
+"label": "CAUTION",
+"code": "CAUTION",
+"stage": "Breathing difficulty increases · Escalating respiratory assessment",
+"what": "Sarah cannot continue her tasks and needs continuous crew observation.",
+"symptoms": "Breathlessness during speech, wheezing and anxiety; alert and responsive.",
+"key": "HR 118 bpm · BP 112/70 mmHg · RR 26/min · SpO2 93% · 36.6 °C",
+"report": [
+[
+"Cabin incident",
+"Air-filter incident documented; contamination source not yet laboratory-confirmed."
+],
+[
+"Environment evidence",
+"No new validated airborne concentration measurement."
+],
+[
+"Suspected trigger",
+"Airborne particles released from damaged filter seal; suspected allergy or irritant trigger, unconfirmed"
+],
+[
+"Breathing",
+"Moderate respiratory distress; speaks in shorter phrases"
+],
+[
+"Skin and eyes",
+"Eye irritation persists"
+],
+[
+"Diagnosis",
+"No confirmed allergy, asthma, anaphylaxis, microbial species or specific allergen; clinical assessment needed"
+]
+],
+"prov": {
+"hr": "synthetic",
+"bp": "synthetic",
+"rr": "synthetic",
+"spo2": "synthetic",
+"temp": "synthetic"
+},
+"alertTitle": "Significant Respiratory Deterioration",
+"basis": "RR 26/min, rising HR, declining SpO2, increased breathing effort and speech difficulty.",
+"assess": "Multisignal deterioration after crew-reported exposure requires immediate hands-on evaluation.",
+"checks": "Continuous or frequent clinical observation; repeat BP and SpO2; assess mentation and breathing effort; check cabin conditions.",
+"labs": "None required to trigger urgent clinical assessment; clinician decides any testing.",
+"actions": "Escalate to the Crew Medical Officer and follow the approved respiratory-emergency pathway; keep environmental team informed.",
+"equip": "Pulse oximeter, HR/BP monitoring; authorized emergency supplies only if present and directed.",
+"treat": "No autonomous diagnosis or drug recommendations; mission emergency protocol governs.",
+"v": {
+"hr": 118.0,
+"sbp": 112.0,
+"dbp": 70.0,
+"rr": 26.0,
+"spo2": 93.0,
+"temp": 36.6
+},
+"rows": [
+{
+"k": "temp",
+"v": 36.6
+},
+{
+"k": "hr",
+"v": 118.0
+},
+{
+"k": "rr",
+"v": 26.0
+},
+{
+"k": "spo2",
+"v": 93.0
+},
+{
+"k": "bp",
+"v": 112.0,
+"v2": 70.0
+},
+{
+"k": "sym",
+"x": {
+"airway": "moderate",
+"expo": true,
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"restored": false,
+"link": "ONLINE",
+"n": 4,
+"down": false
+},
+{
+"label": "CRITICAL",
+"code": "CRITICAL",
+"stage": "Severe respiratory emergency · Acute critical deterioration",
+"what": "Sarah requires immediate emergency medical attention; the crew reports marked difficulty breathing.",
+"symptoms": "Severe breathing difficulty; unable to finish full sentences; awake but struggling.",
+"key": "HR 132 bpm · BP 108/68 mmHg · RR 30/min · SpO2 87% · 36.6 °C",
+"report": [
+[
+"Cabin incident",
+"Reported filter release remains the suspected trigger; specific allergen still unidentified."
+],
+[
+"Environment evidence",
+"No validated airborne-specific cause established."
+],
+[
+"Suspected trigger",
+"Airborne particles released from damaged filter seal; suspected allergy or irritant trigger, unconfirmed"
+],
+[
+"Breathing",
+"Severe respiratory distress and prominent wheeze"
+],
+[
+"Skin and eyes",
+"Eye irritation reported previously; no generalized hives recorded"
+],
+[
+"Diagnosis",
+"No confirmed allergy, asthma, anaphylaxis, microbial species or specific allergen; clinical assessment needed"
+]
+],
+"prov": {
+"hr": "synthetic",
+"bp": "synthetic",
+"rr": "synthetic",
+"spo2": "synthetic",
+"temp": "synthetic"
+},
+"alertTitle": "CRITICAL - Severe Respiratory Distress",
+"basis": "Severe observed breathing difficulty + SpO2 87% (below 88% high-priority reference) + marked tachycardia and tachypnea.",
+"assess": "Severe respiratory symptoms with markedly low simulated SpO2; urgent crew medical response required. This is not a diagnosis of anaphylaxis.",
+"checks": "Immediate Crew Medical Officer emergency evaluation; ensure repeat SpO2/sensor-quality assessment does not delay care; monitor mentation and breathing.",
+"labs": "Do not delay the emergency response for a lab test; none is presumed available.",
+"actions": "Activate authorized onboard respiratory-emergency protocol and request Earth medical support while link remains available.",
+"equip": "Crew medical kit and monitors only as present on actual vehicle; available oxygen/respiratory equipment if carried and protocol-directed.",
+"treat": "Human-led medical response; no medication/dose/procedure generated by C.H.A.R.M.",
+"v": {
+"hr": 132.0,
+"sbp": 108.0,
+"dbp": 68.0,
+"rr": 30.0,
+"spo2": 87.0,
+"temp": 36.6
+},
+"rows": [
+{
+"k": "temp",
+"v": 36.6
+},
+{
+"k": "hr",
+"v": 132.0
+},
+{
+"k": "rr",
+"v": 30.0
+},
+{
+"k": "spo2",
+"v": 87.0
+},
+{
+"k": "bp",
+"v": 108.0,
+"v2": 68.0
+},
+{
+"k": "sym",
+"x": {
+"airway": "severe",
+"expo": true,
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"restored": false,
+"link": "ONLINE",
+"n": 5,
+"down": false
+},
+{
+"label": "CRITICAL",
+"code": "CRITICAL",
+"stage": "Earth communication lost · Signal interruption during emergency",
+"what": "Earth link is lost while the emergency response is underway. No new patient measurement is captured at this demo step.",
+"symptoms": "No newly documented symptom check; previous emergency remains active.",
+"key": "No new measurements. Stage 5 values are LAST KNOWN and STALE.",
+"report": [
+[
+"Cabin incident",
+"Same air-filter incident; ongoing crew medical and environmental response."
+],
+[
+"Environment evidence",
+"No new measurements of the air or patient at this stage."
+],
+[
+"Suspected trigger",
+"Airborne particles released from damaged filter seal; suspected allergy or irritant trigger, unconfirmed"
+],
+[
+"Breathing",
+"Previous severe respiratory distress (last known)"
+],
+[
+"Skin and eyes",
+"Not reassessed in this step"
+],
+[
+"Diagnosis",
+"No confirmed allergy, asthma, anaphylaxis, microbial species or specific allergen; clinical assessment needed"
+]
+],
+"prov": {
+"hr": "no new measurement",
+"bp": "no new measurement",
+"rr": "no new measurement",
+"spo2": "no new measurement",
+"temp": "no new measurement"
+},
+"alertTitle": "CRITICAL - Earth Link Unavailable; Onboard Response",
+"basis": "Prior unresolved severe respiratory emergency + loss of Earth communication; no new vitals.",
+"assess": "Maintain CRITICAL state. Last-known Stage 5 readings must be marked as stale; do not render them as fresh live data.",
+"checks": "Crew Medical Officer to continue local assessment; obtain fresh readings when feasible; maintain chronological incident log.",
+"labs": "No laboratory tests documented.",
+"actions": "Use previously authorized locally available emergency guidance if the app truly supports offline mode; continue crew-led care.",
+"equip": "Only onboard locally available monitoring and mission-certified equipment.",
+"treat": "No automatic clinical clearance or fabricated observations during the signal gap.",
+"v": {},
+"rows": [],
+"earth": true,
+"restored": false,
+"link": "OFFLINE",
+"n": 6,
+"down": false
+},
+{
+"label": "CAUTION - RECOVERING",
+"code": "CAUTION",
+"stage": "Improvement after onboard care · First documented post-response check",
+"what": "Crew reports improvement after executing approved medical and environmental response, even though Earth link remains temporarily unavailable.",
+"symptoms": "Less breathlessness; able to speak in full sentences, still tired and coughing.",
+"key": "HR 99 bpm · BP 114/72 mmHg · RR 22/min · SpO2 94% · 36.6 °C",
+"report": [
+[
+"Cabin incident",
+"Environmental team reports maintenance incident has been contained under approved procedures."
+],
+[
+"Environment evidence",
+"Containment is crew-reported; no lab-confirmed allergen."
+],
+[
+"Suspected trigger",
+"Airborne particles released from damaged filter seal; suspected allergy or irritant trigger, unconfirmed"
+],
+[
+"Breathing",
+"Improving wheeze and cough"
+],
+[
+"Skin and eyes",
+"Mild residual eye irritation"
+],
+[
+"Diagnosis",
+"No confirmed allergy, asthma, anaphylaxis, microbial species or specific allergen; clinical assessment needed"
+]
+],
+"prov": {
+"hr": "synthetic",
+"bp": "synthetic",
+"rr": "synthetic",
+"spo2": "synthetic",
+"temp": "synthetic"
+},
+"alertTitle": "Improving - Continue Close Respiratory Monitoring",
+"basis": "New locally measured values improving from Stage 5 but RR and SpO2 not back to reference.",
+"assess": "Reassuring trend after crew care but persistent symptoms and below-baseline oxygen saturation warrant continued assessment.",
+"checks": "Repeat symptoms, breathing effort, RR and SpO2; observe for recurrence; medical officer to determine readiness.",
+"labs": "Only if medically indicated and genuinely available.",
+"actions": "Continue approved observation, document response and monitor for recurrence; no return-to-duty clearance.",
+"equip": "Onboard patient-monitoring tools; kit as applicable.",
+"treat": "No further treatment details without medical authorization.",
+"v": {
+"hr": 99.0,
+"sbp": 114.0,
+"dbp": 72.0,
+"rr": 22.0,
+"spo2": 94.0,
+"temp": 36.6
+},
+"rows": [
+{
+"k": "temp",
+"v": 36.6
+},
+{
+"k": "hr",
+"v": 99.0
+},
+{
+"k": "rr",
+"v": 22.0
+},
+{
+"k": "spo2",
+"v": 94.0
+},
+{
+"k": "bp",
+"v": 114.0,
+"v2": 72.0
+},
+{
+"k": "sym",
+"x": {
+"airway": "wheeze",
+"expo": true,
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": true,
+"restored": false,
+"link": "OFFLINE",
+"n": 7,
+"down": true
+},
+{
+"label": "NORMAL - FOLLOW-UP",
+"code": "NORMAL",
+"stage": "Stable follow-up · Subsequent monitored check",
+"what": "Earth contact is restored; Sarah is comfortable, and repeat crew observations are near her assigned reference profile.",
+"symptoms": "Breathing comfortable at rest; no wheezing; crew follow-up planned.",
+"key": "HR 80 bpm · BP 118/74 mmHg · RR 17/min · SpO2 98% · 36.6 °C",
+"report": [
+[
+"Cabin incident",
+"Air-filter incident logged for environmental investigation and preventive maintenance review."
+],
+[
+"Environment evidence",
+"Trigger remains suspected; no confirmed fungal or allergen species."
+],
+[
+"Suspected trigger",
+"Airborne particles released from damaged filter seal; suspected allergy or irritant trigger, unconfirmed"
+],
+[
+"Breathing",
+"No current breathing complaint"
+],
+[
+"Skin and eyes",
+"Eye irritation resolved"
+],
+[
+"Diagnosis",
+"No confirmed allergy, asthma, anaphylaxis, microbial species or specific allergen; clinical assessment needed"
+]
+],
+"prov": {
+"hr": "synthetic",
+"bp": "synthetic",
+"rr": "synthetic",
+"spo2": "synthetic",
+"temp": "synthetic"
+},
+"alertTitle": "Stable - Follow-up Required",
+"basis": "Symptoms resolved, HR/RR and simulated SpO2 near assigned reference; repeat medical evaluation required.",
+"assess": "Simulated vitals near reference; closure of acute alert does not imply clinician clearance or proven etiology.",
+"checks": "Crew Medical Officer documentation and follow-up; review environmental incident, risk of recurrence and app logs.",
+"labs": "None assumed; any indicated testing is clinician-led.",
+"actions": "Maintain routine monitoring and follow-up; do not return to exposure until authorized clearance.",
+"equip": "Routine onboard monitoring.",
+"treat": "Only clinician may confirm return to duty; suspected allergy remains unverified.",
+"v": {
+"hr": 80.0,
+"sbp": 118.0,
+"dbp": 74.0,
+"rr": 17.0,
+"spo2": 98.0,
+"temp": 36.6
+},
+"rows": [
+{
+"k": "temp",
+"v": 36.6
+},
+{
+"k": "hr",
+"v": 80.0
+},
+{
+"k": "rr",
+"v": 17.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 118.0,
+"v2": 74.0
+},
+{
+"k": "sym",
+"x": {
+"airway": "none",
+"expo": false,
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"restored": true,
+"link": "RESTORED",
 "n": 8,
 "down": true
 }

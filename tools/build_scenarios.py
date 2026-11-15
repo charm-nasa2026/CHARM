@@ -188,32 +188,92 @@ def bone():
                        stages=st))
 
 
-# ---------------------------------------------------------------- 5. Severe bleeding (emergency, CHARM team)
+# ---------------------------------------------------------------- 5. Bleeding emergency (medic team, app-ready CSV)
+# Stage values, statuses and text: the medic team's CSV. Added on top, clearly labelled: the first-aid steps of
+# Stop the Bleed (American College of Surgeons), which the team's "approved first-aid bleeding-control steps" refer to.
+FIRST_AID = {
+    2: 'Put on gloves and eye protection (blood floats); Press firmly on the wound with gauze and both hands; Do not lift the dressing to look',
+    3: 'Keep firm pressure; If blood soaks through: pack the wound with gauze and press, or for an arm or leg place a tourniquet 5-8 cm above the wound, never on a joint, if the kit has one; Write down the time a tourniquet goes on',
+    4: 'Keep the pressure or the tourniquet on; Keep Sarah lying down, anchored and warm',
+    5: 'Keep the pressure or the tourniquet on; Lie her flat and keep her warm',
+}
+BLEED_STATE = {1: 'none', 2: 'ongoing', 3: 'ongoing', 4: 'ongoing', 5: 'ongoing', 7: 'controlled', 8: 'none'}
+DIZZY = {4: 'mild', 5: 'severe', 7: 'mild'}
+
+
 def bleeding():
     st = []
-    whatif = None
-    for r in read('severe_bleeding_scenario.csv'):
-        n = int(r['step_order'])
-        if n == 9:
-            whatif = dict(title=r['stage'], what=r['what_happens'], key=r['key_measurements'], assess=r['charm_assessment'], actions=r['immediate_action_steps'], basis=r['basis'])
-            continue
-        v = nums(r['key_measurements']) if n != 9 else {}
-        m = re.search(r'Bleeding: (active|controlled|none)', r['key_measurements'])
+    rows_csv = read('bleeding_emergency_scenario.csv')
+    assert [int(r['stage_id']) for r in rows_csv] == list(range(1, 9)), 'bleeding CSV: stages 1-8 in order'
+    for r in rows_csv:
+        n = int(r['stage_id'])
+        assert not r['hemoglobin_g_dL'] and not r['hematocrit_percent'], 'bleeding CSV: lab columns must stay empty'
+        v = vit(hr=num(r['heart_rate_bpm']), sbp=num(r['systolic_bp_mmHg']), dbp=num(r['diastolic_bp_mmHg']),
+                rr=num(r['respiratory_rate_per_min']), spo2=num(r['spo2_percent']))
+        if v.get('hr') and v.get('sbp'):
+            v['si'] = round(v['hr'] / v['sbp'], 2)
         rows = vital_rows(v)
-        if m and n != 9:
-            rows.append({'k': 'sym', 'x': {'bleed': m.group(1), 'inf': False, 'conf': False}})
-        st.append(dict(label=r['charm_status'], stage=r['stage'], what=r['what_happens'], key=r['key_measurements'],
-                       assess=r['charm_assessment'], checks=r['checks_requested'], labs=r['blood_lab_tests'],
+        if v:
+            rows.append({'k': 'sym', 'x': {'bleed': BLEED_STATE.get(n, 'none'), 'dizzy': DIZZY.get(n, 'none'), 'inf': False, 'conf': False}})
+        fa = FIRST_AID.get(n, '')
+        st.append(dict(label=r['charm_status'], code=r['status_code'], stage=r['stage_label'] + ' · ' + r['observation_window'],
+                       what=r['sarah_condition'], symptoms=r['symptoms'],
+                       key=(('HR %g bpm · BP %g/%g mmHg · RR %g/min · SpO2 %g%%' % (v['hr'], v['sbp'], v['dbp'], v['rr'], v['spo2'])) if v.get('hr') else r['last_known_measurements_note']),
+                       report=[['Bleeding observed?', 'Yes (crew report)' if r['bleeding_reported_by_crew'].strip().lower() == 'true' else 'No'],
+                               ['Bleeding', r['bleeding_observation']], ['Control', r['bleeding_control_status']], ['Symptoms', r['symptoms']],
+                               ['Sources', r['measurement_sources']]],
+                       alertTitle=r['alert_title'], basis=r['alert_basis'], trend=r['trend_direction'],
+                       assess=r['charm_assessment'], checks=r['required_checks'], labs=r['laboratory_tests'],
+                       actions=r['immediate_action_steps'] + ('; ' + fa if fa else ''), firstaid=fa, equip=r['equipment'], treat=r['treatment_guidance'],
+                       v=v, rows=rows, earth=r['earth_link_unavailable'].strip().lower() == 'true'))
+    return finish(dict(id='bleed', title='Bleeding Emergency during a Mars Mission', kind='Emergency', file='bleeding_emergency_scenario.csv',
+                       sub='Sarah · maintenance injury · crew-reported bleeding, falling blood pressure, emergency response and recovery',
+                       time='Named observation windows, not clock times.',
+                       m=[['hr', 'Heart rate', 'bpm', 0], ['bp', 'Blood pressure', 'mmHg', 0], ['si', 'Shock index (HR ÷ systolic)', '', 2], ['rr', 'Respiratory rate', '/min', 0], ['spo2', 'SpO₂', '%', 0]],
+                       demo=['All numbers are simulated demo values from the medic team, not NASA participant recordings.',
+                             'Bleeding is a crew report, not a sensor reading: CHARM cannot detect bleeding or estimate blood loss. A normal SpO2 does not rule out serious blood loss, and hemoglobin can stay normal early, so no lab values are shown.',
+                             'First-aid steps added to the action cards follow Stop the Bleed (American College of Surgeons): firm pressure, packing, a tourniquet 5-8 cm above an arm or leg wound, never on a joint, and the time noted.',
+                             'Stage 5 is CRITICAL because of continuing bleeding with systolic pressure 86 and near-fainting, not because of the heart rate alone.'],
+                       stages=st))
+
+
+# ---------------------------------------------------------------- 7. Airborne exposure / respiratory emergency (medic team)
+AIRWAY = {1: 'none', 2: 'irritation', 3: 'wheeze', 4: 'moderate', 5: 'severe', 7: 'wheeze', 8: 'none'}
+ORIGIN = {'real_NASA_ground_analog_baseline_mean_rounded': 'NASA ground analog mean', 'synthetic_demo': 'synthetic', 'missing_no_new_measurement': 'no new measurement'}
+
+
+def airborne():
+    st = []
+    rows_csv = read('airborne_allergy_emergency_scenario.csv')
+    assert [int(r['stage_id']) for r in rows_csv] == list(range(1, 9)), 'airborne CSV: stages 1-8 in order'
+    for r in rows_csv:
+        n = int(r['stage_id'])
+        v = vit(hr=num(r['heart_rate_bpm']), sbp=num(r['systolic_bp_mmHg']), dbp=num(r['diastolic_bp_mmHg']),
+                rr=num(r['respiratory_rate_per_min']), spo2=num(r['spo2_percent']), temp=num(r['body_temperature_c']))
+        rows = vital_rows(v)
+        if v:
+            rows.append({'k': 'sym', 'x': {'airway': AIRWAY.get(n, 'none'), 'expo': r['crew_reported_suspected_exposure'].strip().lower() == 'true' and n < 8, 'inf': False, 'conf': False}})
+        link = r['earth_link_status'].strip().upper()
+        st.append(dict(label=r['charm_status'], code=r['status_code'], stage=r['stage_label'] + ' · ' + r['observation_window'],
+                       what=r['sarah_condition'], symptoms=r['symptoms'],
+                       key=(('HR %g bpm · BP %g/%g mmHg · RR %g/min · SpO2 %g%% · %g °C' % (v['hr'], v['sbp'], v['dbp'], v['rr'], v['spo2'], v['temp'])) if v.get('hr') else 'No new measurements. Stage 5 values are LAST KNOWN and STALE.'),
+                       report=[['Cabin incident', r['cabin_incident_report']], ['Environment evidence', r['environment_evidence']], ['Suspected trigger', r['suspected_trigger']],
+                               ['Breathing', r['breathing_symptoms']], ['Skin and eyes', r['skin_or_eye_symptoms']], ['Diagnosis', r['diagnosis_confirmation']]],
+                       prov={'hr': ORIGIN.get(r['heart_rate_origin'], r['heart_rate_origin']), 'bp': ORIGIN.get(r['bp_origin'], r['bp_origin']), 'rr': ORIGIN.get(r['resp_rate_origin'], r['resp_rate_origin']),
+                             'spo2': ORIGIN.get(r['spo2_origin'], r['spo2_origin']), 'temp': ORIGIN.get(r['temperature_origin'], r['temperature_origin'])},
+                       alertTitle=r['alert_title'], basis=r['alert_basis'],
+                       assess=r['charm_assessment'], checks=r['required_checks'], labs=r['laboratory_tests'],
                        actions=r['immediate_action_steps'], equip=r['equipment'], treat=r['treatment_guidance'],
-                       basis=r['basis'], v=v, rows=rows, earth=n == 5, branch=n == 9))
-    return finish(dict(id='bleed', title='Severe Bleeding from a Deep Cut', kind='Emergency', file='severe_bleeding_scenario.csv',
-                       sub='Sarah · maintenance injury · life-threatening bleeding, tourniquet, monitoring for shock',
-                       time='Minutes 0 to 30, then hours, played as a demonstration sequence.',
-                       m=[['hr', 'Heart rate', 'bpm', 0], ['bp', 'Blood pressure', 'mmHg', 0], ['si', 'Shock index (HR ÷ systolic)', '', 2], ['rr', 'Respiratory rate', '/min', 0]],
-                       demo=['Vital signs are simulated: each stage sits inside the ATLS hemorrhage class it names (class I: HR under 100, normal BP; class II: HR 100–120, normal systolic BP; class III: HR 120–140, falling BP).',
-                             'Steps follow Stop the Bleed (American College of Surgeons): pressure, wound packing, tourniquet 5–8 cm (2–3 in) above the wound, never on a joint, note the time.',
-                             'Shock index thresholds (0.9 and 1.0) are from published trauma research. Skin laceration and traumatic hypovolemic shock are conditions in NASA\'s Integrated Medical Model for long missions.'],
-                       whatif=whatif, stages=st))
+                       v=v, rows=rows, earth=r['earth_link_unavailable'].strip().lower() == 'true', restored=link == 'RESTORED', link=link))
+    return finish(dict(id='air', title='Airborne Exposure / Respiratory Emergency', kind='Emergency', file='airborne_allergy_emergency_scenario.csv',
+                       sub='Sarah · cabin air-filter seal fails · possible allergic or irritant airway reaction, severe breathing difficulty and recovery',
+                       time='Named observation windows, not clock times.',
+                       m=[['hr', 'Heart rate', 'bpm', 0], ['rr', 'Respiratory rate', '/min', 0], ['spo2', 'SpO₂', '%', 0], ['bp', 'Blood pressure', 'mmHg', 0], ['temp', 'Temperature', '°C', 1]],
+                       prov='Stage 1 HR, BP, RR and temperature are rounded pre-bed-rest means of NASA NLSP CFT70 ground bed-rest analog subject C11_CFT70_8072 (CRF_CFT70_VITALS_8072, DOI 10.83263/wjw1-ta27; HR 76.4, BP 118.2/74.4, RR 16.4, 36.62 °C), a ground study, not flight data. SpO2 is synthetic in every stage; all stage 2-8 values and the incident are synthetic.',
+                       demo=['The exposure and the symptoms are crew reports. CHARM cannot detect or identify an allergen and does not diagnose allergy, asthma or anaphylaxis: "possible allergic or irritant airway reaction" until the Crew Medical Officer assesses it.',
+                             'Severity follows the NAEPP asthma-exacerbation grades: moderate = speaks in phrases, heart rate 100-120; severe = cannot finish sentences, heart rate over 120, breathing over 30/min.',
+                             'CHARM\'s own breathing-rate rule (NEWS2: 25/min or more) already raises a CRITICAL alert at stage 4, one stage before the scenario\'s authored CRITICAL.'],
+                       stages=st))
 
 
 # ---------------------------------------------------------------- 6. Cardiac arrhythmia (medic team, app-ready CSV)
@@ -258,7 +318,7 @@ def arrhythmia():
 
 
 def main():
-    sc = [bleeding(), arrhythmia(), pulmonary(), dehydration(), sans(), bone()]
+    sc = [bleeding(), arrhythmia(), airborne(), pulmonary(), dehydration(), sans(), bone()]
     js = ('/* GENERATED by tools/build_scenarios.py from data/scenarios/*.csv (medic team). Do not edit by hand. */\n'
           'window.CHARM_SCENARIOS = ' + json.dumps(sc, ensure_ascii=False, indent=0) + ';\n')
     with open(OUT, 'w', encoding='utf-8') as f:

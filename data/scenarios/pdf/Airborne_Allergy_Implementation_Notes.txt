@@ -1,0 +1,71 @@
+# CLAUDE IMPLEMENTATION PROMPT
+## C.H.A.R.M. - Airborne-Particle Allergic / Irritant Respiratory Emergency
+
+Goal: Add a new interactive EIGHT-stage demo scenario to the EXISTING C.H.A.R.M. application. Keep all earlier scenarios (pulmonary infection, dehydration, bleeding, arrhythmia, SANS, bone health) intact. Do not rewrite unrelated pages.
+
+ATTACH THESE FILES
+1. CHARM_Allergic_Airway_Emergency_Clinical_Scenario.pdf
+2. CHARM_Allergic_Airway_Emergency_Scenario_App_Ready.csv
+3. CHARM_Allergic_Airway_Baseline_Provenance.csv
+
+Read the CSV first. The main scenario CSV is the source of truth for every stage, every displayed measurement, the symptom reports, alert levels and instructions. The PDF explains clinical limitations and sources. The provenance CSV is the source of truth for the NASA-derived reference baseline.
+
+STORY
+During cabin air-filter maintenance on a Mars transit, a filter-cartridge seal fails and dust-like material previously captured by the filter escapes into the crew cabin. Sarah, a FICTIONAL astronaut, reports sneezing, eye irritation and later cough, wheeze and difficulty breathing. Her vital signs worsen in a medically plausible SYNTHETIC demonstration, reaching a severe respiratory emergency. The Earth communication link then fails. The trained onboard crew continues protocol-directed care; newer local measurements later show improvement, followed by continued monitoring. The allergen is not lab-confirmed and irritant-triggered bronchospasm remains possible.
+
+DATA PROVENANCE - MUST BE CORRECT
+- The real source dataset is CHARM_Baseline_Per_Subject.csv / CHARM_Vitals_All_Readings.csv from the user's project. Subject ID: C11_CFT70_8072, NASA NLSP CFT70 ground bed-rest analog, CRF_CFT70_VITALS_8072, DOI 10.83263/wjw1-ta27. It is NOT a spaceflight astronaut record.
+- Rounded reference means: HR 76 bpm (real mean 76.4), BP 118/74 mmHg (means 118.24 / 74.43), RR 16/min (mean 16.38), temperature 36.6 C (mean 36.62). These individual subject means are not necessarily simultaneous readings.
+- No SpO2 appears in the user's NASA vitals source. SpO2 is synthetic even in Stage 1. All Stage 2-8 numbers and symptoms are synthetic. Stage 6 contains NO NEW numeric measurements.
+- Do not present this example as NASA-recorded allergy, mold exposure or an actual astronaut incident.
+
+SCENARIO ID and routing
+- New id: airborne_allergy_emergency; label: Airborne Exposure / Respiratory Emergency.
+- Keep existing scenario IDs and navigation unchanged. Add a separate entry to scenario picker.
+- Make Sarah and data provenance (NASA ground analog reference vs synthetic demo) visible in the scenario panel and any exported logs.
+- Do not give a definitive diagnosis of allergy, asthma, fungal exposure or anaphylaxis. Use 'possible allergic or irritant airway reaction' pending Crew Medical Officer assessment.
+
+STAGE LOGIC
+- stage_id is the exact demo step. Use status_code for the core colors (NORMAL, ATTENTION, CAUTION, CRITICAL) and charm_status for the fuller recovery/follow-up descriptor.
+- Stage 1: BASELINE = real NASA subject-level summary mean rounded for HR, BP, RR and temperature; SpO2 is SIMULATED.
+- Stage 2: CREW REPORT = accidental filter-seal release and new nasal/eye irritation; note crew input, not automatic airborne detection.
+- Stage 3: WHEEZE/COUGH = ongoing symptoms and rising resting HR/RR; assess and alert the crew medical officer.
+- Stage 4: DETERIORATION = more breathing effort and decreasing synthetic SpO2; urgent reassessment.
+- Stage 5: CRITICAL = severe difficulty speaking/breathing and simulated SpO2 87% with HR 132 bpm; no diagnosis of anaphylaxis from these signs alone.
+- Stage 6: OFFLINE = link lost while the event is critical. All live metric fields are empty. Show Stage 5 values ONLY as explicitly labeled last-known / STALE, not as new readings. Keep the active critical alert.
+- Stage 7: RECOVERING = NEW local vital values are recorded even though Earth link is still offline; show Caution / recovering, not full medical clearance.
+- Stage 8: NORMAL FOLLOW-UP = link restored, symptoms resolved and new local readings close to assigned reference. Only a human clinician can clear return to duty.
+
+CLINICAL SAFETY GUARDRAILS
+- Crew-entered cabin incident and symptoms are required for interpreting the event; HR and SpO2 do not identify the allergen.
+- No invented specific mold species, allergy tests, blood test results, environmental particle counts or medical treatments/dosages. Do not include code that proposes medicine without authorized mission protocol.
+- The air-filter event is deliberately fictional. Do not propose an unplanned change to life-support circulation. Only surface authorized environment-contamination procedure to the trained crew.
+- Separate alert severity from diagnosis. Serious symptoms plus low oxygenation cause CRITICAL.
+- Respect missing sensor inputs: Stage 6 null values must not be graphed or treated as fresh samples. A locally cached critical state may persist offline only if this is actually implemented.
+- C.H.A.R.M. offers decision support and transparent data; it is not a clinically validated diagnostic device or independent physician.
+
+IMPLEMENTATION
+1. Import the main CSV with explicit type parsing: numeric fields parse as nullable numbers, stage_id as integer, booleans from true/false, status_code as enum, and earth_link_status as ONLINE/OFFLINE/RESTORED.
+2. Display (a) cabin event report, (b) crew symptoms, (c) HR, BP, RR, SpO2, temperature, (d) status and detailed alert explanation, (e) required clinical checks, (f) crew next-step card, (g) equipment availability caveats, (h) source/provenance badge for each metric.
+3. Use each individual measurement's *_origin field; do not label synthetic stage values 'NASA data'. For Stage 1 show the rounded NASA analog reference (except synthetic SpO2).
+4. Advance the scenario in stage order only with explicit demo controls; support restart to Stage 1 and repeat without mutating real datasets.
+5. Draw a trend chart with gaps for missing values. At Stage 6 visually indicate 'No new data. Previous recorded values: STALE'. Stage 7 is newly measured locally, even though Earth still offline.
+6. Map NORMAL -> green, ATTENTION -> yellow, CAUTION -> orange, CRITICAL -> red. 'RECOVERING' and 'FOLLOW-UP' are descriptors, not extra core categories.
+7. Let Charmy verbally explain the same stage assessment and next-step card without introducing new diagnoses, values or treatment instructions.
+8. Add simulated communication status badge. On restoration show reconnection; claim data sync only if the app really implements it.
+9. Keep all preexisting features and scenarios; do not globally alter ranges or alert rules to force the demo. Stage status is authored demonstration content, not a validated production alert algorithm.
+
+TESTS / ACCEPTANCE
+- Exactly eight stages; stage_id 1..8; no missing or duplicated stages.
+- Stage 1 HR 76, BP 118/74, RR 16, body temp 36.6 and synthetic SpO2 98, with correct provenance.
+- Stage 5 HR 132, BP 108/68, RR 30, SpO2 87, and CRITICAL alert plus crew-reported severe breathing problems.
+- Stage 6 all numeric fields empty and 'OFFLINE', status remains CRITICAL; never graph previously recorded numbers as new live points.
+- Stage 7 OFFLINE with NEW local numbers and CAUTION-RECOVERING; Stage 8 RESTORED and NORMAL-FOLLOW-UP.
+- No allergy, mold or anaphylaxis certainty; no named medications or dosages invented.
+- Preserve all other existing scenarios, in-app navigation and historical datasets.
+
+SOURCES (BACKGROUND, NOT EVIDENCE OF THIS FICTIONAL INCIDENT)
+NASA OCHMO Microbiology in Space: https://www.nasa.gov/wp-content/uploads/2025/05/ochmo-tb-046-microbiology-rev-a.pdf
+NASA Monitoring Microorganisms: https://www.nasa.gov/missions/station/iss-research/monitoring-microorganisms/
+NIH NHLBI Asthma Attacks: https://www.nhlbi.nih.gov/health/asthma/attacks
+MedlinePlus Warning Signs: https://medlineplus.gov/ency/patientinstructions/000062.htm

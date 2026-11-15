@@ -1,0 +1,221 @@
+# CLAUDE IMPLEMENTATION PROMPT
+## C.H.A.R.M. - Bleeding Emergency During a Mars Mission
+
+Integrate an interactive eight-stage medical demo into the EXISTING C.H.A.R.M. (Crew Health Assessment and Response Module) application. Use the project files below as inputs and preserve all other pre-existing scenarios.
+
+ATTACHED FILES
+1. CHARM_Bleeding_Clinical_Scenario.pdf
+2. CHARM_Bleeding_Scenario_App_Ready.csv
+
+Read both before any changes. The CSV is the authoritative source for exact stage values, status text, symptoms and action cards. The PDF adds clinical reasoning, provenance, action boundaries and QA. DO NOT add invented metrics or treatment details.
+
+## STORY
+Sarah, a fictional astronaut in transit to Mars, experiences external bleeding after an accidental equipment-related maintenance injury. She initially remains stable, but a crew-reported continuation of bleeding coincides with rising resting HR and a gradual decline in blood pressure. Later, serious symptoms and hypotension require a CRITICAL crew emergency response. Ground communication temporarily becomes unavailable, but the app should maintain locally available information and the emergency state without inventing new readings. After mission-protocol-led medical care, the crew reports bleeding control and Sarah's vital signs improve, followed by monitored recovery.
+
+## CRITICAL SCIENTIFIC AND PRODUCT RESTRICTIONS
+- Bleeding is NOT automatically detectable from HR, SpO2, BP, or a wearable stream alone. The event comes from a crew-entered bleeding observation. Make the source visibly clear.
+- Vital-sign trends can support assessment of circulatory instability, but this scenario is not a validated hemorrhage detector and cannot estimate blood-loss volume.
+- Severe symptoms and low BP together with continuing bleeding lead to the critical state; no single HR or SpO2 value automatically diagnoses shock.
+- Do NOT treat a normal SpO2 as proof that significant blood loss is absent.
+- Hemoglobin and hematocrit columns are intentionally empty in all rows. An early normal result would not reliably exclude acute bleeding; do not synthesize CBC results or percentages of volume loss.
+- No image or graphic wound depiction is requested; show non-graphic interface text only.
+- All numeric values are SIMULATED DEMO numbers, not NASA participant recordings or real medical patient data.
+- Do not invent drugs, dosages, transfusion volumes, invasive procedures, emergency kit contents, or automatic treatment capability.
+- Emergency management is led by trained crew under authorized mission medical protocol, not by the app.
+- Keep existing scenarios (arrhythmia, dehydration, respiratory infection, SANS, bone health, etc.) intact.
+
+## EXACT EIGHT STAGES
+
+### Stage 1: Baseline
+Status: NORMAL (core status_code=NORMAL).
+Observation window: Before incident.
+Event: Sarah feels well during a routine Mars transit shift.
+Symptoms: No symptoms.
+Bleeding observation: No bleeding
+Control status: Not applicable
+Measurements: HR 68 bpm; BP 118/76 mmHg; RR 14/min; SpO2 98%
+Assessment: Routine baseline. Nothing indicates a bleeding event.
+Why triggered: Stable personal baseline; no reported bleeding or warning symptoms.
+Checks: Continue routine HR and BP monitoring; confirm previously recorded baseline.
+Labs: No laboratory tests indicated.
+Crew action prompts: Continue normal activity and routine monitoring.
+Equipment: Wearable HR monitor; BP cuff; pulse oximeter if available.
+Treatment boundary: None.
+Alert: No active alert
+Earth link unavailable: false
+
+### Stage 2: Bleeding reported
+Status: ATTENTION (core status_code=ATTENTION).
+Observation window: Initial crew report.
+Event: Sarah reports visible external bleeding after an accidental equipment-related injury during maintenance.
+Symptoms: Localized discomfort; awake, responsive, and speaking normally.
+Bleeding observation: Visible bleeding reported by crew; quantity not measured
+Control status: Crew begins approved first-aid bleeding-control measures
+Measurements: HR 82 bpm; BP 118/74 mmHg; RR 16/min; SpO2 98%
+Assessment: Reported bleeding requires assessment even when vital signs remain near baseline.
+Why triggered: Crew-confirmed bleeding; initially stable vital signs compared with baseline.
+Checks: Crew medical assessment of ongoing bleeding and response to basic control measures; repeat BP, HR, RR and symptoms.
+Labs: None routinely at this early stage; consider only if medically indicated and available.
+Crew action prompts: Alert the Crew Medical Officer; use approved first-aid bleeding-control steps; pause maintenance and reassess.
+Equipment: First-aid dressings and gloves, if available; wearable monitor; BP cuff.
+Treatment boundary: Use trained-crew first aid and mission protocol; do not infer injury severity from pulse alone.
+Alert: ATTENTION - External Bleeding Reported
+Earth link unavailable: false
+
+### Stage 3: Bleeding persists
+Status: CAUTION (core status_code=CAUTION).
+Observation window: Repeat assessment.
+Event: The crew reports that bleeding has not yet been fully controlled.
+Symptoms: Fatigue and increased awareness of heartbeat; remains oriented.
+Bleeding observation: Ongoing bleeding reported; not quantitatively measured
+Control status: Not yet controlled
+Measurements: HR 101 bpm; BP 114/72 mmHg; RR 20/min; SpO2 98%
+Assessment: Persistent visible bleeding with a rising heart rate raises concern for evolving blood loss. No definitive loss volume or shock diagnosis is inferred.
+Why triggered: Continued bleeding plus rising resting HR; trends require crew assessment.
+Checks: Urgent Crew Medical Officer reassessment; repeat HR, BP, RR, mentation and bleeding-control status.
+Labs: CBC / hemoglobin only if medical officer indicates and onboard assay is available; do not delay control for labs.
+Crew action prompts: Continue authorized control measures; maintain close observations; escalate if bleeding persists or symptoms develop.
+Equipment: Approved bleeding-control first-aid kit, HR monitor, BP cuff; analyzer only if available.
+Treatment boundary: Crew medical protocol directs control and escalation; CHARM does not choose invasive procedures or drugs.
+Alert: CAUTION - Persistent Bleeding and Rising Heart Rate
+Earth link unavailable: false
+
+### Stage 4: Symptomatic deterioration
+Status: CAUTION (core status_code=CAUTION).
+Observation window: Close reassessment.
+Event: Bleeding persists and Sarah becomes lightheaded while resting.
+Symptoms: Lightheadedness, weakness and paleness reported by crew; awake and responsive.
+Bleeding observation: Continued bleeding reported
+Control status: Still not confirmed controlled
+Measurements: HR 115 bpm; BP 104/68 mmHg; RR 23/min; SpO2 98%
+Assessment: Multiple signs suggest worsening circulatory status; urgent hands-on medical assessment is necessary.
+Why triggered: Persistent bleeding + weakness/lightheadedness + faster HR + falling BP relative to baseline.
+Checks: Frequent vital-sign reassessment, responsiveness and bleeding status; assess for further deterioration.
+Labs: Laboratory testing only when available and appropriate; initial normal hemoglobin would not exclude acute loss.
+Crew action prompts: Urgent Crew Medical Officer involvement; continue authorized bleeding control; closely observe Sarah; prepare emergency response.
+Equipment: First-aid bleeding-control supplies; BP cuff; HR monitor; pulse oximeter if available.
+Treatment boundary: Escalate under approved medical protocol; no autonomous therapy or medication advice.
+Alert: CAUTION - Possible Circulatory Compromise
+Earth link unavailable: false
+
+### Stage 5: Hemodynamic instability
+Status: CRITICAL (core status_code=CRITICAL).
+Observation window: Critical event.
+Event: Sarah becomes too dizzy to continue her tasks. Bleeding is still an active concern.
+Symptoms: Severe weakness and near-fainting; requires immediate crew assessment.
+Bleeding observation: Uncontrolled or incompletely controlled bleeding reported
+Control status: Emergency crew response active
+Measurements: HR 132 bpm; BP 86/56 mmHg; RR 28/min; SpO2 98%
+Assessment: Potential hemorrhage-related circulatory instability. An urgent emergency medical response is required; this is not a diagnosis derived from HR alone.
+Why triggered: Continuing bleeding + SBP 86 mmHg + marked tachycardia + severe symptoms.
+Checks: Immediate trained-crew ABC and circulation assessment; continuous/repeated BP, HR, RR, responsiveness and bleeding-control checks.
+Labs: Do not delay emergency response for CBC or other laboratory measurements.
+Crew action prompts: Activate the mission medical emergency protocol; notify responding crew; continue first-aid control led by trained crew; document observations.
+Equipment: Approved emergency first-aid kit; BP/HR monitor; mission-specified medical supplies if available.
+Treatment boundary: Only trained crew and the Crew Medical Officer may direct emergency care according to authorized protocol; no doses or procedures selected by CHARM.
+Alert: CRITICAL - Bleeding with Low Blood Pressure
+Earth link unavailable: false
+
+### Stage 6: Earth link unavailable
+Status: CRITICAL (core status_code=CRITICAL).
+Observation window: During critical response.
+Event: Communication with Earth becomes unavailable while crew medical care is underway.
+Symptoms: Ongoing critical event; no new symptom assessment documented at this step.
+Bleeding observation: Last known: bleeding was not confirmed controlled at Stage 5
+Control status: Current control status awaiting fresh crew report
+Measurements: NO NEW NUMERIC VITAL-SIGN SNAPSHOT. Plot a gap. Prior values LAST KNOWN only.
+Assessment: No new measurements are supplied. Local guidance and incident log remain accessible; last-known readings must never be displayed as live.
+Why triggered: Prior critical medical state persists pending reassessment; Earth-link outage is a separate communication event.
+Checks: Continue actual onboard monitoring and obtain fresh crew clinical assessments; mark stale or unavailable values clearly.
+Labs: No new laboratory values supplied; do not invent results.
+Crew action prompts: Keep cached mission-approved guidance available; record all crew actions locally and maintain emergency response; sync later if technically supported.
+Equipment: Local CHARM interface; offline protocol copy; onboard monitoring and approved emergency supplies.
+Treatment boundary: Continue trained-crew medical care per approved onboard protocol even without ground contact.
+Alert: CRITICAL - Earth Link Unavailable; Onboard Protocol Active
+Earth link unavailable: true
+
+### Stage 7: Bleeding controlled - observation
+Status: CAUTION - RECOVERING (core status_code=CAUTION).
+Observation window: After protocol-led care.
+Event: Crew reports bleeding is now controlled following authorized care and Sarah is less dizzy.
+Symptoms: Reduced lightheadedness and fatigue; awake and communicating.
+Bleeding observation: Crew confirms bleeding currently controlled
+Control status: Controlled by trained crew; watch for recurrence
+Measurements: HR 100 bpm; BP 108/70 mmHg; RR 20/min; SpO2 98%
+Assessment: Improving signs following crew-led treatment do not mean automatic medical clearance.
+Why triggered: Control reported; BP, HR and symptoms improving, but recent critical instability requires observation.
+Checks: Repeat BP/HR/RR, assess bleeding recurrence, mental state and symptoms; follow medical-officer plan.
+Labs: CBC / hemoglobin trend if clinician requests and an onboard test is genuinely available.
+Crew action prompts: Continue observation and documentation; confirm bleeding remains controlled; do not return to full duty yet.
+Equipment: Wearable, BP cuff, first-aid kit, optional laboratory device if present.
+Treatment boundary: Continue clinician-directed follow-up; CHARM does not select treatment.
+Alert: CAUTION - Stabilizing; Continue Monitoring
+Earth link unavailable: false
+
+### Stage 8: Recovery and medical follow-up
+Status: NORMAL - FOLLOW-UP (core status_code=NORMAL).
+Observation window: Later clinical follow-up.
+Event: Repeated crew assessments show stable vital signs near Sarah's demo baseline and no recurrent bleeding.
+Symptoms: Dizziness resolved; feels well; Crew Medical Officer follow-up remains planned.
+Bleeding observation: No recurrent bleeding on repeat crew checks
+Control status: Stable, confirmed on repeat assessment
+Measurements: HR 78 bpm; BP 116/74 mmHg; RR 16/min; SpO2 98%
+Assessment: Return toward baseline after medical review. The simulation resolves the urgent alert, but only an authorized clinician can clear return to duty.
+Why triggered: Stable repeat readings, symptoms resolved and crew-confirmed continued bleeding control.
+Checks: Scheduled reassessment and symptom check; document bleeding-control and injury follow-up.
+Labs: Any follow-up blood testing only if clinically indicated and available.
+Crew action prompts: Complete incident documentation; continue planned check-ins; medical officer decides return-to-duty readiness.
+Equipment: Routine HR/BP monitoring; follow-up first-aid supplies as directed.
+Treatment boundary: Follow the Crew Medical Officer's aftercare plan; no autonomous clearance.
+Alert: NORMAL - Stable; Follow-Up Required
+Earth link unavailable: false
+
+## UI / INTERACTIVE IMPLEMENTATION REQUIREMENTS
+
+1. Add a single new scenario card: "Bleeding Emergency During a Mars Mission". The opening screen is Sarah's health dashboard; retain existing C.H.A.R.M. styling.
+2. Show controls Start, Next Stage, Previous Stage, Reset plus an 8-step indicator. The CSV gives narrative observation windows, not clock times: NEVER generate unsupported timestamps or fake per-second data.
+3. Display current HR, systolic/diastolic BP, RR, SpO2 with correct units. Include the exact personal baseline comparison. Show trends over stage number, NOT over an invented chronological axis.
+4. Add a CREW REPORT panel: "Bleeding observed?", "Current bleeding status", and "Symptoms reported". Populate it from the CSV fields bleeding_reported_by_crew, bleeding_observation, bleeding_control_status, and symptoms. This is not a wearable measurement; never present it as sensor-derived.
+5. Display exact alert title, assessment, underlying alert basis, requested checks, equipment, possible lab tests, immediate next actions and treatment guidance. Label availability as conditional when the record says "if available".
+6. Use four core status colors and names based on status_code: NORMAL (green), ATTENTION, CAUTION, CRITICAL (red). Preserve full charm_status such as CAUTION - RECOVERING and NORMAL - FOLLOW-UP.
+7. At Stage 5 show CRITICAL because of bleeding report + hypotension + severe symptoms. Prioritize communication to Crew Medical Officer and approved crew first-aid/medical protocol. Do not add autonomous treatment decisions.
+8. At Stage 6 show offline indicator "Earth Link Unavailable" alongside persistent CRITICAL status. All numeric readings in Stage 6 are null and must not be set to 0, forward-filled, interpolated or shown as LIVE. You may show Stage 5 measurements in a distinct "LAST KNOWN (STAGE 5)" panel. Graphs MUST contain gaps for Stage 6.
+9. Only claim functional offline mode when it exists in the actual application code. If the current architecture doesn't truly cache protocols or write data locally, label those features as proposed/demo rather than falsely claiming operational capability.
+10. In Stage 7, show improving values and reported bleeding control, but maintain CAUTION - RECOVERING. Stage 8 can show NORMAL - FOLLOW-UP only after repeat assessment and simulated medical-officer follow-up. Neither stage means automatic return-to-duty clearance.
+11. Keep symptom logging and crew report distinct from telemetry. Add no fictional sensors, laboratory reports, blood-loss measurements or accuracy statistics.
+12. Display disclaimer in the interface: "SYNTHETIC TRAINING DEMO - NOT A MEDICAL DIAGNOSIS OR FLIGHT-CERTIFIED PROTOCOL".
+
+## CSV IMPORT CONTRACT
+
+The CSV columns are:
+stage_id, stage_label, observation_window, phase_name, sarah_condition, symptoms, bleeding_observation, bleeding_reported_by_crew, bleeding_control_status, heart_rate_bpm, systolic_bp_mmHg, diastolic_bp_mmHg, respiratory_rate_per_min, spo2_percent, hemoglobin_g_dL, hematocrit_percent, charm_status, status_code, alert_title, charm_assessment, alert_basis, required_checks, laboratory_tests, immediate_action_steps, equipment, treatment_guidance, earth_link_unavailable, last_known_measurements_note, trend_direction, measurement_sources, data_origin.
+
+- Exactly eight rows, stage_id 1-8 in order.
+- Numeric vital-sign cells in Stage 6 are blank/null; hemoglobin_g_dL and hematocrit_percent remain blank in ALL rows.
+- `earth_link_unavailable` and `bleeding_reported_by_crew` are text booleans `true` or `false`.
+- `data_origin` explicitly says simulated. Do not join fictional Sarah rows to real NASA subject IDs.
+- Treat `status_code` as the core display color; `charm_status` is the displayed detailed state.
+- Keep the existing UI's data models and schema stable wherever possible; adapt field names at the import boundary.
+
+## DEMO VALIDATION CHECKLIST
+
+- Stage 1 NORMAL baseline: HR 68, BP 118/76, RR 14, SpO2 98.
+- Stage 2 ATTENTION because crew reports external bleeding; normal BP does not cancel this report.
+- Stage 3 CAUTION: persistent bleeding + HR 101.
+- Stage 4 CAUTION: symptomatic worsening with HR 115 and lower BP.
+- Stage 5 CRITICAL: BP 86/56 + significant symptoms + continuing bleeding.
+- Stage 6 CRITICAL + offline: NO NEW numeric values; LAST KNOWN clearly labeled and graphs show a gap.
+- Stage 7 CAUTION - RECOVERING: bleeding reportedly controlled, better metrics, still under review.
+- Stage 8 NORMAL - FOLLOW-UP: stable repeated assessment and medical-officer follow-up; not automatically cleared.
+- Reset returns to Stage 1 without carrying over symptoms, alerts, offline state or bleeding report.
+- Other existing clinical scenarios continue to work normally.
+
+## OUTPUT REQUEST
+
+Implement this scenario in the existing codebase using the attached CSV and PDF. State exactly what changed and which interactions are actually functional, and clearly distinguish real connected data from synthetic demo data.
+
+MEDICAL REFERENCES
+2024 AHA / American Red Cross First Aid Guidelines - https://cpr.heart.org/en/resuscitation-science/2024-first-aid-guidelines
+American Red Cross - Life-Threatening External Bleeding - https://www.redcross.org/take-a-class/resources/learn-first-aid/bleeding-life-threatening-external
+American Red Cross - Shock - https://www.redcross.org/take-a-class/resources/learn-first-aid/shock
+Acute Anemia (NCBI Bookshelf) - https://www.ncbi.nlm.nih.gov/books/NBK537232/
