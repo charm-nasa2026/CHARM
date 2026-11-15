@@ -208,8 +208,7 @@ def bleeding():
                        m=[['hr', 'Heart rate', 'bpm', 0], ['bp', 'Blood pressure', 'mmHg', 0], ['si', 'Shock index (HR ÷ systolic)', '', 2], ['rr', 'Respiratory rate', '/min', 0]],
                        demo=['Vital signs are simulated: each stage sits inside the ATLS hemorrhage class it names (class I: HR under 100, normal BP; class II: HR 100–120, normal systolic BP; class III: HR 120–140, falling BP).',
                              'Steps follow Stop the Bleed (American College of Surgeons): pressure, wound packing, tourniquet 5–8 cm (2–3 in) above the wound, never on a joint, note the time.',
-                             'Shock index thresholds (0.9 and 1.0) are from published trauma research. Skin laceration and traumatic hypovolemic shock are conditions in NASA\'s Integrated Medical Model for long missions.',
-                             'Written by the CHARM team from these sources; needs review by the medic team before operational use.'],
+                             'Shock index thresholds (0.9 and 1.0) are from published trauma research. Skin laceration and traumatic hypovolemic shock are conditions in NASA\'s Integrated Medical Model for long missions.'],
                        stages=st))
 
 
