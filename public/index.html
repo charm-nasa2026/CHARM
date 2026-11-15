@@ -653,7 +653,7 @@ table.mx tr:hover td{background-color:rgba(125,170,235,.04)}
 #app.talking .talkwave{display:inline-flex}
 .bub .cur{display:inline-block;width:7px;height:15px;margin-left:2px;vertical-align:-2px;background:var(--cyan2);animation:blink 1s steps(2) infinite}
 @keyframes blink{50%{opacity:0}}
-.chfoot .mic.stopm{background:#C9262B}
+.chfoot .mic.stopm{background:#C9262B}.mic.listening{background:#C9262B;color:#fff;animation:micpulse 1.2s ease-in-out infinite}@keyframes micpulse{0%{box-shadow:0 0 0 0 rgba(255,77,79,.6)}70%{box-shadow:0 0 0 14px rgba(255,77,79,0)}100%{box-shadow:0 0 0 0 rgba(255,77,79,0)}}@media (prefers-reduced-motion: reduce){.mic.listening{animation:none}}
 .chset .grpl{font-size:11px;font-weight:700;letter-spacing:1.3px;color:var(--faint);margin:14px 0 8px}
 .chset .grpl:first-child{margin-top:0}
 .opts{display:flex;flex-wrap:wrap;gap:6px}
@@ -2625,16 +2625,27 @@ function charmyPop(){
   h+='<div class="qchips" style="padding:12px 16px 4px">'+charmyChips().map(function(q){return '<button data-act="ask" data-q="'+esc(q)+'">'+esc(q)+'</button>';}).join('')+'</div><div class="chbody" id="chbody">';
   if(!S.chat.length)h+='<div class="bub ch">Hi, I\'m Charmy. I answer from the crew\'s data on board, even without Earth. Tap a question or type your own.</div>';
   S.chat.forEach(function(m){if(m.typing){h+='<div class="bub ch"><span id="typing">'+esc(m.shown||'')+'</span><span class="cur"></span></div>';return;}h+='<div class="bub '+(m.me?'me':'ch')+'">'+esc(m.text)+(m.src?'<span class="s">'+esc(m.src)+'</span>':'')+(m.go?'<button class="btn sm pri" style="margin-top:10px" data-act="go" data-to="'+m.go+'">'+esc(m.goLabel)+'</button>':'')+'</div>';});
-  h+='</div><form class="chfoot" data-form="chat"><label for="chin" style="position:absolute;width:1px;height:1px;overflow:hidden">Ask Charmy</label><input id="chin" placeholder="Ask Charmy…" autocomplete="off">'+(S.talking?'<button type="button" class="mic stopm" data-act="stoptalk" aria-label="Stop talking" style="color:#fff">'+IC.stop.replace('<svg','<svg width="18" height="18"')+'</button>':'<button type="button" class="mic" data-act="mic" aria-label="Speak to Charmy">'+IC.mic+'</button>')+'</form></div>';
+  h+='</div><form class="chfoot" data-form="chat"><label for="chin" style="position:absolute;width:1px;height:1px;overflow:hidden">Ask Charmy</label><input id="chin" placeholder="Ask Charmy…" autocomplete="off">'+(S.talking?'<button type="button" class="mic stopm" data-act="stoptalk" aria-label="Stop talking" style="color:#fff">'+IC.stop.replace('<svg','<svg width="18" height="18"')+'</button>':(S.listening?'<button type="button" class="mic listening" data-act="micstop" aria-label="Stop listening">'+IC.mic+'</button>':'<button type="button" class="mic" data-act="mic" aria-label="Speak to Charmy">'+IC.mic+'</button>'))+'</form>'+(S.listening?'<div class="faint" style="font-size:12.5px;padding:0 14px 10px">Listening… speak in English, then pause. Tap the red microphone to finish.</div>':'')+'</div>';
   return h;
 }
+/* topic words in spoken or typed questions */
+var QWORDS=[[/heart ?rate|pulse|heart ?beat|\bhr\b/,'hr'],[/oxygen|saturation|spo ?2|sp o2|o2/,'spo2'],[/breath|respirat/,'rr'],[/temperature|fever|\btemp\b/,'temp'],[/blood pressure|\bbp\b|pressure/,'bp'],[/glucose|sugar/,'glu'],[/sleep/,'sleep'],[/mood|wellbeing|well-being|feeling/,'mood'],[/weight|body mass/,'wt'],[/radiation|dose/,'dose'],[/exercise|workout|training/,'ex'],[/fluid|water|drink|hydrat/,'fluid']];
+function lev1(a,b){if(Math.abs(a.length-b.length)>1)return false;var i=0,j=0,d=0;while(i<a.length&&j<b.length){if(a[i]===b[j]){i++;j++;continue;}if(++d>1)return false;if(a.length>b.length)i++;else if(b.length>a.length)j++;else{i++;j++;}}return d+(a.length-i)+(b.length-j)<=1;}
+/* names heard by speech recognition: exact, or one letter off (Sara, Mae, Marcos), or the first four letters */
+function whoIn(ql){var words=ql.replace(/[^a-z\s']/g,' ').split(/\s+/).map(function(w){return w.replace(/'s$/,'');});
+  return CREW.filter(function(p){var n=p.name.toLowerCase();return ql.indexOf(n)>=0||words.some(function(w){return w.length>=3&&(lev1(w,n)||(n.length>=5&&w.slice(0,4)===n.slice(0,4)));});})[0];}
 function answer(q){
-  var t=viewT(),ql=q.toLowerCase(),r=S.route,res={text:'',src:'CHARM data · '+fmtT(t)};
-  var who=CREW.filter(function(p){return ql.indexOf(p.name.toLowerCase())>=0;})[0];
+  var t=viewT(),ql=q.toLowerCase().replace(/[?!.,]+/g,' ').replace(/\s+/g,' ').trim(),r=S.route,res={text:'',src:'CHARM data · '+fmtT(t)};
+  var who=whoIn(ql);if(!who&&/\b(my|me|i)\b/.test(ql)&&CREWBY[S.signed])who=CREWBY[S.signed];
   var ctxPid=who?who.id:(r.id||null);
+  var qk=null;QWORDS.some(function(w){if(w[0].test(ql)){qk=w[1];return true;}return false;});
+  if(/scenario|simulat/.test(ql)){res.text='The scenarios are on the Simulate scenario page: pick one and press Start live, or read it stage by stage.';res.go='scenario';res.goLabel='Open Simulate scenario';return res;}
+  if(/emergency/.test(ql)&&!ctxPid){res.text='Emergency Mode opens by itself when someone is CRITICAL. To start one by hand, press the red EMERGENCY button at the top when it shows, and pick the person.';return res;}
+  if(who&&/\b(open|show|go to|file)\b/.test(ql)&&!qk&&!/why|what should|do now|summar/.test(ql)){res.text='Opening '+who.name+'\'s file.';res.go='astro-'+who.id;res.goLabel='Open '+who.name+'\'s file';return res;}
   if(ctxPid&&!canSee(ctxPid)&&!/whole crew|everyone|crew status|status of the crew|attention|who needs|earth|how long|delay|queued|queue|24 hours|last day|happened|measure|how do i|repeat|fails/.test(ql)){res.text=CREWBY[ctxPid].name+' is '+WORD[lvKey(personAt(ctxPid,t).lvl)]+'. Their values are private: only '+CREWBY[ctxPid].name+' and the doctor can see them.';return res;}
-  if(/whole crew|everyone|crew status|status of the crew/.test(ql)){res.text=crewSorted(t).map(function(x){return x.p.name+': '+WORD[lvKey(x.st.lvl)]+(x.st.top&&canSee(x.p.id)?' ('+reasonOf(x.p.id,x.st,t)+')':'');}).join('\n');return res;}
-  if(/attention|who needs/.test(ql)){var l=crewSorted(t).filter(function(x){return x.st.lvl!==0;});res.text=l.length?l.map(function(x){return x.p.name+': '+(canSee(x.p.id)?reasonOf(x.p.id,x.st,t):WORD[lvKey(x.st.lvl)]);}).join('\n'):'Nobody right now. All crew are normal.';return res;}
+  if(qk&&!ctxPid&&!/measure|how do i|mean/.test(ql)){var vis=CREW.filter(function(p){return canSee(p.id);});if(vis.length){res.text=MDEF[qk].label+':\n'+vis.map(function(p){var mm=personAt(p.id,t).m[qk];return p.name+': '+(mm&&mm.val?fmtV(qk,mm.val)+' '+MDEF[qk].unit+' ('+WORD[lvKey(mm.l)]+')':'no recent reading');}).join('\n');return res;}}
+  if(/whole crew|everyone|crew status|status of the crew|how is everybody|how are we/.test(ql)){res.text=crewSorted(t).map(function(x){return x.p.name+': '+WORD[lvKey(x.st.lvl)]+(x.st.top&&canSee(x.p.id)?' ('+reasonOf(x.p.id,x.st,t)+')':'');}).join('\n');return res;}
+  if(/attention|who needs|anyone|anybody|trouble|problem|sick|unwell|in danger|critical|who is not ok|everyone ok|everybody ok/.test(ql)&&!ctxPid){var l=crewSorted(t).filter(function(x){return x.st.lvl!==0;});res.text=l.length?l.map(function(x){return x.p.name+': '+(canSee(x.p.id)?reasonOf(x.p.id,x.st,t):WORD[lvKey(x.st.lvl)]);}).join('\n'):'Nobody right now. All crew are normal.';return res;}
   if(/earth|how long|delay|answer/.test(ql)&&!/what should/.test(ql)){var e=envAt(t);res.text=(e&&e.link?'The ship is '+distTxt()+' from Earth. A signal takes '+fmtSec(oneWay())+' one way, so the fastest possible reply is '+roundTxt()+' plus the flight surgeon\'s own time.':'The link is offline. Everything is queued and sends automatically when it returns.')+' '+outboxCount(t)+' records are waiting for confirmation.';res.src='Earth link status';return res;}
   if(/queued|queue/.test(ql)){res.text=outboxCount(t)+' records are waiting for ground confirmation. Critical records go first.';res.go='earth';res.goLabel='Open Earth link';return res;}
   if(/24 hours|last day|happened/.test(ql)){var ev=allEvents().filter(function(e){return e.t<=t&&e.t>t-24*H&&(e.type==='raise'||e.type==='nodata')&&(!e.pid||canSee(e.pid)||e.lv===3);});res.text=ev.length?ev.slice(0,6).map(function(e){return hm(e.t)+' '+(e.pid?CREWBY[e.pid].name+': ':'')+e.text;}).join('\n'):'No alerts in the last 24 hours.';res.go='events';res.goLabel='Open history';return res;}
@@ -2644,8 +2655,9 @@ function answer(q){
   if(/mean/.test(ql)&&r.k){res.text=MDEF[r.k].label+': '+(CSV[MDEF[r.k].csv]||{}).why+' Measured by '+MDEF[r.k].src.toLowerCase()+'.';res.src='CHARM indicator playbook';return res;}
   if(/summar/.test(ql)&&ctxPid){var p=CREWBY[ctxPid],n=allEvents().filter(function(e){return e.pid===ctxPid&&e.type==='raise'&&e.t<=t&&e.t>t-3*D;}).length,lst=function(k){return ((RD[ctxPid]||{})[k]||[]).filter(function(r){return r.t<=t&&r.t>t-3*D;}).map(function(r){return r.v;});};var sl=lst('sleep'),mo=lst('mood'),ex=lst('ex');res.text=p.name+' over the last 3 days: sleep '+(sl.length?sl.join(', ')+' h':'not logged')+'; mood '+(mo.length?mo.join(', ')+'/10':'not logged')+'; exercise '+(ex.length?ex.join(', ')+'%':'not logged')+'. '+n+' alert'+(n===1?'':'s')+' raised.';return res;}
   if(ctxPid){
-    var st=personAt(ctxPid,t),k2=r.k&&/why/.test(ql)?r.k:st.top;
+    var st=personAt(ctxPid,t),k2=qk&&st.m[qk]?qk:r.k&&/why/.test(ql)?r.k:st.top;
     if(!k2){res.text=CREWBY[ctxPid].name+' is NORMAL. All metrics are in range.';return res;}
+    if(qk&&st.m[qk]&&!st.m[qk].val){res.text='There is no recent '+MDEF[qk].label.toLowerCase()+' reading for '+CREWBY[ctxPid].name+'.';return res;}
     var m=st.m[k2],c=CSV[MDEF[k2].csv]||{};
     if(/do now|what should|next/.test(ql)){res.text=CREWBY[ctxPid].name+': '+(m.l===3?c.x:m.l>0?c.c:'nothing urgent.');var nx=NEXT[k2];if(nx&&nx[2]&&m.l>0){res.go='test-'+nx[2]+'-'+ctxPid;res.goLabel='Start '+nx[0].toLowerCase();}res.src='CHARM indicator playbook';return res;}
     if(m.l===-1){res.text=CREWBY[ctxPid].name+'\'s wearable is not reporting, so those metrics are grey (NO DATA). Reconnect the watch or import backup data.';return res;}
@@ -2655,7 +2667,7 @@ function answer(q){
   }
   res.text='I can tell you crew status, explain any metric, guide a measurement, or check the Earth link. Try one of the suggestions above.';res.src='';return res;
 }
-function setTalking(on){S.talking=on;var a=$('app');if(a)a.classList.toggle('talking',on);var f=document.querySelector('.chfoot .mic');if(f&&S.charmy&&!S.chSet){var want=on?'stoptalk':'mic';if(f.dataset.act!==want){f.dataset.act=want;f.className='mic'+(on?' stopm':'');f.setAttribute('aria-label',on?'Stop talking':'Speak to Charmy');f.style.color=on?'#fff':'';f.innerHTML=on?IC.stop.replace('<svg','<svg width="18" height="18"'):IC.mic;}}}
+function setTalking(on){S.talking=on;var a=$('app');if(a)a.classList.toggle('talking',on);var f=document.querySelector('.chfoot .mic');if(f&&S.charmy&&!S.chSet&&!S.listening){var want=on?'stoptalk':'mic';if(f.dataset.act!==want){f.dataset.act=want;f.className='mic'+(on?' stopm':'');f.setAttribute('aria-label',on?'Stop talking':'Speak to Charmy');f.style.color=on?'#fff':'';f.innerHTML=on?IC.stop.replace('<svg','<svg width="18" height="18"'):IC.mic;}}}
 /* Charmy writes and (optionally) speaks. o.voice overrides the Voice setting; o.onWrite streams the text as it is written. */
 function speak(txt,o){
   o=o||{};var voice=o.voice!=null?o.voice:S.voice;
@@ -2805,7 +2817,8 @@ document.addEventListener('click',function(e){
     case 'emresok': log({pid:HAZ[S.emSel]?null:S.emSel,type:'crew',text:'Emergency resolved: '+ds.v+' · by '+whoName(),src:'crew'}); delete S.emg[S.emSel]; S.emRes=false; S.emSel=null; toast('Emergency resolved',ds.v+'. Logged and sent to Earth.'); renderAll(); break;
     case 'charmy': S.charmy=!S.charmy; renderOv(); if(S.charmy){setTimeout(function(){var b=$('chbody');if(b)b.scrollTop=b.scrollHeight;},0);} break;
     case 'ask': askCharmy(ds.q); break;
-    case 'mic': toast('Voice input is not available yet','Type your question for now.'); break;
+    case 'mic': micStart(); break;
+    case 'micstop': if(REC)try{REC.stop();}catch(x){} break;
     case 'import': S.ov='import'; S.imp=null; S.drawer=false; renderAll(); break;
     case 'impback': S.imp=null; renderOv(); break;
     case 'impgo': startImport(); break;
@@ -2997,6 +3010,23 @@ function rtTap(){
   if(r.state==='go'){var ms=Math.round(performance.now()-r.t0);r.trials.push(clamp(ms,150,900));r.state=r.trials.length>=5?'done':'next';renderView();return;}
   if(r.state==='wait'){clearTimeout(r.timer);r.state='early';renderView();return;}
   r.state='wait';renderView();r.timer=setTimeout(function(){r.state='go';r.t0=performance.now();var pad=$('rtpad');if(pad){pad.classList.add('go');pad.querySelector('span:last-child').textContent='Tap now';}},1200+Math.random()*1800);
+}
+/* Voice input: the browser's speech recognition (Chrome, Edge, Safari). It turns speech into text, which goes to Charmy exactly like a
+   typed question. Of the recognizer's alternatives, the one that names a crew member or a health topic Charmy knows is preferred. */
+var REC=null;
+function micScore(tx){var t=tx.toLowerCase(),n=0;CREW.forEach(function(p){if(t.indexOf(p.name.toLowerCase())>=0)n+=3;});QWORDS.forEach(function(w){if(w[0].test(t))n+=2;});if(/crew|status|earth|delay|emergency|scenario|measure|summary|what should|happened/.test(t))n+=1;return n;}
+function micPick(res){var best=res[0].transcript,bs=-1;for(var i=0;i<res.length;i++){var sc=micScore(res[i].transcript)+(res[i].confidence||0);if(sc>bs){bs=sc;best=res[i].transcript;}}return best;}
+function micUi(){var f=document.querySelector('.chfoot .mic');if(!f){renderOv();return;}f.dataset.act=S.listening?'micstop':'mic';f.className='mic'+(S.listening?' listening':'');f.setAttribute('aria-label',S.listening?'Stop listening':'Speak to Charmy');f.innerHTML=IC.mic;f.style.color=S.listening?'#fff':'';var inp=$('chin');if(inp)inp.placeholder=S.listening?'Listening…':'Ask Charmy…';}
+function micStart(){
+  var SR2=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR2){toast('Voice input is not supported in this browser','Open CHARM in Chrome, Edge or Safari, or type your question.');return;}
+  stopTalk();if(REC){try{REC.abort();}catch(x){}REC=null;}
+  var r=new SR2(),fin='',got=false;r.lang='en-US';r.interimResults=true;r.maxAlternatives=4;r.continuous=false;
+  r.onresult=function(e){var live='';for(var i=e.resultIndex;i<e.results.length;i++){var rr=e.results[i];if(rr.isFinal){fin+=' '+micPick(rr);got=true;}else live+=rr[0].transcript;}var inp=$('chin');if(inp)inp.value=(fin+' '+live).trim();};
+  r.onerror=function(e){var m={'not-allowed':['Microphone blocked','Allow the microphone for charm2026.health (lock icon next to the address), then tap the microphone again.'],'service-not-allowed':['Voice input is off in this browser','Allow speech recognition in the browser settings, or type your question.'],'no-speech':['I did not hear anything','Tap the microphone and speak, or type your question.'],'network':['Voice input needs the internet','This browser sends speech to its own recognition service. Type your question instead.'],'audio-capture':['No microphone found','Connect a microphone or type your question.']}[e.error];if(m)toast(m[0],m[1]);};
+  r.onend=function(){S.listening=false;REC=null;micUi();var q=fin.trim();if(q){var inp=$('chin');if(inp)inp.value='';askCharmy(q);}};
+  REC=r;S.listening=true;S.charmy=true;micUi();
+  try{r.start();}catch(x){S.listening=false;REC=null;micUi();toast('Voice input could not start',x.message||'');}
 }
 function askCharmy(q){
   stopTalk();S.chat.push({me:true,text:q});var a=answer(q);var m={text:a.text,src:S.brief?'':a.src,go:a.go,goLabel:a.goLabel,typing:true,shown:''};S.chat.push(m);S.charmy=true;S.chSet=false;renderOv();
