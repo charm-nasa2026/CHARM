@@ -3,6 +3,17 @@
 Crew Health Assessment and Response Module, NASA Space Apps 2026.
 This is the live version: real data on a server, with no simulated data built in.
 
+## A quick tour (screenshots)
+All screenshots are from the app itself (local test mode, demo data loaded). Click one to see it full size.
+
+| | |
+|---|---|
+| ![Who are you?](docs/screenshots/01-who-are-you.png) **1. Who are you?** Each astronaut picks their name. NASA Reviewer (for the judges) is first; the doctor signs in. | ![Overview](docs/screenshots/02-overview.png) **2. Overview.** Every crew member as a card, sorted by urgency, with colour + word + shape status and the cabin readings (CO₂, space weather, temperature) on top. |
+| ![Astronaut file](docs/screenshots/03-astronaut-file.png) **3. Astronaut file.** One tile per measurement with its level, trend and source (REAL / SIM), and why CHARM raised each alert. | ![Arrhythmia scenario](docs/screenshots/04-scenario-arrhythmia.png) **4. A scenario stage.** The alert title and why, the ECG evidence, the trend charts and what the crew should do now. |
+| ![Simulate scenario](docs/screenshots/05-simulate-scenario.png) **5. Simulate scenario.** Seven medic-team scenarios. **Run live** writes each stage into Sarah's file every 2 s, and CHARM's engine raises the alerts itself. | ![Emergency Mode](docs/screenshots/06-emergency-mode.png) **6. Emergency Mode.** Opens by itself at CRITICAL: one illustrated, spoken screen per Crew Medical Officer action. |
+| ![Wellbeing check](docs/screenshots/07-wellbeing-check.png) **7. Mood and wellbeing check.** 14 questions on a 1–5 scale plus free notes. | ![Charmy](docs/screenshots/08-charmy.png) **8. Charmy.** The AI assistant answers typed or spoken questions about the crew's data. |
+| ![Earth link](docs/screenshots/09-earth-link.png) **9. Earth link.** The real light-time delay for today's mission day, the ship's position on the Mars transfer, and the outbox that keeps working when the link is down. | |
+
 ## What runs where
 
 | Part | Where | What it does |
@@ -20,14 +31,15 @@ The server logic lives in `shared/engine.js` and `shared/core.js`. The browser u
   - **Add measurement** (left menu, the astronaut file, or each metric page)
   - **Guided tests** (blood pressure, glucose, ECG, reaction time)
   - **Import data** (CSV templates for NASA, ESA, JAXA and CSA in `public/assets/templates/`)
-  - **Settings › Demo › Load demo scenario** (for the judges' demo). It writes about 3 hours of readings tagged `DEMO`:
+  - **Simulate scenario** (side panel) runs one of the seven medic-team scenarios live.
+  - **Settings › Demo tools › Load 3 hours of demo history** (for the judges' demo). It writes about 3 hours of readings tagged `DEMO`:
     - Sarah: irregular rhythm, CRITICAL
     - Marcus: short sleep, CAUTION
     - Elena: wearable silent, NO DATA
     - Cabin CO₂ rising
 
 ## Laptop / tablet view
-The button next to the gear wheel switches between laptop and tablet view. Tablet view has bigger touch targets, a collapsed menu and fewer cards per row. The choice is saved on the device. On a touch screen narrower than 1400 px, tablet view turns on automatically.
+The **Laptop / Tablet** button at the right of the top bar switches between laptop and tablet view. Tablet view has bigger touch targets, a collapsed menu and fewer cards per row. The choice is saved on the device. On a touch screen narrower than 1400 px, tablet view turns on automatically.
 
 ## Alert scenarios (team table, 15.11)
 `data/reference/charm_alert_scenarios.csv` is the team's scenario table. WATCH = ATTENTION (yellow), ALERT = CAUTION (orange), CRITICAL = CRITICAL (red). Implemented in `shared/engine.js`:
@@ -42,6 +54,19 @@ The button next to the gear wheel switches between laptop and tablet view. Table
 | B | Fluid loss and space anemia (`c_anem`) | Hb up ≥ 5 % vs own first value while body mass is down > 2 % or fluids < 2.5 L/day | Hb below WHO (women 12, men 13 g/dL) or down ≥ 10 % | Hb < 8 g/dL |
 
 Not yet: the reaction-test drop as "new confusion" in qSOFA (use the symptom check), and "in the days before landing" (the app has no landing date, so scenario 1 WATCH applies at any time). Trend rules read up to 120 days of body mass, blood counts, vision and fluids on the server (new Firestore index `pid + k + t`).
+
+## Mood and wellbeing check
+**Add measurement › Mood and wellbeing** (also the daily "mood" task) asks 14 short questions on a 1–5 scale (1 = worst, 5 = best), like the rating scales in NASA crew self-reports: overall mood, calm, energy, feeling rested, focus, hope, patience, handling stress, last night's sleep, workload, the crew, mission control, family and home, and how the body feels. A free **Notes** box keeps the astronaut's own words. The answers are saved as one `well` record, and the Mood tile gets `2 × average` (0–10). Levels (`wellStats` in `shared/engine.js`): CAUTION if the average is 2 or lower, or "hope" is 1; ATTENTION if any answer is 1, three or more answers are 2 or lower, or the average is 2.5 or lower.
+
+## Heart rhythm: vitals give urgency, the ECG names the rhythm
+Medic team note, implemented in `c_af` (`shared/engine.js`):
+- A watch flag of an irregular pulse is **ATTENTION** (screening only).
+- An irregular pulse with a fast heart rate or symptoms is **CAUTION**: "record a 12-lead ECG".
+- An irregular, fast pulse with low blood pressure, fainting or chest pain and **no ECG yet** is **CRITICAL**: "record an ECG now".
+- Only an ECG read by the medical officer names the rhythm ("compatible with atrial fibrillation"). Echocardiography can follow as a later step. Once a reviewed ECG exists, the heart-rate tile is capped at CAUTION, so the rhythm alert leads.
+
+## Charmy voice input
+Tap the microphone in Charmy's chat to start speaking and tap it again to stop and send; Charmy keeps listening through pauses. It uses the browser's own speech recognition (Web Speech API, English): Chrome, Edge and Safari, with an internet connection. Charmy matches crew names even when they are misheard slightly, reads "my / me" as the signed-in astronaut, and recognises topic words (heart rate, pressure, oxygen, sleep, mood, bleeding…).
 
 ## Demo tools (not part of the real app)
 Settings › **Demo tools** is only for the video and the judges: a quick demo alert, the live demo file, 3 hours of crew demo history and the crew data library. The scenarios moved to **Simulate scenario** in the side panel. The page says so at the top, and everything it makes is marked DEMO.
@@ -133,7 +158,6 @@ The lock above is in the app's screens only (team decision for the demo). It is 
 ## Not included yet
 - Live link to an Earth ground station. The Earth link uses loopback: each record is acknowledged after 2 × the one-way light time. **Test link loss** in the Earth link page cuts it.
 - Direct pairing with a watch or wearable. Use CSV import or manual entry.
-- Voice input.
 
 Thresholds are demo values and need review by a flight surgeon.
 

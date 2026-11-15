@@ -41,6 +41,15 @@ python3 tools/build_crew_csv.py "<path to charm_db>" data
 
 The `note` column holds what the crew did. Each note appears in **Alerts and history** at its own time, between the alert and the recovery.
 
+## Medic-team scenarios (`scenarios/`)
+One CSV per scenario, with the team's PDFs and implementation notes in `scenarios/pdf/`. `python3 tools/build_scenarios.py` builds them into `public/js/scenarios.js`, so **Simulate scenario** works offline. Order in the app:
+1. `bleeding_emergency_scenario.csv`: bleeding emergency, 8 stages (first-aid steps from Stop the Bleed, American College of Surgeons).
+2. `arrhythmia_scenario.csv`: cardiac arrhythmia, 8 stages (screening flag → ECG required → reviewed AF → unstable, AHA tachyarrhythmia algorithm).
+3. `airborne_allergy_emergency_scenario.csv`: airborne exposure / respiratory emergency, 8 stages. Stage 1 HR, BP, RR and temperature are the rounded pre-bed-rest means of NASA CFT70 subject C11_CFT70_8072; SpO₂ and later values are synthetic.
+4. `pulmonary_infection_scenario.csv` (8), `dehydration_scenario.csv` (10), `sans_scenario.csv` (11), `bone_health_chronic_scenario.csv` (7).
+
+All scenario values are constructed for the demo and stored with `src: 'scenario'` (DEMO) when run live.
+
 ## Reference tables (`reference/`)
 
 | File | Use |
