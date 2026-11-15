@@ -19,7 +19,7 @@ OUT = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.path.dirname(__file_
 
 COLS = ['time_gmt', 'astronaut', 'agency', 'role', 'phase', 'mission_day',
         'heart_rate', 'spo2', 'resp_rate', 'temp_c', 'bp_systolic', 'bp_diastolic', 'glucose_mgdl', 'sleep_hours',
-        'radiation_dose_pct', 'mood_0_10', 'exercise_pct', 'weight_kg', 'fluid_intake_l',
+        'radiation_dose_pct', 'proton_flux_pfu', 'mood_0_10', 'exercise_pct', 'weight_kg', 'fluid_intake_l',
         'hemoglobin_g_dl', 'hematocrit_pct', 'wbc_k_per_ul', 'platelets_k_per_ul', 'lymphocytes_per_ul',
         'irregular_rhythm', 'context', 'skin_temp_c', 'sim_label',
         'ecg_irregular', 'ecg_no_p_waves', 'ecg_seconds', 'ecg_unstable',
@@ -101,6 +101,29 @@ def bedrest_file(key, obs):
     return out
 
 
+# Space radiation environment on each Inspiration4 date: NOAA SWPC GOES daily proton fluence >10 MeV, from the
+# Solar and Geophysical Activity Summary (SGAS) issued at 02:45 UTC the next day, archived by NOAA NCEI:
+# https://www.ngdc.noaa.gov/stp/space-weather/swpc-products/daily_reports/solar_geophysical_activity_summaries/
+# Daily average flux (pfu = protons/cm2-s-sr) = fluence (protons/cm2-day-sr) / 86400. SGAS values are real-time preliminary.
+SWPC_FLUENCE_10MEV = {
+    dt.date(2021, 6, 16): (4.3e4, 'SGAS 2021-06-17'),
+    dt.date(2021, 8, 3): (4.4e4, 'SGAS for 2021-08-03 not archived; 2021-08-02 and 2021-08-04 were both 4.4e4'),
+    dt.date(2021, 9, 13): (4.5e4, 'SGAS 2021-09-14'),
+    dt.date(2021, 9, 16): (4.7e4, 'SGAS 2021-09-17'),
+    dt.date(2021, 9, 17): (4.7e4, 'SGAS 2021-09-18'),
+    dt.date(2021, 9, 18): (4.9e4, 'SGAS 2021-09-19'),
+    dt.date(2021, 9, 19): (5.0e4, 'SGAS 2021-09-20'),
+    dt.date(2021, 11, 2): (2.2e5, 'SGAS 2021-11-03'),
+    dt.date(2021, 12, 9): (4.5e4, 'SGAS 2021-12-10'),
+    dt.date(2022, 3, 31): (4.1e5, 'SGAS 2022-04-01 · proton event: >10 MeV flux reached 10.6 pfu at 06:30 UTC (S1 radiation storm)'),
+}
+
+
+def pfu(d):
+    f = SWPC_FLUENCE_10MEV.get(d)
+    return (fmt(f[0] / 86400.0, 2), f[1]) if f else ('', '')
+
+
 def i4_file(key, obs):
     name, agency, role, pid, source = CREW[key]
     by = collections.defaultdict(dict)
@@ -117,10 +140,25 @@ def i4_file(key, obs):
         row = {c: '' for c in COLS}
         row.update(time_gmt=d.isoformat() + 'T08:00:00Z', astronaut=name, agency=agency, role=role, phase=ph, mission_day=str(md),
                    source=source + ' · draw ' + lab + ' · blood drawn on Earth')
+        row['proton_flux_pfu'], ref = pfu(d)
+        if ref: row['source'] += ' · protons >10 MeV: NOAA SWPC GOES daily average (' + ref + ')'
         for c, dd in [('hemoglobin_g_dl', 1), ('hematocrit_pct', 1), ('wbc_k_per_ul', 1), ('platelets_k_per_ul', 0), ('lymphocytes_per_ul', 0)]:
             if c in vals:
                 row[c] = fmt(vals[c], dd)
         out.append(row)
+    # the three days in orbit (launch 2021-09-16 00:03 UTC, splashdown 2021-09-18 23:07 UTC): no blood draw, space radiation only
+    for i in range(3):
+        d = I4_LAUNCH + dt.timedelta(days=i)
+        v, ref = pfu(d)
+        row = {c: '' for c in COLS}
+        row.update(time_gmt=d.isoformat() + 'T12:00:00Z', astronaut=name, agency=agency, role=role, phase='mission', mission_day=str(i + 1),
+                   proton_flux_pfu=v, source='Inspiration4 flight day %d (in orbit; 585 km; 51.6 deg) · protons >10 MeV: NOAA SWPC GOES daily average (%s)' % (i + 1, ref))
+        out.append(row)
+    # the proton event on the R+194 draw day: peak value at its time
+    pk = {c: '' for c in COLS}
+    pk.update(time_gmt='2022-03-31T06:30:00Z', astronaut=name, agency=agency, role=role, phase='recovery', mission_day='197', proton_flux_pfu='10.6',
+              source='NOAA SWPC SGAS 2022-04-01 · >10 MeV proton flux peak 10.6 pfu at 06:30 UTC (S1 radiation storm) · crew on Earth')
+    out.append(pk)
     out.sort(key=lambda r: r['time_gmt'])
     return out
 
@@ -284,7 +322,7 @@ MD_FROM, MD_TO = -15, 60          # mission days written (today = Day 60 when th
 def sim_fill(key, real_rows, base):
     """Values only for measurements this person's real file does not have. Anchored to the person's real pre-mission
     baseline when it exists, otherwise to the NASA bed-rest crew average. Seeded, so every build is identical.
-    Mostly NORMAL, with a few realistic ATTENTION days (a short night, a low-fluid day)."""
+    Mostly NORMAL, with a few realistic ATTENTION days (a short night, a low-fluid day) and one CAUTION day each (CAUTION_DAYS)."""
     import random
     name, agency, role, pid, src = CREW[key]
     rnd = random.Random('charm-sim-' + key)
@@ -333,7 +371,27 @@ def sim_fill(key, real_rows, base):
                     sans_refraction_shift_d=fmt(max(0, 0.004 * max(0, md) + g(0.05)), 2), sans_folds='none', sans_globe_flattening='none')
             if 'wbc_k_per_ul' not in have:
                 row(md, '07:45', wbc_k_per_ul=fmt(6.2 + g(0.9), 1), platelets_k_per_ul=fmt(250 + g(30), 0), lymphocytes_per_ul=fmt(1900 + g(250), 0))
+    # A few CAUTION (orange) days in the last two weeks, so the history shows orange alerts too (team decision 15.11).
+    # Applied after generation, so every other simulated value stays exactly as before.
+    for md, col, val in CAUTION_DAYS.get(key, []):
+        for r in out:
+            if r['mission_day'] == str(md) and r.get(col) not in (None, ''):
+                r[col] = str(int(float(r['ortho_lying_sbp'])) - val) if col == 'ortho_standing_sbp' else val   # drop >= 20 within 3 min
+                r['note'] = 'Simulated CAUTION day (demo filler)'
+                break
     return sorted(out, key=lambda r: (int(r['mission_day']), r['time_gmt']))
+
+
+# (mission day, column, value): glucose < 70, SpO2 92-93, orthostatic drop >= 20 mmHg, blood in urine = CAUTION
+CAUTION_DAYS = {
+    'sarah': [(52, 'spo2', '93')],
+    'maya': [(55, 'spo2', '93')],
+    'david': [(56, 'ortho_standing_sbp', 24)],
+    'marcus': [(49, 'glucose_mgdl', '64')],
+    'robert': [(58, 'spo2', '93')],
+    'amara': [(49, 'urine_blood', '1')],
+    'john': [(57, 'glucose_mgdl', '67')],
+}
 
 
 def baselines():

@@ -5,3 +5,5 @@ tools/node_modules/
 firebase-debug*.log
 *.local
 .claude/settings.local.json
+# copied from data/ by tools/sync-shared.js on every deploy
+public/data/

@@ -29,6 +29,42 @@ The server logic lives in `shared/engine.js` and `shared/core.js`. The browser u
 ## Laptop / tablet view
 The button next to the gear wheel switches between laptop and tablet view. Tablet view has bigger touch targets, a collapsed menu and fewer cards per row. The choice is saved on the device. On a touch screen narrower than 1400 px, tablet view turns on automatically.
 
+## Alert scenarios (team table, 15.11)
+`data/reference/charm_alert_scenarios.csv` is the team's scenario table. WATCH = ATTENTION (yellow), ALERT = CAUTION (orange), CRITICAL = CRITICAL (red). Implemented in `shared/engine.js`:
+| # | Scenario | ATTENTION | CAUTION | CRITICAL |
+|---|---|---|---|---|
+| 1 | Dizziness on standing (`c_orth`) | HR +30 on standing without a BP drop; body mass down > 2 % or fluids < 2.5 L/day | drop ≥ 20 / 10 mmHg within 3 min | standing systolic ≤ 90, or fainting |
+| 2 | Solar radiation storm (cabin) | NOAA S1 (≥ 10 pfu) | S2 (≥ 100 pfu) | S3+ (≥ 1,000 pfu) |
+| 3 | Infection (`c_inf`) | one SIRS sign, or temperature ≥ 0.8 °C above own normal | ≥ 2 SIRS signs, or temperature > 38.0 °C | qSOFA ≥ 2 (RR ≥ 22, systolic ≤ 100, new confusion) |
+| 4 | Cabin CO₂ / low oxygen | CO₂ 1-h mean > 2.3 mmHg | > 3.0 mmHg | SpO₂ ≤ 91 % or RR ≥ 25 (per person) |
+| 5 | Low blood sugar | – | glucose < 70 mg/dL | < 54 mg/dL |
+| A | SANS self vision test (`c_sans`) | worse than before flight once | worse 2 tests in a row | (OCT / exam thresholds) |
+| B | Fluid loss and space anemia (`c_anem`) | Hb up ≥ 5 % vs own first value while body mass is down > 2 % or fluids < 2.5 L/day | Hb below WHO (women 12, men 13 g/dL) or down ≥ 10 % | Hb < 8 g/dL |
+
+Not yet: the reaction-test drop as "new confusion" in qSOFA (use the symptom check), and "in the days before landing" (the app has no landing date, so scenario 1 WATCH applies at any time). Trend rules read up to 120 days of body mass, blood counts, vision and fluids on the server (new Firestore index `pid + k + t`).
+
+## Demo tools (not part of the real app)
+Settings › **Demo tools** is only for the video and the judges (it also holds the old Demo page: the 3-hour demo scenario and the crew data library). The page says so at the top, and everything it makes is marked DEMO.
+- **Live demo file:** plays `data/demo/demo_sarah_red-alert.csv` as if it were live. Pick the start (default: the treadmill starts in 2 minutes, the red alert follows about 30 minutes later), the speed (1×, 2×, 5×, 10×) and the astronaut. The rows before the start point are added at once as recent history; the rest arrive at their own time, and the file repeats at the end. The server adds due rows on every 5-minute tick, and every open CHARM screen asks for them every 20 seconds. Readings are tagged `src: 'demo'` (SIM), the crew notes appear in Alerts and history, and the Overview shows a DEMO banner while it runs. **Stop** ends it.
+- **Generate a demo alert:** pick an astronaut, a measurement and a level (ATTENTION / CAUTION / CRITICAL; a level the measurement does not have is greyed out). CHARM writes a value that reaches that level with that person's own limits (`demoReading` in `shared/engine.js`), then a normal value 5 minutes later, and clears the alert at once. Values are tagged `src: 'demoalert'` and show a DEMO tag; the Overview shows a DEMO ALERT banner, the red-alert list says DEMO ALERT, and the history has "DEMO ALERT generated / ended".
+- **Demo scenario · Pulmonary Infection in Space:** Sarah's 8-stage respiratory-infection scenario from the medic team (PDF + `data/scenarios/pulmonary_infection_scenario.csv`, embedded in `index.html` so it runs offline). Start / Next / Previous / Reset, her vitals vs baseline, trend charts by stage (stage 4 SpO₂ shown as the 93–94 % range; stage 6 has no new numbers and shows last-known values, labelled), the status the source assigns (NORMAL, ALERT, CRITICAL, ALERT – RECOVERING, NORMAL / RESOLVED), the six guidance panels, "Earth Communication Unavailable – Onboard Protocol Active" in stage 6, and crew documentation (logged as DEMO, queued when offline). No lab results, drugs or doses are invented. It does not change Sarah's real data.
+- State is kept in `system/demo` (not readable by the app); `mission.demoLive` and `mission.demoAlerts` tell the app what is running. Demo readings have fixed ids, so two screens pumping at once never store a row twice.
+
+## Earth link delay
+The ship flies a 180-day (about 6 months) transfer from Earth to Mars, launched on Mission Day 1 (`shipGeom` in `shared/engine.js`: conic transfer solved with Kepler's equation; Earth and Mars on circular orbits). The one-way delay is the Earth–ship distance divided by the speed of light, for the moment you view: about 30 s on day 30, 2 min on day 90, 5.6 min on day 150, 8 min on arrival (day 181), then it follows Mars. The Ship position card on the Earth link page draws the same path.
+
+## Loading and the offline copy
+The app keeps an offline copy in the browser (IndexedDB). If that copy is locked by another tab ("Failed to obtain primary lease"), the app reloads once after 20 s without it, for that tab. Each load reads the last 8 days of readings (about 15,000 documents now), so many reloads cost Firestore reads.
+
+## Personal limits: the CHARM model
+The team's alert model (`charm_model/`, model version charm-baseline-2.0) gives each crew member a personal band for heart rate, blood pressure, breathing rate and temperature: their own baseline from the research subject their data comes from, plus the expected change in space for **today's mission day** (from Settings › Mission). The band is in `shared/engine.js` (`MODEL` block). It only **adds** ATTENTION ("unusual for you") for a resting value outside the band. It never loosens a CHARM common limit (a systolic 155 is ATTENTION even for someone who usually runs high) and never moves a CRITICAL limit. A limit set by hand in Settings › Alert thresholds switches the band off for that metric. Rebuild the block after refitting the model:
+```bash
+python3 tools/build_model_profiles.py "<folder that contains charm_model>"
+```
+Inspiration4 crew (Marcus, Mei, Robert, Amara) have blood counts only, so their vitals use the common limits.
+
+**Other alert rules changed on 15.11:** SpO₂ uses the NEWS2 bands (ATTENTION 94–95 %, CAUTION 92–93 %, CRITICAL ≤ 91 %). Body mass is followed as a trend: ATTENTION > 2 % lost in 14 days, CAUTION > 5 % in 30 days, CRITICAL > 10 % in 30 days.
+
 ## Alert levels
 NORMAL (green) · ATTENTION (yellow, one screening limit) · CAUTION (orange, medical criterion or multi-signal condition) · CRITICAL (red, urgent). The six condition alerts and their numbers come from the medic team's `data/reference/charm_alert_rules.csv`, and the logic is in `shared/engine.js` (`conditions`, `examLevel`). New exam forms are under **Add measurement**: ECG review, orthostatic BP test, urine/kidney check, neck-vein ultrasound, eye exam, symptom check, fluid intake.
 
@@ -79,10 +115,18 @@ cd public && python3 -m http.server 8000
 ## Server tests
 `node --test test/core.test.js`
 
+## Who sees what
+- **Astronauts** pick their name in **Who are you?** (no password). They see their own data, and only the status (colour + word) of the rest of the crew: values, charts, history and Charmy's answers about other people are hidden.
+- **Doctor:** pick **Doctor** and sign in with user name `doctor` and the team password. The doctor (flight surgeon) sees every file and is the only one who can change alert thresholds. The sign-in lasts until the browser is closed.
+- **Emergency:** when a crew member is CRITICAL, their file opens for the crew, and every opening is logged.
+- There is no shared display (removed 15.11): everyone signs in as themselves or as the doctor.
+- **Private file message:** opening someone else's file shows a message; **I am … / the doctor · sign in** lets the right person sign in and goes straight on to the file.
+- The red **EMERGENCY** button in the top bar appears only while a crew member is CRITICAL or an emergency is open.
+
 ## Security note (read before real astronaut data)
-There is **no sign-in** (team decision for the demo).
+The lock above is in the app's screens only (team decision for the demo). It is **not** a security boundary.
 - Firestore rules let anyone with the link **read** the data. Nobody can write directly; all writes go through the `api` function.
-- The "Who is using this device" choice only labels entries. It is not a login.
+- The doctor password is checked in the browser against a SHA-256 hash in `public/index.html`. Anyone with developer tools can get past it. Change the password before sharing the link widely (new hash: `node -e "console.log(require('crypto').createHash('sha256').update('CHARM-doctor|doctor|NEW_PASSWORD').digest('hex'))"`).
 - Before real medical data: add Firebase Authentication, limit reads to the crew and flight surgeons, and check the callable's `req.auth`.
 
 ## Not included yet

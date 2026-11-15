@@ -22,7 +22,10 @@
   P.getOverride = async function (pid) { return this.overrides[pid] ? JSON.parse(JSON.stringify(this.overrides[pid])) : null; };
   P.setOverride = async function (pid, o) { this.overrides[pid] = JSON.parse(JSON.stringify(o)); this.changed('overrides'); };
   P.readings = async function (pid, from, to) { return this.readingsL.filter(function (r) { return r.pid === pid && r.t >= from && r.t <= to; }); };
-  P.addReadings = async function (arr) { var me = this; arr.forEach(function (r) { me.readingsL.push(Object.assign({ id: me.id('r') }, r)); }); this.changed('readings'); };
+  P.addReadings = async function (arr) { var me = this; arr.forEach(function (r) { var x = Object.assign({}, r), id = x._id; delete x._id; if (id) { if (me.readingsL.some(function (y) { return y.id === id; })) return; x.id = id; } else x.id = me.id('r'); me.readingsL.push(x); }); this.changed('readings'); };
+  P.readingsK = async function (pid, ks, from, to) { return this.readingsL.filter(function (r) { return r.pid === pid && ks.indexOf(r.k) >= 0 && r.t >= from && r.t <= to; }); };
+  P.getDemo = async function () { return this.demo ? JSON.parse(JSON.stringify(this.demo)) : null; };
+  P.setDemo = async function (o) { this.demo = JSON.parse(JSON.stringify(o)); };
   P.env = async function (from, to) { return this.envL.filter(function (r) { return r.t >= from && r.t <= to; }); };
   P.addEnv = async function (arr) { var me = this; arr.forEach(function (r) { me.envL.push(Object.assign({ id: me.id('e') }, r)); }); this.changed('env'); };
   P.getStatus = async function (pid) { return this.status[pid] ? Object.assign({}, this.status[pid]) : null; };
@@ -43,6 +46,10 @@
     delete this.status[pid]; delete this.overrides[pid]; this.changed('purge'); return n;
   };
   P.deleteCrew = async function (id) { delete this.crew[id]; this.changed('crew'); };
+  P.listPush = async function () { var p = this.push || {}; return Object.keys(p).map(function (k) { return Object.assign({ id: k }, p[k]); }); };
+  P.setPush = async function (id, o) { (this.push || (this.push = {}))[id] = Object.assign({}, o); };
+  P.delPush = async function (id) { if (this.push) delete this.push[id]; };
+  P.sendPush = async function (tokens, data) { (this.sent || (this.sent = [])).push({ tokens: tokens.slice(), data: data }); return { invalid: tokens.filter(function (t) { return /^dead/.test(t); }) }; };
   P.addInbox = async function (arr) { var me = this; arr.forEach(function (o) { me.inbox.push(Object.assign({ id: me.id('i') }, o)); }); this.changed('inbox'); };
   return MemDB;
 });

@@ -135,17 +135,26 @@
       var buf = c.createBuffer(1, r.pcm.length, r.sr); buf.copyToChannel ? buf.copyToChannel(r.pcm, 0) : buf.getChannelData(0).set(r.pcm);
       var src = c.createBufferSource(); src.buffer = buf; src.connect(gainNode);
       gainNode.gain.value = muted ? 0 : 1;
-      job.src = src; src.onended = function () { res(true); };
+      if (c.state === 'suspended') try { c.resume(); } catch (e) { }
+      var done = false, fin = function () { if (!done) { done = true; res(true); } };
+      job.src = src; src.onended = fin; setTimeout(fin, Math.ceil(buf.duration * 1000) + 1500);   // never hang if the audio clock stops
       src.start();
     });
   }
+  function ascii(t) { return String(t).normalize('NFKD').replace(/[^\x20-\x7E]/g, ' ').replace(/\s{2,}/g, ' ').trim(); }
+  function waitReady(ms) { return new Promise(function (res) { var t0 = Date.now(); (function poll() { if (st[cur] === 'ready' || st[cur] === 'failed' || Date.now() - t0 > ms) return res(); setTimeout(poll, 200); })(); }); }
   async function run(job) {
+    // An alert can come while Charmy's voice is still loading: wait for it (up to 15 s) instead of speaking with another voice.
+    if (!isNeuralVoiceReady() && st[cur] !== 'failed') { if (st[cur] === 'idle') load(cur); await waitReady(15000); if (job.dead) return; }
     var neural = isNeuralVoiceReady() && worker;
-    if (!neural) { if (st[cur] === 'idle') load(cur); await webSpeech(job); return; }
+    if (!neural) { await webSpeech(job); return; }
     var parts = sentences(job.text), next = synth(parts[0], job.rate), first = true;
     for (var i = 0; i < parts.length; i++) {
       var r;
-      try { r = await next; } catch (e) { console.warn('Charmy voice synthesis failed, using the browser voice:', e.message); if (!job.dead) await webSpeech({ text: parts.slice(i).join(' '), rate: job.rate, onStart: first ? job.onStart : null }); return; }
+      try { r = await next; }
+      catch (e) {   // retry the sentence without unusual characters; if Charmy still cannot say it, skip it (no change of voice)
+        try { r = await synth(ascii(parts[i]) || '.', job.rate); } catch (e2) { console.warn('Charmy voice could not say a sentence, skipped:', e2.message); if (i + 1 < parts.length) next = synth(parts[i + 1], job.rate); continue; }
+      }
       if (job.dead) return;
       if (i + 1 < parts.length) next = synth(parts[i + 1], job.rate);
       var dur = r.pcm.length / r.sr; if (dur > .3) cpsAvg = cpsAvg * .6 + .4 * (parts[i].length / dur);

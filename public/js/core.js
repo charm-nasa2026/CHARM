@@ -45,7 +45,33 @@
     var saved = await db.addEvents(events);
     var ob = saved.filter(function (e) { return !e.replayed; }).map(outboxFor).filter(Boolean); // replayed history is not re-sent to Earth
     if (ob.length) await db.addOutbox(ob);
+    await notify(db, saved);
     return saved;
+  }
+
+  /*
+   * Phone alerts. CAUTION (orange) goes to the phone of the astronaut it is about (cabin alerts: every phone);
+   * CRITICAL (red) and Emergency Mode go to every registered phone. Replayed history never sends.
+   * A failure here never blocks the alert itself.
+   */
+  function pushId(token) { var h = 5381; for (var i = 0; i < token.length; i++) h = ((h * 33) ^ token.charCodeAt(i)) >>> 0; return 'p' + h.toString(36) + token.length.toString(36) + token.slice(-12).replace(/[^A-Za-z0-9_-]/g, ''); }
+  async function notify(db, saved) {
+    if (!db.listPush || !db.sendPush) return;
+    try {
+      var evs = saved.filter(function (e) { return !e.replayed && ((e.type === 'raise' && e.lv >= E.CAU) || e.type === 'emergency'); });
+      if (!evs.length) return;
+      var devs = await db.listPush(); if (!devs.length) return;
+      var crew = await db.listCrew(), names = {}; crew.forEach(function (c) { names[c.id] = c.name; });
+      for (var i = 0; i < evs.length; i++) {
+        var ev = evs[i], lv = ev.type === 'emergency' ? E.CRI : ev.lv;
+        var to = devs.filter(function (d) { return lv >= E.CRI || !ev.pid || d.pid === ev.pid; });
+        if (!to.length) continue;
+        var data = { l: String(lv >= E.CRI ? 3 : 2), pid: ev.pid || '', name: (ev.pid && names[ev.pid]) || '', k: ev.k || '', text: str(ev.text, 200), sub: str(ev.sub || '', 200), t: String(ev.t), id: ev.id || '', sim: ev.sim ? '1' : '' };
+        var res = await db.sendPush(to.map(function (d) { return d.token; }), data);
+        var bad = (res && res.invalid) || [];
+        for (var j = 0; j < bad.length; j++) await db.delPush(pushId(bad[j]));
+      }
+    } catch (e) { if (typeof console !== 'undefined') console.warn('phone alert not sent:', e && e.message); }
   }
 
   async function bootstrap(db, now) {
@@ -66,11 +92,15 @@
   }
 
   async function crewDoc(db, pid) { var l = await db.listCrew(); for (var i = 0; i < l.length; i++) if (l[i].id === pid) return l[i]; return null; }
-  async function thresholdsFor(db, pid) { var c = await crewDoc(db, pid); return E.profile(await db.getOverride(pid), c && c.baseline); }
+  async function thresholdsFor(db, pid) { var c = await crewDoc(db, pid), m = await db.getMission(); return E.profile(await db.getOverride(pid), c && c.baseline, pid, m && m.launch); }
 
   /* Re-evaluate one person. mode 'reading' raises only; 'tick' also clears (hysteresis). */
   async function evaluate(db, pid, now, mode) {
     var rs = await db.readings(pid, now - 4 * D, now);
+    if (db.readingsK) { // longer history for the trend rules; if the index is still building, carry on with 4 days
+      try { var have = {}; rs.forEach(function (r) { have[r.id] = 1; }); (await db.readingsK(pid, TREND_KEYS, now - 120 * D, now - 4 * D)).forEach(function (r) { if (!have[r.id]) rs.push(r); }); }
+      catch (e) { if (typeof console !== 'undefined') console.warn('trend history not loaded:', e && e.message); }
+    }
     var series = E.sortSeries(rs), th = await thresholdsFor(db, pid);
     var prev = await db.getStatus(pid);
     var res = E.transitions(pid, series, th, now, prev, mode);
@@ -92,6 +122,7 @@
    * updates cabin alerts and moves the Earth outbox. earth = { external: bool } when a real ground station is configured.
    */
   async function tick(db, now, earth) {
+    try { await pumpDemo(db, now); } catch (e) { if (typeof console !== 'undefined') console.warn('demo pump:', e && e.message); }
     var crew = await db.listCrew();
     for (var i = 0; i < crew.length; i++) await evaluate(db, crew[i].id, now, 'tick');
     await evaluateEnv(db, now);
@@ -169,12 +200,14 @@
     var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
     function g() { return (rnd() + rnd() + rnd() - 1.5) * 1.15; }
     var t0 = now - 3 * H, today6 = dayStartUTC(now) + 6 * H; if (today6 > now) today6 -= D;
+    // the red-alert story is Sarah's; if Sarah was removed from the crew it moves to the first crew member who is still there
+    var red = ['sarah', 'maya', 'david', 'amara', 'robert', 'mei', 'john'].filter(function (p) { return have[p]; })[0];
     Object.keys(DEMO_BASE).forEach(function (pid) {
       if (!have[pid]) return;
       var b = DEMO_BASE[pid], stop = pid === 'elena' ? now - 40 * MIN : now + 1;
       for (var t = t0; t <= now && t < stop; t += 5 * MIN) {
         var hr = b.hr + g() * 1.6, sp = b.spo2 + g() * 0.25, rr = b.rr + g() * 0.4, irr = false;
-        if (pid === 'sarah' && t > now - 25 * MIN) { var u = Math.min(1, (t - (now - 25 * MIN)) / (13 * MIN)); hr = b.hr + 3 + (122 - b.hr) * u + g(); if (t >= now - 12 * MIN) { hr = 141 + g() * 6; irr = true; sp = 93.7 + g() * 0.3; rr = 22.6 + g() * 0.6; } }
+        if (pid === red && t > now - 25 * MIN) { var u = Math.min(1, (t - (now - 25 * MIN)) / (13 * MIN)); hr = b.hr + 3 + (122 - b.hr) * u + g(); if (t >= now - 12 * MIN) { hr = 141 + g() * 6; irr = true; sp = 93.7 + g() * 0.3; rr = 22.6 + g() * 0.6; } }
         out.push({ pid: pid, k: 'hr', t: t, v: Math.round(hr), irr: irr || undefined });
         out.push({ pid: pid, k: 'spo2', t: t, v: Math.round(Math.min(100, sp) * 10) / 10 });
         out.push({ pid: pid, k: 'rr', t: t, v: Math.round(rr * 10) / 10 });
@@ -202,6 +235,106 @@
     for (var i = 0; i < ks.length; i++) if (have[ks[i]]) await evaluate(db, ks[i], meta.now, 'reading');
     await evaluateEnv(db, meta.now);
     return { saved: rows.length, env: env.length };
+  }
+
+  /*
+   * ===== DEMO TOOLS (Settings › Demo tools). Not part of the real CHARM app: for the video and the judges only. =====
+   * Everything written here is tagged: readings src 'demo' (live file stream) or 'demoalert' (generated alert), sim: true,
+   * and every event says DEMO. State lives in system/demo (not readable by the app); mission.demoLive / mission.demoAlerts
+   * tell the app what is running. pumpDemo() runs on every tick (5 min) and whenever an open app calls 'demoPump' (20 s).
+   * Readings get fixed ids, so two pumps at the same time never store a row twice.
+   */
+  var DEMO_ALERT_MIN = 5;
+  var TREND_KEYS = ['wt', 'blood', 'vision', 'fluid']; // rules that look back weeks (body mass, hemoglobin, vision self test)
+  async function demoState(db) { return (db.getDemo && (await db.getDemo())) || { alerts: [] }; }
+  async function demoMission(db, patch) { var m = (await db.getMission()) || {}; Object.keys(patch).forEach(function (k) { m[k] = patch[k]; }); await db.setMission(m); }
+  function demoRow(r, pid, t, src, id, by, now) {
+    var o = { pid: pid, k: r.k, t: t, src: src, sim: true, by: by || 'Demo tools', created: now, sc: E.SCALE, _id: id };
+    if (r.x) o.x = r.x; else { o.v = r.v; if (r.v2 != null) o.v2 = r.v2; }
+    if (r.irr) o.irr = true; if (r.ctx) o.ctx = r.ctx;
+    return o;
+  }
+  async function demoLiveStart(db, d, meta) {
+    var pid = str(d.pid, 40), c = await crewDoc(db, pid); if (!c) throw err('not-found', 'Unknown astronaut');
+    var rows = (Array.isArray(d.rows) ? d.rows : []).slice(0, 6000).filter(function (r) { return r && typeof r.o === 'number' && r.o >= 0 && (r.note || E.RKEYS.indexOf(r.k) >= 0); })
+      .map(function (r) { var o = { o: Math.round(r.o) }; if (r.note) { o.note = str(r.note, 240); return o; } o.k = r.k; if (r.x) o.x = r.x; else { o.v = r.v; if (r.v2 != null) o.v2 = r.v2; } if (r.irr) o.irr = true; if (r.ctx) o.ctx = r.ctx; return o; })
+      .sort(function (a, b) { return a.o - b.o; });
+    if (!rows.length) throw err('invalid-argument', 'The file has no usable rows');
+    var speed = [1, 2, 5, 10].indexOf(d.speed) >= 0 ? d.speed : 1, startAt = Math.max(0, Math.min(rows[rows.length - 1].o, Math.round(d.startAt || 0)));
+    var now = meta.now, id = 'L' + now.toString(36), span = rows[rows.length - 1].o + 5 * MIN, name = str(d.name, 80) || 'Demo file';
+    // history before the start point goes in at once (in the past), the rest streams in as time passes
+    var back = [], notes = [], next = 0;
+    for (var i = 0; i < rows.length && rows[i].o < startAt; i++) {
+      var tt = now - Math.round((startAt - rows[i].o) / speed);
+      if (rows[i].note) notes.push({ id: 'dn' + id + '-0-' + i, t: tt, pid: pid, type: 'crew', text: rows[i].note, sub: 'DEMO · live demo file · ' + name, src: 'crew', sim: true, replayed: true });
+      else back.push(demoRow(rows[i], pid, tt, 'demo', 'dl' + id + '-0-' + i, meta.by, now));
+      next = i + 1;
+    }
+    var ok = back.filter(function (r) { return !E.validateReading(r, now); });
+    if (ok.length) await db.addReadings(ok);
+    if (notes.length) await db.addEvents(notes);
+    var st = await demoState(db);
+    st.live = { id: id, pid: pid, name: name, rows: rows, startAt: startAt, t0: now, speed: speed, loop: d.loop !== false, span: span, next: next, cycle: 0, by: meta.by || null };
+    await db.setDemo(st);
+    await demoMission(db, { demoLive: { id: id, pid: pid, name: name, speed: speed, started: now, loop: d.loop !== false, by: meta.by || null } });
+    await emit(db, [{ t: now, pid: pid, type: 'crew', text: 'DEMO · live demo file started: ' + name, sub: 'Not real data · ' + c.name + ' · ' + speed + '× speed' + (d.loop !== false ? ' · repeats at the end' : '') + ' · started by ' + (meta.by || 'crew'), src: 'crew', sim: true, prio: 0 }]);
+    await evaluate(db, pid, now, 'reading');
+    return { ok: true, backfilled: ok.length, rows: rows.length };
+  }
+  async function demoLiveStop(db, meta) {
+    var st = await demoState(db), lv = st.live; st.live = null; await db.setDemo(st);
+    await demoMission(db, { demoLive: null });
+    if (lv) await emit(db, [{ t: meta.now, pid: lv.pid, type: 'crew', text: 'DEMO · live demo file stopped: ' + lv.name, sub: 'Stopped by ' + (meta.by || 'crew'), src: 'crew', sim: true, prio: 0 }]);
+    return { ok: true };
+  }
+  async function demoAlert(db, d, meta) {
+    var pid = str(d.pid, 40), c = await crewDoc(db, pid); if (!c) throw err('not-found', 'Unknown astronaut');
+    var k = str(d.k, 20), level = d.level, now = meta.now, th = await thresholdsFor(db, pid);
+    var g = E.demoReading(k, level, th, now); if (!g) throw err('invalid-argument', 'This level is not possible for this measurement');
+    var id = 'A' + now.toString(36) + Math.random().toString(36).slice(2, 5), until = now + DEMO_ALERT_MIN * MIN;
+    var rows = g.abn.map(function (r, i) { return demoRow(r, pid, now - (r.back || 0), 'demoalert', 'da' + id + '-a' + i, meta.by, now); });
+    await db.addReadings(rows);
+    var st = await demoState(db); st.alerts = (st.alerts || []).filter(function (a) { return a.due > now - H; });
+    st.alerts.push({ id: id, pid: pid, k: k, level: level, due: until, norm: g.norm, by: meta.by || null }); await db.setDemo(st);
+    var m = (await db.getMission()) || {}, list = (m.demoAlerts || []).filter(function (a) { return a.until > now; });
+    list.push({ id: id, pid: pid, k: k, l: level, until: until, text: g.text }); m.demoAlerts = list; await db.setMission(m);
+    await emit(db, [{ t: now, pid: pid, k: k, type: 'crew', text: 'DEMO ALERT generated · ' + E.MDEF[k].label + ' ' + E.WORD[String(level)], sub: 'Not a real reading · ' + c.name + ' · demo value ' + g.text + ' · back to normal in ' + DEMO_ALERT_MIN + ' min · by ' + (meta.by || 'crew'), src: 'crew', sim: true, prio: 0 }]);
+    await evaluate(db, pid, now, 'reading');
+    return { ok: true, id: id, until: until, text: g.text };
+  }
+  async function pumpDemo(db, now) {
+    if (!db.getDemo) return { rows: 0 };
+    var st = await demoState(db), lv = st.live, wrote = 0, ended = [], changed = false;
+    if (lv && lv.rows && lv.rows.length) {
+      var fileNow = lv.startAt + (now - lv.t0) * lv.speed, out = [], notes = [];
+      while (out.length + notes.length < 800) {
+        if (lv.next >= lv.rows.length) { if (!lv.loop) break; lv.next = 0; lv.cycle++; }
+        var r = lv.rows[lv.next], ft = r.o + lv.cycle * lv.span; if (ft > fileNow) break;
+        var t = Math.min(now, lv.t0 + Math.round((ft - lv.startAt) / lv.speed)), key = lv.id + '-' + lv.cycle + '-' + lv.next;
+        if (r.note) notes.push({ id: 'dn' + key, t: t, pid: lv.pid, type: 'crew', text: r.note, sub: 'DEMO · live demo file · ' + lv.name, src: 'crew', sim: true });
+        else { var row = demoRow(r, lv.pid, t, 'demo', 'dl' + key, lv.by, now); if (!E.validateReading(row, now)) out.push(row); }
+        lv.next++; changed = true;
+      }
+      if (out.length) await db.addReadings(out);
+      if (notes.length) await emit(db, notes);
+      wrote += out.length;
+      if (out.length || notes.length) await evaluate(db, lv.pid, now, 'reading');
+    }
+    var due = (st.alerts || []).filter(function (a) { return a.due <= now; });
+    for (var i = 0; i < due.length; i++) {
+      var a = due[i];
+      await db.addReadings(a.norm.map(function (r, j) { return demoRow(r, a.pid, a.due, 'demoalert', 'da' + a.id + '-n' + j, a.by, now); }));
+      // a demo alert goes back to normal at once (real alerts need 3 checks in range): three checks in a row clear it
+      for (var q = 0; q < 3; q++) await evaluate(db, a.pid, now, 'tick');
+      await emit(db, [{ id: 'de' + a.id, t: Math.min(now, a.due), pid: a.pid, k: a.k, type: 'crew', text: 'DEMO ALERT ended · ' + E.MDEF[a.k].label + ' back to normal', sub: 'Demo values replaced by a normal value after ' + DEMO_ALERT_MIN + ' min', src: 'crew', sim: true, prio: 0 }]);
+      ended.push(a.id); changed = true;
+    }
+    if (changed) {
+      st.alerts = (st.alerts || []).filter(function (a) { return ended.indexOf(a.id) < 0; });
+      await db.setDemo(st);
+      if (ended.length) { var m = (await db.getMission()) || {}; m.demoAlerts = (m.demoAlerts || []).filter(function (x) { return ended.indexOf(x.id) < 0 && x.until > now - MIN; }); await db.setMission(m); }
+    }
+    return { rows: wrote, ended: ended.length };
   }
 
   /*
@@ -240,6 +373,11 @@
       case 'addEnv': {
         var items = (Array.isArray(d.items) ? d.items : []).slice(0, 2000), ok = [], bad = [];
         items.forEach(function (e, i) { var x = E.validateEnv(e, meta.now); if (x) bad.push({ i: i, reason: x }); else ok.push({ k: e.k, t: Math.round(e.t), v: e.v, src: SOURCES[d.src] ? d.src : 'manual', by: meta.by || null, created: meta.now }); });
+        if (d.src === 'import') { // the same file imported twice, or 4 crew files with the same dates, must not duplicate points
+          var keep = [];
+          for (var q = 0; q < ok.length; q++) { var ex = await db.env(ok[q].t, ok[q].t); if (!ex.some(function (x) { return x.k === ok[q].k; })) keep.push(ok[q]); }
+          ok = keep;
+        }
         if (ok.length) await db.addEnv(ok);
         await evaluateEnv(db, meta.now);
         return { saved: ok.length, rejected: bad };
@@ -278,7 +416,7 @@
         for (var i = 0; i < pids.length; i++) {
           var o = E.clone((await db.getOverride(pids[i])) || {});
           keys.forEach(function (key) { var a = key.split('.'); o[a[0]] = o[a[0]] || {}; o[a[0]][a[1]] = { v: ch[key], by: meta.by || 'Crew Medical Officer', when: meta.now, why: why }; });
-          var cd = await crewDoc(db, pids[i]), bad = E.checkProfile(E.profile(o, cd && cd.baseline)); if (bad.length) problems.push(pids[i] + ' (' + bad.join(', ') + ')');
+          var cd = await crewDoc(db, pids[i]), bad = E.checkProfile(E.profile(o, cd && cd.baseline, pids[i])); if (bad.length) problems.push(pids[i] + ' (' + bad.join(', ') + ')');
           next[pids[i]] = o;
         }
         if (problems.length) throw err('failed-precondition', 'Limits would be out of order for ' + problems.join('; '));
@@ -307,6 +445,10 @@
         return { ok: true };
       }
       case 'runDemo': return runDemo(db, meta);
+      case 'demoLiveStart': return demoLiveStart(db, d, meta);
+      case 'demoLiveStop': return demoLiveStop(db, meta);
+      case 'demoAlert': return demoAlert(db, d, meta);
+      case 'demoPump': return pumpDemo(db, meta.now);
       case 'setBaseline': {
         var bc = await crewDoc(db, d.pid); if (!bc) throw err('not-found', 'Unknown astronaut');
         var B = {}, lim = { hr: [25, 230], sbp: [60, 250], dbp: [30, 160], rr: [4, 60], temp: [33, 42.5] };
@@ -315,11 +457,25 @@
         B.set = meta.now; B.via = str(d.via, 120) || 'Set in CHARM'; B.by = meta.by || null;
         await db.setCrew(bc.id, Object.assign({}, bc, { baseline: B }));
         var offs = E.personalOffsets(B), parts = Object.keys(offs).map(function (m) { var o = offs[m]; return m.toUpperCase() + ' ' + o.mean.toFixed(m === 'temp' ? 1 : 0) + ' (' + (o.off > 0 ? '+' : '') + o.off + (o.capped ? ', capped' : '') + ')'; });
-        await emit(db, [{ t: meta.now, pid: bc.id, type: 'crew', text: 'Personal baseline set · caution limits adjusted', sub: (parts.join(' · ') || 'fewer than 5 baseline readings: common limits kept') + ' · ' + B.via, src: 'crew', by: meta.by || null }]);
+        await emit(db, [{ t: meta.now, pid: bc.id, type: 'crew', text: 'Personal baseline set · attention limits adjusted', sub: (parts.join(' · ') || 'fewer than 5 baseline readings: common limits kept') + ' · ' + B.via, src: 'crew', by: meta.by || null }]);
         await evaluate(db, bc.id, meta.now, 'reading');
         return { ok: true, offsets: offs };
       }
       case 'replay': return replay(db, d, meta);
+      case 'pushRegister': {
+        var tok = str(d.token, 4096); if (tok.length < 20) throw err('invalid-argument', 'Missing phone token');
+        var who = d.pid === 'shared' ? 'shared' : (await crewDoc(db, d.pid)) ? d.pid : null; if (!who) throw err('invalid-argument', 'Unknown astronaut');
+        await db.setPush(pushId(tok), { token: tok, pid: who, device: str(d.device, 80) || null, updated: meta.now });
+        return { ok: true, pid: who };
+      }
+      case 'pushUnregister': { var tk = str(d.token, 4096); if (tk) await db.delPush(pushId(tk)); return { ok: true }; }
+      case 'pushTest': {
+        var tt = str(d.token, 4096); if (tt.length < 20) throw err('invalid-argument', 'Missing phone token');
+        var lvT = d.l === 2 ? 2 : 3;
+        var r = await db.sendPush([tt], { l: String(lvT), pid: '', name: 'Test', k: '', text: 'Test alert from CHARM: this phone gets ' + (lvT === 3 ? 'CRITICAL' : 'CAUTION') + ' alerts', sub: 'Nothing is wrong. Sent by ' + (meta.by || 'crew'), t: String(meta.now), id: '', sim: '' });
+        if (r && r.invalid && r.invalid.length) { await db.delPush(pushId(tt)); throw err('failed-precondition', 'This phone is no longer registered. Turn alerts on again.'); }
+        return { ok: true };
+      }
       /*
        * Delete an astronaut's data (mode 'data': readings, alerts, logs, baseline, limits; the crew member stays)
        * or remove the astronaut from the system (mode 'all'). Irreversible, so the exact name must be typed.
@@ -344,5 +500,5 @@
     }
   }
 
-  return { api: api, tick: tick, evaluate: evaluate, evaluateEnv: evaluateEnv, bootstrap: bootstrap, SEED_CREW: SEED_CREW, outboxFor: outboxFor };
+  return { pushId: pushId, api: api, tick: tick, pumpDemo: pumpDemo, evaluate: evaluate, evaluateEnv: evaluateEnv, bootstrap: bootstrap, SEED_CREW: SEED_CREW, outboxFor: outboxFor };
 });

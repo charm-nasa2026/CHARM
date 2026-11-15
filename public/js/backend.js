@@ -25,9 +25,15 @@
     var cfg = window.CHARM_FIREBASE_CONFIG;
     if (!cfg) { var r = await fetch('/__/firebase/init.json'); if (!r.ok) throw new Error('No Firebase config. Deploy to Firebase Hosting, or set window.CHARM_FIREBASE_CONFIG in js/config.js.'); cfg = await r.json(); }
     state.project = cfg.projectId;
-    var app = FB.initializeApp(cfg), db;
-    try { db = FB.initializeFirestore(app, { localCache: FB.persistentLocalCache({ tabManager: FB.persistentMultipleTabManager() }) }); }
-    catch (e) { db = FB.initializeFirestore(app, { localCache: FB.memoryLocalCache() }); }
+    var app = FB.initializeApp(cfg), db; window.__charmFbApp = app;
+    // Offline copy in IndexedDB (multi-tab). If another tab or a stale lock holds the IndexedDB lease, Firestore can wait
+    // for minutes ("Failed to obtain primary lease"); the watchdog below then reloads once with an in-memory cache.
+    var memOnly = false; try { memOnly = sessionStorage.getItem('charm-memcache') === '1'; } catch (e) { }
+    var lp = { experimentalAutoDetectLongPolling: true };   // falls back to long polling on networks that block streaming
+    try { if (memOnly) throw new Error('memory cache for this session'); db = FB.initializeFirestore(app, Object.assign({ localCache: FB.persistentLocalCache({ tabManager: FB.persistentMultipleTabManager() }) }, lp)); }
+    catch (e) { db = FB.initializeFirestore(app, Object.assign({ localCache: FB.memoryLocalCache() }, lp)); }
+    var gotCrew = false;
+    setTimeout(function () { if (gotCrew || memOnly) return; try { sessionStorage.setItem('charm-memcache', '1'); } catch (e) { } console.warn('CHARM: no data after 20 s, reloading without the offline cache'); location.reload(); }, 20000);
     var fns = FB.getFunctions(app, 'us-central1');
     if (/[?&]emulator\b/.test(location.search)) { FB.connectFirestoreEmulator(db, location.hostname, 8080); FB.connectFunctionsEmulator(fns, location.hostname, 5001); }
     apiFn = FB.httpsCallable(fns, 'api', { timeout: 300000 });
@@ -35,11 +41,21 @@
     var list = function (snap) { return snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); }); };
     var fail = function (name) { return function (e) { state.error = name + ': ' + e.message; emit('status', state); console.error(name, e); }; };
     var C = function (n) { return FB.collection(db, n); };
-    FB.onSnapshot(C('crew'), function (s) { emit('crew', list(s)); }, fail('crew'));
+    FB.onSnapshot(C('crew'), function (s) { gotCrew = true; emit('crew', list(s)); }, fail('crew'));
     FB.onSnapshot(FB.doc(db, 'mission', 'main'), function (s) { emit('mission', s.exists() ? s.data() : null); }, fail('mission'));
     FB.onSnapshot(C('overrides'), function (s) { var o = {}; s.docs.forEach(function (d) { o[d.id] = d.data(); }); emit('overrides', o); }, fail('overrides'));
-    FB.onSnapshot(FB.query(C('readings'), FB.where('t', '>=', since)), function (s) { emit('readings', list(s)); }, fail('readings'));
-    FB.onSnapshot(FB.query(C('env'), FB.where('t', '>=', since)), function (s) { emit('env', list(s)); }, fail('env'));
+    // Everything from the last 8 days, plus older daily records (imported clinical files, mission-day data) from the last 100 days,
+    // plus imported space-weather points from the last 400 days. Wearable streams older than 8 days stay on the server only.
+    var merged = function (name) {
+      var parts = {}, push = function () { var seen = {}, out = []; Object.keys(parts).forEach(function (k) { parts[k].forEach(function (r) { if (!seen[r.id]) { seen[r.id] = 1; out.push(r); } }); }); emit(name, out); };
+      return function (key) { return function (s) { parts[key] = list(s); push(); }; };
+    };
+    var quiet = function (name) { return function (e) { console.warn(name + ' (older history) not loaded yet:', e.message); }; };
+    var rd = merged('readings'), ev = merged('env');
+    FB.onSnapshot(FB.query(C('readings'), FB.where('t', '>=', since)), rd('recent'), fail('readings'));
+    FB.onSnapshot(FB.query(C('readings'), FB.where('src', '==', 'record'), FB.where('t', '>=', Date.now() - 100 * D), FB.where('t', '<', since)), rd('older'), quiet('readings'));
+    FB.onSnapshot(FB.query(C('env'), FB.where('t', '>=', since)), ev('recent'), fail('env'));
+    FB.onSnapshot(FB.query(C('env'), FB.where('src', '==', 'import'), FB.where('t', '>=', Date.now() - 400 * D), FB.where('t', '<', since)), ev('older'), quiet('env'));
     FB.onSnapshot(FB.query(C('events'), FB.where('t', '>=', Date.now() - 30 * D), FB.orderBy('t', 'desc'), FB.limit(1500)), function (s) { emit('events', list(s)); }, fail('events'));
     FB.onSnapshot(FB.query(C('outbox'), FB.orderBy('t', 'desc'), FB.limit(300)), function (s) { emit('outbox', list(s)); }, fail('outbox'));
     FB.onSnapshot(FB.query(C('inbox'), FB.orderBy('t', 'desc'), FB.limit(100)), function (s) { emit('inbox', list(s)); }, fail('inbox'));

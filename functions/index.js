@@ -12,6 +12,7 @@ const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { setGlobalOptions, logger } = require('firebase-functions');
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
+const { getMessaging } = require('firebase-admin/messaging');
 const E = require('./engine.js');
 const C = require('./core.js');
 
@@ -40,7 +41,13 @@ const db = {
   getOverride: async (pid) => { const s = await col('overrides').doc(pid).get(); return s.exists ? s.data() : null; },
   setOverride: (pid, o) => col('overrides').doc(pid).set(clean(o)),
   readings: async (pid, from, to) => data(await col('readings').where('pid', '==', pid).where('t', '>=', from).where('t', '<=', to).get()),
-  addReadings: (arr) => commitAll(arr.map((r) => (b) => b.set(col('readings').doc(), clean(r)))),
+  // weeks of history for the trend rules, only for a few metrics (needs the pid + k + t index)
+  readingsK: async (pid, ks, from, to) => data(await col('readings').where('pid', '==', pid).where('k', 'in', ks).where('t', '>=', from).where('t', '<=', to).get()),
+  // a reading with _id (demo tools) gets that document id, so writing it twice stores it once
+  addReadings: (arr) => commitAll(arr.map((r) => (b) => { const x = Object.assign({}, r), id = x._id; delete x._id; b.set(id ? col('readings').doc(id) : col('readings').doc(), clean(x)); })),
+  // demo tools state (system collection: not readable by the app)
+  getDemo: async () => { const s = await col('system').doc('demo').get(); return s.exists ? s.data() : null; },
+  setDemo: (o) => col('system').doc('demo').set(clean(o)),
   env: async (from, to) => data(await col('env').where('t', '>=', from).where('t', '<=', to).get()),
   addEnv: (arr) => commitAll(arr.map((r) => (b) => b.set(col('env').doc(), clean(r)))),
   getStatus: async (pid) => { const s = await col('status').doc(pid).get(); return s.exists ? s.data() : null; },
@@ -71,6 +78,19 @@ const db = {
     return n;
   },
   deleteCrew: (id) => col('crew').doc(id).delete(),
+  // phone alerts (collection 'push' is not readable by the app: see firestore.rules)
+  listPush: async () => data(await col('push').get()),
+  setPush: (id, o) => col('push').doc(id).set(clean(o)),
+  delPush: (id) => col('push').doc(id).delete(),
+  sendPush: async (tokens, payload) => {
+    const invalid = [];
+    for (let i = 0; i < tokens.length; i += 500) {
+      const part = tokens.slice(i, i + 500);
+      const res = await getMessaging().sendEachForMulticast({ tokens: part, data: payload, webpush: { headers: { Urgency: 'high', TTL: '3600' } } });
+      res.responses.forEach((r, j) => { if (!r.success && r.error && /registration-token-not-registered|invalid-registration-token|invalid-argument/.test(r.error.code)) invalid.push(part[j]); });
+    }
+    return { invalid };
+  },
   addInbox: (arr) => commitAll(arr.map((o) => (b) => b.set(col('inbox').doc(), clean(o))))
 };
 
