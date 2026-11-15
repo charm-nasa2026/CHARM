@@ -2140,7 +2140,7 @@ setInterval(function(){if(S.route.v==='prefs'&&S.prefTab==='dtools'&&demoAlerts(
    Simulated demonstration – not a flight-certified medical protocol. */
 function scnList(){return window.CHARM_SCENARIOS||[];}
 function scnGet(id){var l=scnList();for(var i=0;i<l.length;i++)if(l[i].id===id)return l[i];return l[0]||null;}
-function scnCur(){return scnGet(S.scnSid||(SR.sid)||'pulm');}
+function scnCur(){return scnGet(S.scnSid||(SR.sid)||(scnList()[0]||{}).id);}
 function scnColor(code){return code==='CRITICAL'?'var(--crit)':code==='CAUTION'||code==='ALERT'?'var(--warn)':code==='ATTENTION'?'var(--att)':'var(--ok)';}
 function scnHas(st,m){return m.some(function(x){return x[0]==='bp'?st.v.sbp!=null:st.v[x[0]]!=null;});}
 function scnLast(sc,i){for(var j=i;j>=1;j--)if(scnHas(sc.stages[j-1],sc.m))return sc.stages[j-1];return null;}
@@ -2225,8 +2225,8 @@ function vScenario(){
   if(srRunning()&&SR.sid===sc.id&&SR.n)S.scn=SR.n;
   var N=sc.stages.length,i=Math.min(S.scn||0,N);
   h+='<div class="ph"><div><h1>'+esc(sc.title)+'</h1><p>'+esc(sc.sub)+' · '+N+' stages</p></div></div>';
-  h+='<div class="tabs" style="margin-bottom:12px;flex-wrap:wrap">'+L.map(function(x){return '<button data-act="scnsid" data-v="'+x.id+'" aria-pressed="'+(x.id===sc.id)+'">'+esc({pulm:'Pulmonary infection',bleed:'Severe bleeding',arr:'Cardiac arrhythmia',dehy:'Dehydration',sans:'SANS (vision)',bone:'Bone health'}[x.id]||x.title)+(SR.sid===x.id?' · LIVE':'')+'</button>';}).join('')+'</div>';
-  h+='<div class="envbanner" role="note" style="border-color:rgba(167,139,250,.7);background:rgba(167,139,250,.12);margin-top:0"><span class="demotag">DEMO</span><span><b>Simulated scenario: the values are constructed, the alerts and guidance are CHARM\'s own.</b> CHARM supports the crew\'s decisions and does not choose or dose medication. '+esc(sc.time)+' Source: '+(sc.id==='bleed'?'ATLS hemorrhage classes and Stop the Bleed, American College of Surgeons (':'the medic team\'s scenario (')+esc(sc.file)+').</span></div>';
+  h+='<div class="tabs" style="margin-bottom:12px;flex-wrap:wrap">'+L.map(function(x){return '<button data-act="scnsid" data-v="'+x.id+'" aria-pressed="'+(x.id===sc.id)+'">'+esc({pulm:'Pulmonary infection',bleed:'Severe bleeding',arr:'Cardiac arrhythmia',dehy:'Dehydration',sans:'SANS (vision)',bone:'Bone health'}[x.id]||x.title)+'</button>';}).join('')+'</div>';
+  h+='<div class="envbanner" role="note" style="border-color:rgba(167,139,250,.7);background:rgba(167,139,250,.12);margin-top:0"><span class="demotag">DEMO</span><span>'+(sc.id==='arr'?'<b style="display:block;letter-spacing:.5px">SIMULATED DEMONSTRATION – NOT A FLIGHT-CERTIFIED MEDICAL PROTOCOL</b>':'')+'<b>Simulated scenario: the values are constructed, the alerts and guidance are CHARM\'s own.</b> CHARM supports the crew\'s decisions and does not choose or dose medication. '+esc(sc.time)+' Source: '+(sc.id==='bleed'?'ATLS hemorrhage classes and Stop the Bleed, American College of Surgeons (':'the medic team\'s scenario (')+esc(sc.file)+').</span></div>';
   h+=srCard(sc);
   if(!i){h+='<div class="card pad"><h2 style="margin-top:0">Step through the scenario</h2><p class="muted">Read each stage without writing any data: what happens, CHARM\'s assessment, the checks, tests, actions, equipment and treatment guidance from the medic team. Or press <b>Start live</b> above to play it into the app.</p><div class="acts"><button class="btn" data-act="scnset" data-v="1">Read stage 1</button></div></div>';return h+scnNotes(sc);}
   var st=sc.stages[i-1],shown=scnHas(st,sc.m)?st:scnLast(sc,i),last=shown&&shown!==st,c=scnColor(st.code),live=SR.sid===sc.id;

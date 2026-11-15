@@ -315,7 +315,7 @@ test('alert scenario B: hemoglobin up while body mass falls is ATTENTION; down 1
 
 test('demo scenarios played live: the engine raises the medic team\'s levels by itself', async () => {
   global.window = {}; require('../public/js/scenarios.js'); const SC = global.window.CHARM_SCENARIOS;
-  assert.deepStrictEqual(SC.map(s => s.id), ['pulm', 'bleed', 'arr', 'dehy', 'sans', 'bone']);
+  assert.deepStrictEqual(SC.map(s => s.id), ['bleed', 'arr', 'pulm', 'dehy', 'sans', 'bone']);
   // stage n -> worst level CHARM must reach (team: NORMAL 0, ALERT >= 1, CRITICAL 3). Dehydration step 8 has no new RR,
   // so the last RR 24 still counts and qSOFA keeps it CRITICAL until step 9 brings a full set (conservative on purpose).
   const want = { pulm: [0, 1, 2, 3, 3, 3, 2, 0], dehy: [1, 1, 1, 2, 3, 3, 3, 3, 1, 0], sans: [null, null, 1, 2, 3, 3, 3, 2, 2, 2, 2], bone: [0, 0, 1, 1, 1, 1, 1], bleed: [0, 3, 3, 2, 2, 1, 1, 0], arr: [0, 1, 2, 2, 3, 3, 2, 0] };
