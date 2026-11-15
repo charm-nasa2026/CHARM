@@ -1934,13 +1934,14 @@ var EMI={
  eye:function(){return '<path d="M60 160 q160 -120 320 0 q-160 120 -320 0z" fill="#EAF1FB"/><circle cx="220" cy="160" r="52" fill="#2D6CB8"/><circle cx="220" cy="160" r="22" fill="#0B1220"/><circle cx="236" cy="146" r="8" fill="#FFFFFF"/>'+emiTxt(220,290,'eye check · vision test');},
  kit:function(){return '<rect x="100" y="100" width="240" height="160" rx="22" fill="#B3141B"/><rect x="180" y="74" width="80" height="34" rx="10" fill="none" stroke="#B3141B" stroke-width="10"/><rect x="204" y="140" width="32" height="88" fill="#FFFFFF"/><rect x="176" y="168" width="88" height="32" fill="#FFFFFF"/>'+emiTxt(220,300,'bring it to the patient');},
  protocol:function(){return '<rect x="130" y="40" width="180" height="240" rx="14" fill="#EAF1FB"/><rect x="190" y="28" width="60" height="26" rx="8" fill="#36466A"/>'+[0,1,2,3].map(function(i){return '<path d="M154 '+(100+i*40)+' l8 8 14-16" fill="none" stroke="#1F8F5F" stroke-width="4"/><rect x="186" y="'+(96+i*40)+'" width="100" height="10" rx="5" fill="#9DB0CB"/>';}).join('')+emiTxt(220,312,'approved protocol only');},
+ ecg:function(){var pts=[],x=40;[22,40,16,34,26,44,18,30,38,24].forEach(function(g){pts.push(x+',150',(x+6)+',150',(x+10)+',96',(x+14)+',196',(x+18)+',150');x+=g;});return '<rect x="20" y="50" width="400" height="200" rx="16" fill="'+EMI_PN+'" stroke="'+EMI_CY+'" stroke-width="3"/><polyline points="'+pts.join(' ')+' 400,150" fill="none" stroke="'+EMI_GN+'" stroke-width="3"/>'+emiTxt(220,84,'rhythm strip','#8FDcff',18)+emiTxt(220,296,'record it, the CMO reads it');},
  reassess:function(){return '<path d="M140 160 a80 80 0 1 1 30 62" fill="none" stroke="'+EMI_CY+'" stroke-width="8" marker-end="url(#ar2)"/><path d="M200 150 q20 -30 40 0 q20 -30 40 0 q0 30 -40 56 q-40 -26 -40 -56z" fill="'+EMI_RD+'"/>'+emiTxt(220,306,'repeat every few minutes');}
 };
 function emIllKind(step){
   var t=((step.h||'')+' '+(step.list||[]).join(' ')).toLowerCase();
   if(step.yn)return 'resp';
-  if(step.id==='eq')return 'kit'; if(step.id==='tx')return 'protocol'; if(step.end)return 'reassess'; if(step.id==='lab')return 'lab'; if(step.id==='chk')return /eye|vision|oct|refraction/.test(t)?'eye':/spo2|oxygen sat/.test(t)?'spo2':/temperature/.test(t)?'temp':'monitor';
-  var R=[[/tourniquet|windlass/,'tourniquet'],[/glove|eye protection/,'gloves'],[/foot loop|anchor|restrain|secured/,'anchor'],[/pack the wound|hemostatic/,'pack'],[/write down the time|record every|document/,'time'],[/press(?!ure)|pressure on the wound|press gauze|keep pressing/,'pressure'],
+  if(step.id==='eq')return 'kit'; if(step.id==='tx')return 'protocol'; if(step.end)return 'reassess'; if(step.id==='lab')return 'lab'; if(step.id==='chk')return /ecg|rhythm/.test(t)?'ecg':/eye|vision|oct|refraction/.test(t)?'eye':/spo2|oxygen sat/.test(t)?'spo2':/temperature/.test(t)?'temp':'monitor';
+  var R=[[/tourniquet|windlass/,'tourniquet'],[/ecg|rhythm strip|rhythm observ|tachyarrhythmia|rhythm and vital/,'ecg'],[/glove|eye protection/,'gloves'],[/foot loop|anchor|restrain|secured/,'anchor'],[/pack the wound|hemostatic/,'pack'],[/write down the time|record every|document/,'time'],[/press(?!ure)|pressure on the wound|press gauze|keep pressing/,'pressure'],
     [/airway|breathing and responsiveness|abc assessment/,'airway'],[/oxygen(?! sat)/,'oxygen'],[/\biv\b|saline|crystalloid/,'iv'],[/drink|sips|ors\b|oral rehydration|hydrate|oral fluids/,'drink'],[/legs raised|lie her flat|warm|rest/,'rest'],
     [/spo2/,'spo2'],[/blood pressure|\bbp\b/,'bp'],[/temperature|thermometer/,'temp'],[/monitor|vital/,'monitor'],[/hemoglobin|cbc|analy[sz]er|blood test/,'lab'],[/glasses|eye|vision|oct|refraction|fundus|images to earth/,'eye'],
     [/call|notify|crew medical officer|flight surgeon|earth|alert responding/,'call'],[/protocol|treatment/,'protocol']];
@@ -2140,7 +2141,7 @@ setInterval(function(){if(S.route.v==='prefs'&&S.prefTab==='dtools'&&demoAlerts(
 function scnList(){return window.CHARM_SCENARIOS||[];}
 function scnGet(id){var l=scnList();for(var i=0;i<l.length;i++)if(l[i].id===id)return l[i];return l[0]||null;}
 function scnCur(){return scnGet(S.scnSid||(SR.sid)||'pulm');}
-function scnColor(code){return code==='CRITICAL'?'var(--crit)':code==='ALERT'?'var(--warn)':'var(--ok)';}
+function scnColor(code){return code==='CRITICAL'?'var(--crit)':code==='CAUTION'||code==='ALERT'?'var(--warn)':code==='ATTENTION'?'var(--att)':'var(--ok)';}
 function scnHas(st,m){return m.some(function(x){return x[0]==='bp'?st.v.sbp!=null:st.v[x[0]]!=null;});}
 function scnLast(sc,i){for(var j=i;j>=1;j--)if(scnHas(sc.stages[j-1],sc.m))return sc.stages[j-1];return null;}
 function scnBase(sc,k){for(var j=0;j<sc.stages.length;j++){var v=sc.stages[j].v;if(k==='bp'?v.sbp!=null:v[k]!=null)return sc.stages[j];}return null;}
@@ -2157,8 +2158,8 @@ function scnChart(sc,m,cur){var N=sc.stages.length,k=m[0],W=340,H=150,L=40,R=10,
   for(var i=1;i<=N;i++)s+='<line x1="'+x(i)+'" x2="'+x(i)+'" y1="'+T+'" y2="'+(H-B)+'" stroke="rgba(125,170,235,'+(i===cur?'.45':'.10')+'"/><text x="'+x(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="11" fill="'+(i===cur?'#EAF1FB':'#8F9AAE')+'">'+i+'</text>';
   [hi-pad,lo+pad].forEach(function(v){s+='<text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end" font-size="10.5" fill="#8F9AAE">'+(Math.round(v*100)/100)+'</text>';});
   var base=scnBase(sc,k);if(base){(k==='bp'?[base.v.sbp,base.v.dbp]:[base.v[k]]).forEach(function(b){s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(b)+'" y2="'+y(b)+'" stroke="rgba(61,220,151,.5)" stroke-dasharray="4 4"/>';});}
-  (k==='bp'?[['sbp','#8FDcff'],['dbp','#C4B5FD']]:[[k,'#8FDcff']]).forEach(function(se){var seg=[],path='';sc.stages.forEach(function(st){if(st.n>cur)return;var v=st.v[se[0]];if(v==null)return;seg.push(x(st.n)+','+y(v));});
-    if(seg.length>1)path+='<polyline points="'+seg.join(' ')+'" fill="none" stroke="'+se[1]+'" stroke-width="2"/>';s+=path;});
+  (k==='bp'?[['sbp','#8FDcff'],['dbp','#C4B5FD']]:[[k,'#8FDcff']]).forEach(function(se){var segs=[[]],path='';sc.stages.forEach(function(st){if(st.n>cur||st.branch)return;var v=st.v[se[0]];if(v==null){if(segs[segs.length-1].length)segs.push([]);return;}segs[segs.length-1].push(x(st.n)+','+y(v));});
+    segs.forEach(function(seg){if(seg.length>1)path+='<polyline points="'+seg.join(' ')+'" fill="none" stroke="'+se[1]+'" stroke-width="2"/>';});s+=path;});
   sc.stages.forEach(function(st){if(st.n>cur)return;var v=st.v,c=scnColor(st.code);
     if(k==='spo2'&&v.spo2!=null&&v.spo2b!=null&&v.spo2b!==v.spo2)s+='<rect x="'+(x(st.n)-4)+'" y="'+y(v.spo2b)+'" width="8" height="'+Math.max(2,y(v.spo2)-y(v.spo2b))+'" rx="3" fill="'+c+'"><title>Stage '+st.n+': SpO₂ '+v.spo2+'–'+v.spo2b+' %</title></rect>';
     else (k==='bp'?['sbp','dbp']:[k]).forEach(function(f){if(v[f]==null)return;s+='<circle cx="'+x(st.n)+'" cy="'+y(v[f])+'" r="'+(st.n===cur?6:4.5)+'" fill="'+c+'" stroke="#061022" stroke-width="1.5" data-act="scnset" data-v="'+st.n+'" style="cursor:pointer"><title>Stage '+st.n+' · '+esc(st.label)+': '+scnFmt(st,k,m[3])+' '+m[2]+'</title></circle>';});});
@@ -2166,6 +2167,11 @@ function scnChart(sc,m,cur){var N=sc.stages.length,k=m[0],W=340,H=150,L=40,R=10,
 function scnSplit(t){return String(t||'').split(/;\s*/).map(function(x){x=x.trim().replace(/\.$/,'');return x.charAt(0).toUpperCase()+x.slice(1);}).filter(function(x){return x&&!/^none$/i.test(x);});}
 function scnTicks(title,txt,key){var it=scnSplit(txt);if(!it.length)return scnPanel(title,txt);var tk=S.scnTick||{},n=it.filter(function(_,i){return tk[key+':'+i];}).length;
   return '<div class="card pad" style="padding:14px 16px"><div class="sec" style="margin:0 0 8px">'+title+' <span class="faint" style="letter-spacing:0">· '+n+' of '+it.length+' done</span></div><div style="display:flex;flex-direction:column;gap:8px">'+it.map(function(x,i){var on=!!tk[key+':'+i];return '<button class="btn tick" data-act="scntick" data-k="'+key+':'+i+'" data-x="'+esc(x)+'" aria-pressed="'+on+'" style="'+(on?'border-color:var(--ok);background:rgba(61,220,151,.12)':'')+'">'+(on?'✓ ':'○ ')+esc(x)+'</button>';}).join('')+'</div></div>';}
+/* rhythm evidence: a screening flag, an ECG request and a clinician-reviewed ECG are three different things */
+var EVIDC={'BASELINE ECG':'var(--ok)','SCREENING FLAG':'var(--att)','ECG REQUESTED':'var(--warn)','CLINICIAN-REVIEWED ECG':'var(--crit)','NO NEW SAMPLE':'var(--nd)','FOLLOW-UP ECG PENDING':'var(--warn)','FOLLOW-UP ECG REVIEWED':'var(--ok)'};
+function scnEvid(st){var c=EVIDC[st.evid]||'var(--cyan)',irr=/rregular|Rapid/.test(st.pulse||''),flat=st.evid==='NO NEW SAMPLE';
+  var pts=[],x=8;for(var i=0;i<9;i++){var gap=irr?[22,40,16,34,26,44,18,30,38][i]:30;pts.push(x+','+40,(x+6)+','+40,(x+9)+','+12,(x+12)+','+60,(x+15)+','+40);x+=gap;}
+  return '<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(10,20,40,.6)"><span style="padding:4px 10px;border-radius:999px;border:2px solid '+c+';color:'+c+';font-weight:800;font-size:12.5px;letter-spacing:1px">'+esc(st.evid)+'</span><span style="flex:1;min-width:220px"><b>Pulse:</b> '+esc(st.pulse||'—')+'<br><span class="muted"><b>ECG:</b> '+esc(st.ecg||'—')+'</span></span>'+(flat?'':'<svg viewBox="0 0 300 70" width="220" height="52" role="img" aria-label="Conceptual rhythm drawing"><polyline points="'+pts.join(' ')+' 300,40" fill="none" stroke="'+c+'" stroke-width="2.2"/></svg><span class="faint" style="font-size:11px;width:100%;text-align:right;margin-top:-8px">conceptual drawing, not a recording</span>')+'</div>';}
 function scnPanel(title,txt){return '<div class="card pad" style="padding:14px 16px"><div class="sec" style="margin:0 0 6px">'+title+'</div><p style="margin:0;line-height:1.5">'+esc(txt||'—')+'</p></div>';}
 
 /* ---------- live run: writes the stages into the astronaut's file, the alert engine does the rest ---------- */
@@ -2175,7 +2181,8 @@ function srRunning(){return !!(SR.sid&&MISSION&&MISSION.demoScenario&&MISSION.de
 function srStageMsg(){var ms=MISSION&&MISSION.demoScenario;return ms?ms.title+' · stage '+ms.n+' of '+ms.of+' · '+ms.label:'';}
 function srClear(){if(SR.timer){clearTimeout(SR.timer);SR.timer=null;}SR.next=0;}
 function srSchedule(){srClear();var sc=scnGet(SR.sid);if(!sc||SR.paused||!SR.every||SR.busy)return;if(SR.n>=sc.stages.length){SR.done=true;return;}
-  SR.next=Date.now()+SR.every*1000;SR.timer=setTimeout(function(){SR.timer=null;srSend(SR.n+1);},SR.every*1000);}
+  SR.next=Date.now()+SR.every*1000;SR.timer=setTimeout(function(){SR.timer=null;srSend(srNextN());},SR.every*1000);}
+function srNextN(){var sc=scnGet(SR.sid),n=SR.n+1;while(sc&&n<=sc.stages.length&&sc.stages[n-1].branch)n++;return Math.min(n,sc?sc.stages.length:n);}
 function srSend(n){var sc=scnGet(SR.sid);if(!sc)return;if(S.mode!=='live')S.mode='live';n=Math.max(1,Math.min(sc.stages.length,n));var st=sc.stages[n-1],prev=n>1?sc.stages[n-2]:null,pid=SR.pid;
   srClear();SR.busy=true;SR.err='';SR.n=n;S.scn=n;S.scnSid=sc.id;
   if(st.code==='CRITICAL'&&(!prev||prev.code!=='CRITICAL'))delete S.seenCrit[pid]; // the RED ALERT pops again for this run
@@ -2218,7 +2225,7 @@ function vScenario(){
   if(srRunning()&&SR.sid===sc.id&&SR.n)S.scn=SR.n;
   var N=sc.stages.length,i=Math.min(S.scn||0,N);
   h+='<div class="ph"><div><h1>'+esc(sc.title)+'</h1><p>'+esc(sc.sub)+' · '+N+' stages</p></div></div>';
-  h+='<div class="tabs" style="margin-bottom:12px;flex-wrap:wrap">'+L.map(function(x){return '<button data-act="scnsid" data-v="'+x.id+'" aria-pressed="'+(x.id===sc.id)+'">'+esc({pulm:'Pulmonary infection',bleed:'Severe bleeding',dehy:'Dehydration',sans:'SANS (vision)',bone:'Bone health'}[x.id]||x.title)+(SR.sid===x.id?' · LIVE':'')+'</button>';}).join('')+'</div>';
+  h+='<div class="tabs" style="margin-bottom:12px;flex-wrap:wrap">'+L.map(function(x){return '<button data-act="scnsid" data-v="'+x.id+'" aria-pressed="'+(x.id===sc.id)+'">'+esc({pulm:'Pulmonary infection',bleed:'Severe bleeding',arr:'Cardiac arrhythmia',dehy:'Dehydration',sans:'SANS (vision)',bone:'Bone health'}[x.id]||x.title)+(SR.sid===x.id?' · LIVE':'')+'</button>';}).join('')+'</div>';
   h+='<div class="envbanner" role="note" style="border-color:rgba(167,139,250,.7);background:rgba(167,139,250,.12);margin-top:0"><span class="demotag">DEMO</span><span><b>Simulated scenario: the values are constructed, the alerts and guidance are CHARM\'s own.</b> CHARM supports the crew\'s decisions and does not choose or dose medication. '+esc(sc.time)+' Source: '+(sc.id==='bleed'?'ATLS hemorrhage classes and Stop the Bleed, American College of Surgeons (':'the medic team\'s scenario (')+esc(sc.file)+').</span></div>';
   h+=srCard(sc);
   if(!i){h+='<div class="card pad"><h2 style="margin-top:0">Step through the scenario</h2><p class="muted">Read each stage without writing any data: what happens, CHARM\'s assessment, the checks, tests, actions, equipment and treatment guidance from the medic team. Or press <b>Start live</b> above to play it into the app.</p><div class="acts"><button class="btn" data-act="scnset" data-v="1">Read stage 1</button></div></div>';return h+scnNotes(sc);}
@@ -2227,8 +2234,9 @@ function vScenario(){
   if(st.earth)h+='<div class="envbanner" role="status" style="border-color:var(--crit);background:rgba(255,77,79,.12)"><b style="font-size:17px">Earth Communication Unavailable – Onboard Protocol Active</b><span>CHARM keeps working on board: monitoring, the astronaut\'s data, earlier results and the approved onboard protocol stay available. Loss of the Earth link is not loss of local monitoring, and it does not change the status.</span></div>';
   if(st.branch)h+='<div class="envbanner" role="note" style="border-color:var(--warn);background:rgba(255,176,32,.10)"><b>Side branch – not a step in time.</b><span>The medic team lists this so the crew checks it at any stage. Running it live adds no new values.</span></div>';
   var tag=/RECOVER/.test(st.label)?' <span class="chip">↗ recovering</span>':/RESOLV/.test(st.label)?' <span class="chip">✓ resolved</span>':'';
-  h+='<div class="card pad" style="border-left:6px solid '+c+'"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="font-family:var(--f-disp);font-weight:800;font-size:22px;letter-spacing:1px;color:'+c+'">'+(st.code==='CRITICAL'?'▲ ':st.code==='ALERT'?'◆ ':'● ')+esc(st.label)+'</span>'+tag+'<span class="faint">'+esc(st.stage)+'</span><span class="sp" style="flex:1"></span><button class="btn sm ghost" data-act="scnsay">Charmy reads it</button></div>';
-  h+='<p style="margin:10px 0 0;font-size:16px"><b>What happens:</b> '+esc(st.what)+'</p><p class="muted" style="margin:6px 0 0"><b>Key measurements:</b> '+esc(st.key)+'</p><p class="muted" style="margin:6px 0 0"><b>CHARM assessment:</b> '+esc(st.assess)+'</p>'+(st.basis&&st.basis!=='—'?'<p class="faint" style="margin:6px 0 0;font-size:13px"><b>Medical basis:</b> '+esc(st.basis)+'</p>':'')+(st.code==='CRITICAL'?'<p style="margin:8px 0 0;color:var(--crit);font-weight:700">Crew response required now.</p>':'')+'</div>';
+  h+='<div class="card pad" style="border-left:6px solid '+c+'"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="font-family:var(--f-disp);font-weight:800;font-size:22px;letter-spacing:1px;color:'+c+'">'+(st.code==='CRITICAL'?'▲ ':st.code==='CAUTION'||st.code==='ALERT'?'◆ ':st.code==='ATTENTION'?'■ ':'● ')+esc(st.label)+'</span>'+tag+'<span class="faint">'+esc(st.stage)+'</span><span class="sp" style="flex:1"></span><button class="btn sm ghost" data-act="scnsay">Charmy reads it</button></div>';
+  if(st.alertTitle)h+='<p style="margin:10px 0 0;font-size:18px;font-weight:800;color:'+c+'">'+esc(st.alertTitle)+'</p>';
+  h+='<p style="margin:10px 0 0;font-size:16px"><b>What happens:</b> '+esc(st.what)+'</p>'+(st.symptoms?'<p class="muted" style="margin:6px 0 0"><b>Symptoms:</b> '+esc(st.symptoms)+'</p>':'')+'<p class="muted" style="margin:6px 0 0"><b>Key measurements:</b> '+esc(st.key)+'</p><p class="muted" style="margin:6px 0 0"><b>CHARM assessment:</b> '+esc(st.assess)+'</p>'+(st.basis&&st.basis!=='—'?'<p class="faint" style="margin:6px 0 0;font-size:13px"><b>'+(st.alertTitle?'Why this alert':'Medical basis')+':</b> '+esc(st.basis)+'</p>':'')+(st.evid?scnEvid(st):'')+(st.code==='CRITICAL'?'<p style="margin:8px 0 0;color:var(--crit);font-weight:700">Crew response required now.</p>':'')+'</div>';
   if(shown){
     h+='<div class="sec" style="margin-top:14px">MEASUREMENTS'+(last?' · LAST KNOWN (STAGE '+shown.n+')':'')+'</div>';
     if(last)h+='<p class="note" style="margin-top:0">The source gives no new numbers for this stage, so the values below are the last known ones from stage '+shown.n+', not new measurements.</p>';
@@ -2240,6 +2248,7 @@ function vScenario(){
     scnPanel('1 · CHARM ASSESSMENT',st.assess)+scnTicks('2 · REQUIRED CHECKS · TAP WHEN DONE',st.checks,sc.id+':'+i+':c')+scnPanel('3 · '+(st.labsTitle||'LABORATORY TESTS'),st.labs)+scnTicks('4 · IMMEDIATE ACTION STEPS · TAP WHEN DONE',st.actions,sc.id+':'+i+':a')+scnPanel('5 · REQUIRED EQUIPMENT',st.equip)+scnPanel('6 · TREATMENT GUIDANCE',st.treat)+'</div>';
   var lg=(S.scnLog||[]).filter(function(e){return e.sid===sc.id;});
   h+='<div class="card pad" style="margin-top:12px"><div class="sec" style="margin-top:0">CREW DOCUMENTATION · REASSESSMENTS AND INTERVENTIONS</div><form data-form="scnlog" class="frow" style="margin-top:0"><label style="flex:1;min-width:240px">What did the crew check or do?<input id="scnin" type="text" maxlength="200" style="width:100%"></label><button class="btn pri" type="submit">Log it</button></form>'+(lg.length?lg.map(function(e){return '<div class="qrow"><span class="q"><span class="demotag">DEMO</span> Stage '+e.s+' · '+esc(e.x)+'</span><span class="faint">'+hm(e.t)+'</span></div>';}).join(''):'<p class="note">Entries are kept on board and sent to Earth when the link returns (marked DEMO).</p>')+'</div>';
+  if(sc.whatif){var w=sc.whatif;h+='<div class="card pad" style="margin-top:12px;border:1px dashed var(--crit)"><div class="sec" style="margin-top:0;color:var(--crit)">WHAT IF · '+esc(w.title.toUpperCase())+'</div><p style="margin:0"><b>'+esc(w.what)+'</b></p><p class="muted" style="margin:6px 0 0">'+esc(w.key)+'</p><p class="muted" style="margin:6px 0 0">'+esc(w.assess)+'</p><p style="margin:6px 0 0"><b>Do:</b> '+esc(w.actions)+'</p><p class="faint" style="margin:6px 0 0;font-size:13px">'+esc(w.basis)+'</p></div>';}
   return h+scnNotes(sc);}
 function scnNotes(sc){var d=(sc.demo||[]).slice(),dis=sc.stages[0]&&sc.stages[0].disclaimer;if(dis)d.push(dis);
   return d.length?'<div class="card pad" style="margin-top:12px"><div class="sec" style="margin-top:0">ABOUT THE VALUES</div>'+d.map(function(x){return '<p class="note" style="margin:4px 0">'+esc(x)+'</p>';}).join('')+'</div>':'';}
@@ -2256,7 +2265,6 @@ function scnEmFlow(id){
   sp(st.actions).forEach(function(a,i){f.push({id:'c'+i,h:cap(a),p:'Do this now. Tap Done when it is complete.',cmo:1});});
   var chk=sp(st.checks);if(chk.length)f.push({id:'chk',h:'Measure now.',p:'Tap each check when it is done. CHARM re-checks the alert with every new value.',list:chk,cmo:1});
   if(st.labs&&!/^(none|no blood test)/i.test(st.labs.trim()))f.push({id:'lab',h:'Laboratory tests.',p:'Run what the onboard equipment allows. Tap each one when done or not available.',list:sp(st.labs),cmo:1});
-  var eq=sp(st.equip,/[,;]\s*/);if(eq.length)f.push({id:'eq',h:'Bring the equipment.',p:'Tap each item when it is at the patient.',list:eq,cmo:1});
   if(st.treat&&!/^none\.?$/i.test(st.treat.trim()))f.push({id:'tx',h:'Treatment per the approved protocol.',p:st.treat,note:'CHARM does not choose or dose medication. The medical officer follows the mission protocol.',confirm:'Done per protocol · next',cmo:1});
   f.push({id:'end',h:'Reassess and keep monitoring.',p:'Repeat the vital signs every few minutes. Every step is logged and queued for the flight surgeon.'+(st.earth?' Earth is out of contact: continue the onboard protocol.':''),end:true,cmo:1});
   var main=f.filter(function(x){return !x.branch;});
@@ -2264,7 +2272,7 @@ function scnEmFlow(id){
   f[0].yn=[main[1].id,'cpr'];
   f[1].done=main[1]?main[1].id:'end';
   f.forEach(function(x){x.say=x.list?x.h+' '+x.list.join('. ')+'.':x.id==='tx'?x.h+' '+x.p:x.h;});
-  f.scn={sid:ms.sid,n:ms.n,of:ms.of,label:ms.label,title:sc.title,earth:!!st.earth,key:key,main:main};
+  f.scn={sid:ms.sid,n:ms.n,of:ms.of,label:ms.label,title:sc.title,earth:!!st.earth,key:key,main:main,equip:sp(st.equip,/[,;]\s*/)};
   EMSC[key]=f;return f;}
 function emSay(s,id){return (s.say||s.h).replace(/\{n\}/g,HAZ[id]||(CREWBY[id]||{}).name||'');}
 /* stage changed while Emergency Mode is open: jump to the new stage's first medical officer screen and say it */
@@ -2277,6 +2285,7 @@ function emSyncStage(id){var fl=emFlow(id),es=emState(id);if(!fl.scn){es.fk=null
   es.fk=fl.scn.key;}
 function scnEmPanel(id){var fl=emFlow(id);if(!fl.scn)return '';var sc=fl.scn,live=SR.sid===sc.sid&&SR.n<sc.of;
   return '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 12px"><span class="demotag">DEMO</span><span class="faint" style="font-size:13px">'+esc(sc.title)+' · stage '+sc.n+' of '+sc.of+' · <b style="color:'+scnColor(sc.label.indexOf('CRITICAL')>=0?'CRITICAL':/NORMAL/.test(sc.label)?'NORMAL':'ALERT')+'">'+esc(sc.label)+'</b></span>'+(live?'<button class="btn sm" data-act="srnext" '+(SR.busy?'disabled':'')+' style="margin-left:auto">Next scenario stage ›</button>':'')+'</div>'+
+    (sc.equip&&sc.equip.length?'<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:-4px 0 12px"><span class="faint" style="font-size:12.5px;font-weight:700;letter-spacing:1px">KIT</span>'+sc.equip.map(function(q){return '<span class="eq" style="font-size:12.5px">'+esc(q)+'</span>';}).join('')+'</div>':'')+
     (sc.earth?'<div style="margin:0 0 12px;padding:8px 12px;border:1px solid var(--crit);border-radius:10px;background:rgba(255,77,79,.12);font-weight:700">Earth communication unavailable – onboard protocol active</div>':'');}
 
 function sw(key,label,sub){var on=key==='collapsedNow'?S.collapsedNow:S[key];return '<div class="toggle"><span>'+label+'<small>'+sub+'</small></span><button class="sw" role="switch" aria-checked="'+(!!on)+'" aria-label="'+label+'" data-act="sw" data-k="'+key+'"></button></div>';}
@@ -2351,7 +2360,7 @@ function entryModal(){
 /* exam forms: fields per exam (CHARM_Exact_Alert_Thresholds) */
 var YN=[['','—'],['no','No'],['yes','Yes']];
 var EXF={
- sym:[['inf','Suspected infection (fever, chills, sore throat, cough, wound…)','yn'],['conf','Confusion or altered mental state','yn'],['faint','Fainted or nearly fainted','yn'],['chest','Chest pain or palpitations','yn'],['bleed','Bleeding (injury)','sel',[['none','None'],['controlled','Controlled (pressure, dressing or tourniquet)'],['active','Active, not controlled']]]],
+ sym:[['inf','Suspected infection (fever, chills, sore throat, cough, wound…)','yn'],['conf','Confusion or altered mental state','yn'],['faint','Fainted or nearly fainted','yn'],['chest','Chest pain','yn'],['palp','Palpitations (racing or fluttering heartbeat)','yn'],['dizzy','Dizziness','sel',[['none','None'],['mild','Mild lightheadedness'],['severe','Severe, cannot stay upright']]],['bleed','Bleeding (injury)','sel',[['none','None'],['controlled','Controlled (pressure, dressing or tourniquet)'],['active','Active, not controlled']]]],
  ecg:[['irr','Irregular RR intervals','yn'],['noP','No repeating P waves','yn'],['sec','Recording length (seconds)','n'],['unstable','Signs of instability (fainting, chest pain, BP < 90, confusion)','yn']],
  ortho:[['s1','Lying or seated · systolic','n'],['d1','Lying or seated · diastolic','n'],['s2','Standing · systolic','n'],['d2','Standing · diastolic','n'],['min','Minutes after standing','n'],['h1','Lying or seated · heart rate','n'],['h2','Standing · heart rate','n'],['syncope','Fainted during the test','yn']],
  urine:[['vol','24-hour urine volume (L)','n'],['blood','Blood in urine (dipstick)','yn'],['us','Kidney ultrasound','sel',[['none','Not done / normal'],['stone','Stone seen'],['hydro','Hydronephrosis']]]],
@@ -2535,7 +2544,7 @@ function emerView(){
   var crit=CREW.filter(function(p){return personAt(p.id,t).lvl===3;}).map(function(p){return p.id;});if(crit.indexOf(id)<0&&!isEnv)crit.unshift(id);
   Object.keys(S.emg).forEach(function(k){if(HAZ[k]&&crit.indexOf(k)<0)crit.push(k);});
   var st=isEnv?null:personAt(id,t),start=isEnv?es.opened:(emAlertStart(id)||es.opened);
-  var title=isEnv?'EMERGENCY · '+HAZ[id]+' · all crew':'CRITICAL · '+nm+' · '+(st.m.hr.val&&st.m.hr.val.irr?'Irregular heart rhythm':reasonOf(id,st,t));
+  var title=isEnv?'EMERGENCY · '+HAZ[id]+' · all crew':'CRITICAL · '+nm+' · '+(st.m.hr.val&&st.m.hr.val.irr&&!(st.m.c_af&&st.m.c_af.l>=2)?'Irregular heart rhythm':reasonOf(id,st,t));
   var h='<div class="emer" role="dialog" aria-label="Emergency Mode"><div class="emtop">'+IC.dia.replace('<svg','<svg width="30" height="30" style="color:#fff"')+'<h2>'+esc(title)+'</h2><div class="tm tnum" id="emtimer">'+fmtClock(t-start)+'<small>since alert'+(isLive()?'':' · history')+'</small></div></div>';
   h+='<div class="emtabs">'+crit.map(function(c){return '<button data-act="emtab" data-id="'+c+'" aria-pressed="'+(c===id)+'">'+(HAZ[c]?HAZ[c]:CREWBY[c].name)+'</button>';}).join('')+'<span style="margin-left:auto;align-self:center;color:var(--mute);font-size:13px">'+crit.length+' active</span></div>';
   h+='<div class="embody"><div class="emstep'+(flow.scn?' cmo':'')+'">'+(isEnv?'':scnEmPanel(id));
@@ -2834,7 +2843,7 @@ document.addEventListener('click',function(e){
     case 'libtog': S.libOpen=!S.libOpen; renderView(); break;
     case 'emtick': var esk=emState(S.emSel),flk=emFlow(S.emSel),stk=flk[esk.step],kk=stk.id+':'+ds.i; esk.tick=esk.tick||{}; esk.tick[kk]=!esk.tick[kk]; if(esk.tick[kk])esk.log.push({t:liveNow(),x:'✓ '+stk.list[+ds.i]}); renderOv(); break;
     case 'srstop': srStop(); break;
-    case 'srnext': if(SR.sid){var scx=scnGet(SR.sid);if(SR.n<scx.stages.length){SR.critPause=false;srSend(SR.n+1);}} break;
+    case 'srnext': if(SR.sid){var scx=scnGet(SR.sid);if(SR.n<scx.stages.length){SR.critPause=false;srSend(srNextN());}} break;
     case 'srpause': SR.paused=!SR.paused; SR.critPause=false; if(SR.paused)srClear(); else srSchedule(); renderView(); break;
     case 'scnset': if(SR.sid&&SR.sid===(S.scnSid||SR.sid))break; var nv=Math.max(1,Math.min(scnCur().stages.length,+ds.v||1)); S.scn=nv; if(S.route.v!=='scenario')go('scenario'); else renderView(); $('view').scrollTop=0; break;
     case 'scnsay': var sd=scnCur().stages[(S.scn||1)-1]; speak('Stage '+sd.n+'. '+sd.label.replace(' - ',', ')+'. '+sd.what+' '+sd.assess,{voice:true}); break;

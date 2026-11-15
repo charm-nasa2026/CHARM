@@ -51,7 +51,7 @@
   var EXAMK = ['ecg', 'ortho', 'urine', 'ijv', 'sym'];
   var CONDK = ['c_inf', 'c_af', 'c_orth', 'c_kid', 'c_sans', 'c_vte', 'c_anem', 'c_vol', 'c_bleed'];
   var MKEYS = ['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'fluid', 'wt', 'vision', 'blood', 'bone'].concat(EXAMK).concat(CONDK);
-  var LKEYS = ['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'wt', 'bone', 'c_bleed', 'c_vol'].concat(CONDK.filter(function (k) { return k !== 'c_vol' && k !== 'c_bleed'; })); // what raises alerts (the first of equal levels is the headline: shock index before the infection screen)
+  var LKEYS = ['c_bleed', 'c_af', 'c_vol'].concat(CONDK.filter(function (k) { return ['c_vol', 'c_bleed', 'c_af'].indexOf(k) < 0; })).concat(['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'wt', 'bone']); // what raises alerts; the first of equal levels is the headline, so a condition that explains the numbers comes first // what raises alerts (the first of equal levels is the headline: shock index before the infection screen)
   var RKEYS = MKEYS.filter(function (k) { return CONDK.indexOf(k) < 0; }).concat(['rt']); // every metric a reading can carry
   /* Alert levels. -1 NO DATA · 0 NORMAL (green) · 1 ATTENTION (yellow: one screening limit crossed)
      · 2 CAUTION (orange: medical criterion or multi-signal pattern) · 3 CRITICAL (red: urgent). */
@@ -231,7 +231,7 @@
     urine: { vol: [0, 10], blood: 'b', us: ['none', 'stone', 'hydro'] },
     ijv: { vel: [0, 200], retro: 'b', thrombus: 'b' },
     vision: { trt: [-100, 400], frisen: [0, 5], refr: [-10, 10], folds: ['none', 'any', 'sharp'], flat: ['none', 'present', 'moderate'], self: ['none', 'same', 'worse'], stable: 'b' },
-    sym: { inf: 'b', conf: 'b', faint: 'b', chest: 'b', bleed: ['none', 'controlled', 'active'] },
+    sym: { inf: 'b', conf: 'b', faint: 'b', chest: 'b', palp: 'b', dizzy: ['none', 'mild', 'severe'], bleed: ['none', 'controlled', 'active'] },
     bone: { ntx: [0, 1000], oc: [0, 500], bsap: [0, 500], follow: 'b' },
     blood: { hb: [2, 25], hct: [10, 75], wbc: [0, 200], plt: [0, 3000], lym: [0, 50000] }
   };
@@ -259,7 +259,7 @@
         var ve = [x.trt != null && x.trt >= 20, x.refr != null && x.refr >= 0.75, x.folds === 'any' || x.folds === 'sharp', x.flat === 'present' || x.flat === 'moderate'].filter(Boolean).length;
         if (vc) return x.stable ? CAU : CRI; // scenario 3: an established finding reviewed as not rising is followed, not an emergency
         return ve >= 2 ? CAU : ve || x.self === 'worse' ? ATT : 0;
-      case 'sym': if (x.bleed === 'active') return CRI; return x.inf || x.conf || x.faint || x.chest || x.bleed === 'controlled' ? ATT : 0;
+      case 'sym': if (x.bleed === 'active') return CRI; return x.inf || x.conf || x.faint || x.chest || x.palp || (x.dizzy && x.dizzy !== 'none') || x.bleed === 'controlled' ? ATT : 0;
       case 'blood': var l = 0, up = function (v) { if (v > l) l = v; };
         if (x.wbc != null && (x.wbc > 12 || x.wbc < 4)) up(ATT);        // SIRS WBC criterion
         if (x.wbc != null && (x.wbc > 20 || x.wbc < 2)) up(CRI);
@@ -279,7 +279,7 @@
       case 'ijv': if (x.vel != null) p.push(x.vel + ' cm/s'); if (x.retro) p.push('retrograde flow'); if (x.thrombus) p.push('thrombus seen'); return p.join(' · ') || 'Normal flow';
       case 'vision': if (x.trt != null) p.push('ΔTRT ' + (x.trt > 0 ? '+' : '') + x.trt + ' µm'); if (x.frisen) p.push('Frisén ' + x.frisen); if (x.refr) p.push('refraction ' + (x.refr > 0 ? '+' : '') + x.refr + ' D'); if (x.stable) p.push('reviewed: not rising'); if (x.folds && x.folds !== 'none') p.push(x.folds === 'sharp' ? 'sharp folds near macula' : 'folds'); if (x.flat && x.flat !== 'none') p.push(x.flat + ' globe flattening'); if (x.self === 'worse') p.push('self vision test worse than before flight'); else if (x.self === 'same') p.push('self vision test unchanged'); return p.join(' · ') || 'No change from baseline';
       case 'bone': if (x.ntx != null) p.push('NTX ' + x.ntx); if (x.oc != null) p.push('osteocalcin ' + x.oc); if (x.bsap != null) p.push('BSAP ' + x.bsap); if (x.follow) p.push('follow-up pending'); return p.join(' · ');
-      case 'sym': if (x.inf) p.push('suspected infection'); if (x.conf) p.push('confusion'); if (x.faint) p.push('fainting'); if (x.chest) p.push('chest pain'); if (x.bleed === 'active') p.push('bleeding, not controlled'); if (x.bleed === 'controlled') p.push('bleeding controlled'); return p.length ? p.join(' · ') : 'No symptoms';
+      case 'sym': if (x.inf) p.push('suspected infection'); if (x.conf) p.push('confusion'); if (x.faint) p.push('fainting'); if (x.chest) p.push('chest pain'); if (x.palp) p.push('palpitations'); if (x.dizzy === 'mild') p.push('lightheaded'); if (x.dizzy === 'severe') p.push('severe dizziness'); if (x.bleed === 'active') p.push('bleeding, not controlled'); if (x.bleed === 'controlled') p.push('bleeding controlled'); return p.length ? p.join(' · ') : 'No symptoms';
       case 'blood': if (x.hb != null) p.push('Hb ' + x.hb); if (x.wbc != null) p.push('WBC ' + x.wbc); if (x.plt != null) p.push('Plt ' + x.plt); if (x.lym != null) p.push('Lymph ' + x.lym); return p.join(' · ');
     }
     return null;
@@ -447,16 +447,25 @@
     var q = []; if (rr != null && rr >= 22) q.push('breathing ' + Math.round(rr)); if (sb != null && sb <= 100) q.push('systolic ' + Math.round(sb)); if (sy.conf) q.push('new confusion');
     var tb = th.temp && th.temp.b, warm = tp != null && tb && tp >= tb + 0.8, fever = tp != null && tp > 38.0;
     // Scenario 3. CRITICAL: qSOFA >= 2 with an infection sign; ALERT: >= 2 SIRS signs, or temperature > 38.0 alone; WATCH: one sign, or 0.8 °C above own normal
-    var bleedOnly = (sy.bleed === 'active' || sy.bleed === 'controlled') && !sy.inf && !(tp != null && (tp > I.tHi || tp < I.tLo)) && !(b.wbc != null && (b.wbc > 12 || b.wbc < 4));
-    if (bleedOnly) m.c_inf = cond(0, 'No infection pattern: fast heart and breathing are explained by the reported bleeding', crit, '', 'INF-BLEED');
+    var ex0 = x('ecg'), rhythmSign = (m.hr.val && m.hr.val.irr) || (ex0 && ex0.irr);
+    var bleedOnly = (sy.bleed === 'active' || sy.bleed === 'controlled' || rhythmSign) && !sy.inf && !(tp != null && (tp > I.tHi || tp < I.tLo)) && !(b.wbc != null && (b.wbc > 12 || b.wbc < 4));
+    if (bleedOnly) m.c_inf = cond(0, (rhythmSign && !sy.bleed ? 'No infection pattern: fast heart and breathing go with the irregular rhythm' : 'No infection pattern: fast heart and breathing are explained by the reported bleeding'), crit, '', 'INF-BLEED');
     else if (q.length >= 2 && (sy.inf || crit.length)) m.c_inf = cond(CRI, 'Infection with warning signs – urgent', q.concat(crit), '1) Lie down; a crewmate stays. 2) Vitals and SpO2 every 15 min. 3) Flight surgeon now. 4) Flight surgeon decides treatment from the medical kit.', 'INF-QSOFA');
     else if (crit.length >= 2 || fever) m.c_inf = cond(CAU, 'Signs of infection', crit, '1) Rest and drink. 2) Vitals and SpO2 every 4 h. 3) Mask, distance, clean shared surfaces. 4) Blood count if available. 5) Tell the CMO; flight surgeon reviews today. 6) Medication only per protocol.', 'INF-SIRS');
     else if (crit.length === 1 || warm || sy.inf) m.c_inf = cond(ATT, crit.length || warm ? 'Watch: one sign of infection' : 'Watch: symptoms of infection reported', crit.length ? crit : warm ? ['temperature ' + tp + ' °C, 0.8 °C or more above own normal'] : ['crew symptom check: suspected infection'], '1) Re-measure temperature, HR and RR in 4 h. 2) Rest and drink.', 'INF-WATCH');
     else m.c_inf = cond(0, 'No infection pattern', crit, 'Combine temperature, heart rate, breathing and WBC; log symptoms if infection is suspected.', 'INF-SCREEN');
-    // 2. Atrial fibrillation: ECG review decides; resting HR > 100 alone is ATTENTION on the heart-rate metric
-    var e = x('ecg'), el = e ? examLevel('ecg', e) : 0, unst = e && el >= CAU && (sy.faint || sy.chest || sy.conf || (sb != null && sb < 90));
-    m.c_af = el ? cond(unst ? CRI : el, el >= CAU ? 'ECG meets the clinical AF criterion' + (unst ? ' with instability' : '') : 'Irregular rhythm on ECG', [examText('ecg', e)],
-      el >= CAU ? (unst ? 'Urgent medical assessment per mission medical protocol.' : 'Medical review; assess rhythm, blood pressure and symptoms.') : 'Repeat the ECG for at least 30 seconds and check for P waves.', unst ? 'AF-UNSTABLE' : el >= CAU ? 'AF-ECG' : 'AF-IRREG') : cond(0, 'No ECG finding', [], '', 'AF');
+    // 2. Atrial fibrillation (scenario 6, AHA 2025 tachyarrhythmia algorithm). A wearable irregular pulse is a SCREENING flag (WATCH);
+    //    an irregular pulse with palpitations and a resting HR > 100 needs an ECG (CAUTION); a clinician-reviewed ECG decides AF (CAUTION);
+    //    CRITICAL only with instability: hypotension (systolic < 90), fainting, confusion, chest pain or severe dizziness - never from HR alone.
+    var e = x('ecg'), el = e ? examLevel('ecg', e) : 0, hvA = m.hr.val, irrP = hvA && hvA.irr && !hvA.ex;
+    var unst = (sy.faint || sy.chest || sy.conf || sy.dizzy === 'severe' || (sb != null && sb < 90));
+    if (el >= CAU) m.c_af = cond(unst ? CRI : CAU, unst ? 'Unstable rhythm – low blood pressure or severe symptoms' : 'Clinician-reviewed ECG: atrial fibrillation – close monitoring', [examText('ecg', e)].concat(hvA ? ['heart rate ' + Math.round(hvA.v)] : []).concat(unst && sb != null ? ['systolic ' + Math.round(sb)] : []).concat(sy.dizzy && sy.dizzy !== 'none' ? [sy.dizzy === 'severe' ? 'severe dizziness' : 'lightheaded'] : []),
+      unst ? '1) Responding crew and CMO now. 2) ABC check; continuous HR, BP, rhythm, SpO2. 3) Approved onboard tachyarrhythmia emergency protocol. 4) Flight surgeon. CHARM does not choose drugs or settings.' : '1) Keep at rest. 2) Continuous rhythm and vital signs. 3) CMO directs the evaluation per the approved protocol.', unst ? 'AF-UNSTABLE' : 'AF-ECG');
+    else if (irrP && (el === 0 || !e || !e.irr) && sy.palp && hvA.v > 100) m.c_af = cond(CAU, 'Persistent irregular rhythm – ECG required', ['irregular pulse (screening)', 'palpitations', 'heart rate ' + Math.round(hvA.v)].concat(sy.dizzy && sy.dizzy !== 'none' ? ['lightheaded'] : []), '1) Record a quality ECG / rhythm strip. 2) Repeat BP, HR, SpO2 and symptoms. 3) Tell the CMO; stop exertion.', 'AF-ECG-NEEDED');
+    else if (irrP && (!e || !e.irr)) m.c_af = cond(ATT, 'Irregular pulse – verify the signal (screening only)', ['irregular pulse from the wearable'].concat(sy.palp ? ['palpitations'] : []), '1) Rest and repeat HR and BP. 2) Check the sensor fit. 3) ECG if it comes back.', 'AF-SCREEN');
+    else m.c_af = el ? cond(el, 'Irregular rhythm on ECG', [examText('ecg', e)], 'Repeat the ECG for at least 30 seconds and check for P waves.', 'AF-IRREG') : cond(0, 'No rhythm finding', [], '', 'AF');
+    // a heart rate explained by a clinician-reviewed AF is rated by the AF rule (stable vs unstable), not by the rate alone
+    if (el >= CAU && m.hr.l === CRI) m.hr.l = CAU;
     // 3. Orthostatic hypotension: lying/sitting vs standing within 3 minutes; fainting = red
     // Scenario 1 (landing day). CRITICAL: standing systolic <= 90 (or fainting); ALERT: drop >= 20/10 within 3 min; WATCH: HR +30 without a drop, or fluid loss
     var o = x('ortho'), ol = o ? examLevel('ortho', o) : 0; if (sy.faint && ol >= CAU) ol = CRI;

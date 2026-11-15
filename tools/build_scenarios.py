@@ -62,13 +62,13 @@ def vital_rows(v):
 def finish(sc):
     """down = this stage should clear alerts that are no longer met (recovery)."""
     prev = None
-    rank = {'NORMAL': 0, 'ALERT': 1, 'CRITICAL': 2}
+    rank = {'NORMAL': 0, 'ATTENTION': 1, 'ALERT': 1, 'CAUTION': 2, 'CRITICAL': 3}
     for i, st in enumerate(sc['stages']):
         st['n'] = i + 1
-        st['code'] = code_of(st['label'])
+        st['code'] = st.get('code') or code_of(st['label'])
         lab = st['label'].upper()
         st['down'] = i == 0 or (prev is not None and not st.get('branch') and (
-            rank[st['code']] < rank[prev] or any(w in lab for w in ('RECOVER', 'RESOLV', 'MONITORING', 'STABLE'))))
+            rank[st['code']] < rank[prev] or any(w in lab for w in ('RECOVER', 'RESOLV', 'MONITORING', 'STABLE', 'FOLLOW-UP'))))
         if not st.get('branch') and not st.get('earth'):
             prev = st['code']
     return sc
@@ -191,8 +191,12 @@ def bone():
 # ---------------------------------------------------------------- 5. Severe bleeding (emergency, CHARM team)
 def bleeding():
     st = []
+    whatif = None
     for r in read('severe_bleeding_scenario.csv'):
         n = int(r['step_order'])
+        if n == 9:
+            whatif = dict(title=r['stage'], what=r['what_happens'], key=r['key_measurements'], assess=r['charm_assessment'], actions=r['immediate_action_steps'], basis=r['basis'])
+            continue
         v = nums(r['key_measurements']) if n != 9 else {}
         m = re.search(r'Bleeding: (active|controlled|none)', r['key_measurements'])
         rows = vital_rows(v)
@@ -209,11 +213,52 @@ def bleeding():
                        demo=['Vital signs are simulated: each stage sits inside the ATLS hemorrhage class it names (class I: HR under 100, normal BP; class II: HR 100–120, normal systolic BP; class III: HR 120–140, falling BP).',
                              'Steps follow Stop the Bleed (American College of Surgeons): pressure, wound packing, tourniquet 5–8 cm (2–3 in) above the wound, never on a joint, note the time.',
                              'Shock index thresholds (0.9 and 1.0) are from published trauma research. Skin laceration and traumatic hypovolemic shock are conditions in NASA\'s Integrated Medical Model for long missions.'],
+                       whatif=whatif, stages=st))
+
+
+# ---------------------------------------------------------------- 6. Cardiac arrhythmia (medic team, app-ready CSV)
+def arrhythmia():
+    st = []
+    rows_csv = read('arrhythmia_scenario.csv')
+    assert [int(r['stage_id']) for r in rows_csv] == list(range(1, 9)), 'arrhythmia CSV: stages 1-8 in order'
+    for r in rows_csv:
+        n = int(r['stage_id'])
+        v = vit(hr=num(r['heart_rate_bpm']), sbp=num(r['systolic_bp_mmHg']), dbp=num(r['diastolic_bp_mmHg']),
+                rr=num(r['respiratory_rate_per_min']), spo2=num(r['spo2_min_percent']), spo2b=num(r['spo2_max_percent']))
+        rows = vital_rows(v)
+        pp, ecg = r['pulse_pattern'], r['ecg_status']
+        irr = 'rregular' in pp and 'Regular' != pp
+        for x in rows:
+            if x['k'] == 'hr' and irr: x['irr'] = True
+        sy = r['symptoms'].lower()
+        if v:
+            rows.append({'k': 'sym', 'x': {'palp': 'palpitation' in sy and 'resolved' not in sy, 'dizzy': 'severe' if 'severe' in sy else 'mild' if ('dizz' in sy or 'lightheaded' in sy) and 'no dizziness' not in sy and 'resolved' not in sy else 'none', 'inf': False, 'conf': False}})
+        # ECG: a clinician-reviewed or baseline ECG is an exam result; a screening flag or a request is not
+        if 'Sinus rhythm' in ecg or 'sinus rhythm' in ecg:
+            rows.append({'k': 'ecg', 'x': {'irr': False, 'sec': 60}})
+        elif 'reviewed' in ecg and 'atrial fibrillation' in ecg:
+            rows.append({'k': 'ecg', 'x': {'irr': True, 'noP': True, 'sec': 60}})
+        evid = ('BASELINE ECG' if n == 1 else 'SCREENING FLAG' if 'Not yet obtained' in ecg else 'ECG REQUESTED' if 'requested' in ecg
+                else 'CLINICIAN-REVIEWED ECG' if 'reviewed by Crew Medical Officer' in ecg or 'Previously reviewed' in ecg
+                else 'NO NEW SAMPLE' if 'no new' in ecg.lower() else 'FOLLOW-UP ECG PENDING' if 'pending' in ecg else 'FOLLOW-UP ECG REVIEWED')
+        st.append(dict(label=r['charm_status'], code=r['status_code'], stage=r['stage_label'] + ' · ' + r['observation_window'],
+                       what=r['sarah_condition'], symptoms=r['symptoms'], key=(('HR %g bpm · BP %g/%g mmHg · RR %g/min · SpO2 %g%%' % (v['hr'], v['sbp'], v['dbp'], v['rr'], v['spo2'])) if v else r['last_known_measurements_note']),
+                       pulse=pp, ecg=ecg, evid=evid, alertTitle=r['alert_title'], basis=r['alert_basis'], trend=r['trend_direction'],
+                       assess=r['charm_assessment'], checks=r['required_checks'], labs=r['laboratory_tests'],
+                       actions=r['immediate_action_steps'], equip=r['equipment'], treat=r['treatment_guidance'],
+                       v=v, rows=rows, earth=r['earth_link_unavailable'].strip().lower() == 'true'))
+    return finish(dict(id='arr', title='Cardiac Arrhythmia during a Mars Mission', kind='Emergency', file='arrhythmia_scenario.csv',
+                       sub='Sarah · Mars transit · irregular pulse to clinician-reviewed atrial fibrillation, instability and recovery',
+                       time='Named observation windows, not clock times.',
+                       m=[['hr', 'Heart rate', 'bpm', 0], ['bp', 'Blood pressure', 'mmHg', 0], ['rr', 'Respiratory rate', '/min', 0], ['spo2', 'SpO₂', '%', 0]],
+                       demo=['All stage values are synthetic illustrative values from the medic team, not a NASA patient record and not ECG signal data.',
+                             'A wearable irregular pulse is a screening flag only. Atrial fibrillation is shown only after the Crew Medical Officer reviews an ECG (stage 4). CHARM does not diagnose a rhythm or choose drugs or doses.',
+                             'Stage 5 is CRITICAL because Sarah is hypotensive and severely dizzy with the abnormal rhythm (AHA tachyarrhythmia algorithm: hypotension, altered mental status, signs of shock, ischemic chest discomfort or acute heart failure), not because of a heart-rate number.'],
                        stages=st))
 
 
 def main():
-    sc = [pulmonary(), bleeding(), dehydration(), sans(), bone()]
+    sc = [pulmonary(), bleeding(), arrhythmia(), dehydration(), sans(), bone()]
     js = ('/* GENERATED by tools/build_scenarios.py from data/scenarios/*.csv (medic team). Do not edit by hand. */\n'
           'window.CHARM_SCENARIOS = ' + json.dumps(sc, ensure_ascii=False, indent=0) + ';\n')
     with open(OUT, 'w', encoding='utf-8') as f:

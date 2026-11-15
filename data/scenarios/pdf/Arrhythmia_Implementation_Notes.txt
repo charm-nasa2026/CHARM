@@ -1,0 +1,183 @@
+# CLAUDE IMPLEMENTATION PROMPT
+## C.H.A.R.M. - Cardiac Arrhythmia During a Mars Mission
+
+Implement an interactive medical demo scenario in the existing C.H.A.R.M. (Crew Health Assessment and Response Module) application.
+
+ATTACHED SOURCES
+1. CHARM_Arrhythmia_Clinical_Scenario.pdf
+2. CHARM_Arrhythmia_Scenario_App_Ready.csv
+
+Read both files before coding. The CSV is authoritative for stage-level values and text. The PDF explains the narrative, checks, safe actions, available equipment, and scientific limitations. Do not remove or modify existing pulmonary infection, dehydration, SANS, or bone-health scenarios.
+
+## THE STORY
+Sarah, a fictional astronaut during Mars transit, begins with a documented healthy resting rhythm. She experiences brief palpitations and an irregular pulse. C.H.A.R.M. first requests signal verification and repeated measurement. Persistent palpitations and a rising heart rate lead to an ECG request and Crew Medical Officer assessment. In this **simulated** case, the Crew Medical Officer reviews an ECG compatible with atrial fibrillation (AF), with an increasing ventricular rate. The situation becomes CRITICAL only when Sarah develops significant low blood pressure and severe dizziness alongside the abnormal rhythm. Earth communication then becomes temporarily unavailable, but C.H.A.R.M. continues to display the onboard approved emergency protocol and maintain local monitoring. The scenario subsequently shows improvement after clinician-directed care and final follow-up.
+
+IMPORTANT CLINICAL DISTINCTIONS
+- A wearable PPG signal or pulse irregularity is only a screening signal; AF is not diagnosed from pulse/heart rate alone.
+- The simulated clinician ECG interpretation is explicitly recorded in Stage 4. The app must distinguish SCREENING FLAG, ECG REQUESTED, and CLINICIAN-REVIEWED ECG.
+- C.H.A.R.M. cannot independently diagnose AF, choose drugs/doses or prescribe procedures.
+- Stage 5 is CRITICAL because the patient is symptomatic and hypotensive, not because heart rate crosses an invented universal threshold.
+- Do not imply AF or serious cardiac events are common in astronauts.
+- All stage values are SYNTHETIC ILLUSTRATIVE DEMO values. They are not a NASA patient record, nor actual ECG signal data.
+
+## EXACT EIGHT STAGES
+
+### Stage 1 - Baseline
+Status: NORMAL (status_code: NORMAL).
+What happens: Sarah feels well during routine Mars transit.
+Symptoms: None.
+Numbers: HR 68 bpm; BP 118/76 mmHg; RR 14/min; SpO2 98%.
+Pulse / ECG: Regular; Sinus rhythm documented at baseline.
+Assessment: Stable compared with her personal baseline; no rhythm concern.
+Requested checks: Routine vital-sign monitoring; review established baseline.
+Labs: None.
+Actions: Continue routine activity and monitoring.
+Equipment: Wearable vital-sign sensor; ECG baseline record if available.
+Treatment guidance: None.
+Alert title: No active alert
+
+### Stage 2 - First irregularity
+Status: ATTENTION (status_code: ATTENTION).
+What happens: Sarah notices brief fluttering in her chest while at rest.
+Symptoms: Brief palpitations; no dizziness, chest pain, or breathlessness.
+Numbers: HR 96 bpm; BP 116/74 mmHg; RR 16/min; SpO2 98%.
+Pulse / ECG: Intermittently irregular (screening signal); Not yet obtained; rhythm unconfirmed.
+Assessment: Possible rhythm irregularity. Signal artifact or a benign cause remains possible; do not diagnose from pulse data.
+Requested checks: Repeat resting HR and BP; confirm signal quality; ask about symptoms; request ECG recording if pattern recurs.
+Labs: No laboratory test initially.
+Actions: Pause exertion, rest, repeat measurements, record onset and symptoms.
+Equipment: Wearable; BP cuff; ECG-capable device if available.
+Treatment guidance: No arrhythmia treatment from wearable alert alone.
+Alert title: Irregular Pulse – Verify Signal
+
+### Stage 3 - Persistent irregular rhythm
+Status: CAUTION (status_code: CAUTION).
+What happens: Palpitations persist; Sarah feels mildly lightheaded.
+Symptoms: Persistent palpitations; mild lightheadedness; alert and responsive.
+Numbers: HR 118 bpm; BP 112/72 mmHg; RR 20/min; SpO2 97%.
+Pulse / ECG: Irregular; ECG requested; no clinician-confirmed diagnosis yet.
+Assessment: Persistent symptomatic tachycardia with irregular pulse raises concern for a clinically important arrhythmia.
+Requested checks: Obtain quality ECG/rhythm strip; repeat BP, HR, SpO2 and symptom assessment; check for urgent warning signs.
+Labs: Electrolytes and glucose only if clinically indicated and onboard testing is available.
+Actions: Notify Crew Medical Officer; stop exertion; continue reassessment; document rhythm observations.
+Equipment: ECG-capable monitor; BP cuff; pulse oximeter; onboard analyzer if available.
+Treatment guidance: Follow approved assessment protocol; no automated drug selection.
+Alert title: Persistent Irregular Rhythm – ECG Required
+
+### Stage 4 - Rhythm reviewed
+Status: CAUTION (status_code: CAUTION).
+What happens: Crew Medical Officer reviews a simulated ECG compatible with atrial fibrillation.
+Symptoms: Ongoing palpitations; mild dizziness; awake and communicating.
+Numbers: HR 136 bpm; BP 106/68 mmHg; RR 22/min; SpO2 97%.
+Pulse / ECG: Irregularly irregular; Simulated ECG reviewed by Crew Medical Officer: atrial fibrillation with rapid ventricular response.
+Assessment: Clinician-reviewed ECG supports AF in this fictional case. Requires continued evaluation and close monitoring; no automatic diagnosis by CHARM.
+Requested checks: Confirm ECG interpretation; reassess circulation, BP, symptoms, and mental status; review onset history.
+Labs: Electrolytes, kidney function and other tests only if indicated and available.
+Actions: Medical officer directs evaluation; keep Sarah at rest; begin continuous rhythm and vital-sign monitoring; review approved protocol.
+Equipment: ECG/rhythm monitor; BP cuff; pulse oximeter; local protocol access.
+Treatment guidance: Only clinician-authorized care per onboard protocol; CHARM does not select medicines or dosing.
+Alert title: Clinician-Reviewed Arrhythmia – Close Monitoring
+
+### Stage 5 - Hemodynamic deterioration
+Status: CRITICAL (status_code: CRITICAL).
+What happens: Sarah becomes very dizzy and cannot continue her tasks.
+Symptoms: Severe lightheadedness; marked weakness; difficulty remaining upright; responsive.
+Numbers: HR 162 bpm; BP 88/56 mmHg; RR 26/min; SpO2 95%.
+Pulse / ECG: Rapid and irregular; Previously reviewed AF pattern; continuing abnormal rhythm on simulated monitor.
+Assessment: Rapid arrhythmia with hypotension and severe symptoms: possible hemodynamic instability requiring immediate emergency assessment.
+Requested checks: Immediate airway, breathing and circulation assessment by trained crew; reassess consciousness, BP, HR, rhythm and SpO2 continuously.
+Labs: Do not delay emergency assessment for laboratory testing; use available results as appropriate.
+Actions: Alert responding crew and Crew Medical Officer; activate approved onboard tachyarrhythmia emergency protocol; document events.
+Equipment: ECG/vital-sign monitor; BP monitor; emergency medical equipment specified by mission protocol.
+Treatment guidance: Emergency rhythm care only by appropriately trained crew under approved protocol; CHARM never selects drugs or procedural settings.
+Alert title: CRITICAL – Unstable Rhythm / Low Blood Pressure
+
+### Stage 6 - Earth unavailable
+Status: CRITICAL (status_code: CRITICAL).
+What happens: Ground medical communication becomes temporarily unavailable during the critical event.
+Symptoms: Continuing critical episode; no new symptom assessment supplied for this stage.
+Numbers: NO NEW NUMERIC VITAL SIGN SNAPSHOT; keep numeric fields blank.
+Pulse / ECG: No new sample supplied; Monitoring continues locally; no new numeric ECG data or vital-sign snapshot supplied.
+Assessment: Communication outage does not interrupt onboard assessment or the approved emergency protocol. No new values are invented.
+Requested checks: Continue local rhythm and vital-sign monitoring; preserve timestamps and mark stale values clearly.
+Labs: Use results already available onboard; do not invent laboratory findings.
+Actions: Open cached approved emergency protocol; continue clinician/crew-led reassessment; log actions for later synchronization.
+Equipment: Local CHARM device; onboard monitoring equipment; cached approved protocols.
+Treatment guidance: Continue only care authorized by the mission protocol and trained medical officer.
+Alert title: Earth Link Unavailable – Onboard Emergency Protocol Active
+
+### Stage 7 - Response and monitoring
+Status: CAUTION - RECOVERING (status_code: CAUTION).
+What happens: Sarah feels less dizzy after treatment directed under the approved onboard protocol.
+Symptoms: Palpitations and dizziness improving; residual fatigue.
+Numbers: HR 98 bpm; BP 110/70 mmHg; RR 18/min; SpO2 98%.
+Pulse / ECG: Rhythm reassessment required; Follow-up ECG review pending; specific rhythm not asserted.
+Assessment: Blood pressure and heart rate improve, but recurrence and residual arrhythmia remain possible.
+Requested checks: Repeat ECG/rhythm strip and full vital signs; reassess symptoms and mental status.
+Labs: Repeat relevant tests only if clinically indicated and available.
+Actions: Continue observation; document response; maintain planned follow-up; no immediate return to duty.
+Equipment: ECG monitor; BP cuff; pulse oximeter; CHARM tablet.
+Treatment guidance: Continue clinician-directed plan; do not infer safe discharge from one improved reading.
+Alert title: CAUTION – Improving, Continue Monitoring
+
+### Stage 8 - Recovery and follow-up
+Status: NORMAL - FOLLOW-UP (status_code: NORMAL).
+What happens: Sarah feels well again following ongoing medical assessment.
+Symptoms: Palpitations and dizziness resolved; medical follow-up still required.
+Numbers: HR 72 bpm; BP 116/74 mmHg; RR 15/min; SpO2 98%.
+Pulse / ECG: Regular; Follow-up simulated ECG reviewed by medical officer: sinus rhythm.
+Assessment: Symptoms and measurements return near baseline; episode resolved in this simulated case, without automatic medical clearance.
+Requested checks: Scheduled rhythm review, symptom check and follow-up vital signs.
+Labs: Further tests only if clinically indicated.
+Actions: Complete event report; review possible causes and recurrence risk; return to duty only after medical clearance.
+Equipment: Routine wearable; ECG equipment for follow-up if required.
+Treatment guidance: Continue or complete the medical officer-approved plan as directed.
+Alert title: Rhythm Episode Resolved – Follow-Up Needed
+
+## APP EXPERIENCE AND USER INTERACTION
+
+1. Add one new scenario card: "Cardiac Arrhythmia During a Mars Mission". Open Sarah's monitoring dashboard when selected.
+2. Provide Start, Next Stage, Previous Stage, Reset and an eight-step stage indicator. Do not fabricate event time intervals; use narrative observation windows.
+3. Show current HR (bpm), systolic/diastolic BP (mmHg), RR (/min), SpO2 (%), pulse regularity, symptom list and clinical status. Use the CSV numerical columns with no reinterpretation.
+4. Show a personal baseline comparison. For Stage 6, do not show fresh numeric readings; display "No new snapshot supplied" and, if helpful, "Last known (Stage 5)" with a distinct visual treatment. Do not falsely label prior values LIVE.
+5. Plot HR, SBP, DBP, RR and SpO2 over stage number. Numeric series must have a GAP at Stage 6 (null/missing); do not interpolate or manufacture readings. Use named stages on the horizontal axis, not invented clock times.
+6. Display four-color statuses NORMAL, ATTENTION, CAUTION and CRITICAL; status_code drives standard four-level colors and charm_status drives the full label (including CAUTION - RECOVERING and NORMAL - FOLLOW-UP).
+7. Alert panel should show exact title, why it appears (alert_basis), what the crew needs to check, and the next steps. Explain the medical concern without presenting a screening flag as a confirmed diagnosis.
+8. Show separate panels: (a) Assessment, (b) Checks, (c) Laboratory Tests, (d) Immediate Action Steps, (e) Equipment, (f) Treatment Guidance. Display conditional availability explicitly; do not add medications, quantities, settings, or new clinical tests.
+9. Add an ECG/rhythm-evidence panel with three distinct states: screening observation (Stages 2-3), simulated clinician-reviewed ECG report (Stage 4 onward), and follow-up review. If displaying ECG-like animations, clearly label them conceptual, not raw patient recordings; it is safer to display an ECG status badge and text unless an actual signal file is provided.
+10. Add an Earth-link status indicator. At Stage 6 show "Earth Link Unavailable - Onboard Emergency Protocol Active" and keep locally cached protocol information available. Store actions locally and synchronize later only if the underlying application supports it; never pretend network synchronization has already occurred.
+11. Add Reset to clear alerts and restart at the Stage 1 baseline. Navigating backwards must restore the exact corresponding data and avoid inconsistent cached statuses.
+12. Use actual functionality already implemented by the application; label speculative future capability or missing sensor streams as demo-only. Preserve existing CHARM styling and architecture.
+
+## CSV IMPORT CONTRACT
+
+Expected CSV columns: stage_id, stage_label, observation_window, phase_name, sarah_condition, symptoms, heart_rate_bpm, systolic_bp_mmHg, diastolic_bp_mmHg, respiratory_rate_per_min, spo2_min_percent, spo2_max_percent, pulse_pattern, ecg_status, charm_status, status_code, alert_title, charm_assessment, alert_basis, required_checks, laboratory_tests, immediate_action_steps, equipment, treatment_guidance, earth_link_unavailable, last_known_measurements_note, trend_direction, data_origin.
+
+Rules:
+- Exactly eight rows with stage_id 1 through 8, in order.
+- Blank numeric cells are null, NOT 0 and NOT the previous sample; Stage 6 intentionally has blanks.
+- "earth_link_unavailable" is a boolean expressed as true/false text in the CSV.
+- Full status text is in charm_status; status_code is one of four core status colors.
+- Do not invent ECG sample arrays, laboratory results, arrhythmia classification accuracy, patient history, drugs, dosage, or emergency treatment settings.
+- Keep the label: "SIMULATED DEMONSTRATION - NOT A FLIGHT-CERTIFIED MEDICAL PROTOCOL" visible.
+
+## QA AND DEMO CHECKS
+
+- 1: NORMAL, HR 68, sinus baseline, no alert.
+- 2: ATTENTION, new palpitations, screening irregularity, check signal.
+- 3: CAUTION, persistent symptoms, ECG requested, not yet confirmed.
+- 4: CAUTION, simulated ECG clinician-reviewed as AF; medical assessment active.
+- 5: CRITICAL, hypotension + severe dizziness, emergency response panel.
+- 6: CRITICAL and Earth link unavailable; no new numerical samples, last-known clearly marked.
+- 7: CAUTION - RECOVERING, improving metrics; rhythm reevaluation required, not automatic full clearance.
+- 8: NORMAL - FOLLOW-UP, simulated reviewed sinus ECG and symptom resolution; continue medical follow-up.
+
+## EXPECTED OUTPUT
+
+Integrate this fully interactive eight-stage scenario into the existing CHARM app; use source files to populate cards, graphs and guidance. Report which components and data files you changed and which features are genuinely interactive. Do not claim medical validation or automatic rhythm diagnosis.
+
+## SCIENTIFIC BACKGROUND (FOR CONTEXT, NOT TO OVERRIDE ATTACHED DATA)
+
+NASA: Risk of Cardiac Rhythm Problems during Spaceflight - https://humanresearchroadmap.nasa.gov/Evidence/reports/Arrhythmia.pdf
+NASA OCHMO: Waivered Health Conditions - https://www.nasa.gov/ochmo/hsa-standards/ochmo-technical-briefs/waivered-health-conditions/
+2023 ACC/AHA/ACCP/HRS AF Guideline - https://www.jacc.org/doi/10.1016/j.jacc.2023.08.017

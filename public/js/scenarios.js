@@ -484,6 +484,14 @@ window.CHARM_SCENARIOS = [
 "Steps follow Stop the Bleed (American College of Surgeons): pressure, wound packing, tourniquet 5–8 cm (2–3 in) above the wound, never on a joint, note the time.",
 "Shock index thresholds (0.9 and 1.0) are from published trauma research. Skin laceration and traumatic hypovolemic shock are conditions in NASA's Integrated Medical Model for long missions."
 ],
+"whatif": {
+"title": "If shock develops (any time)",
+"what": "Sarah becomes pale, sweaty and confused; the pulse is fast and weak.",
+"key": "HR above 120 | Systolic BP falling (below 90) | RR above 30 | Shock index 1.0 or more",
+"assess": "Signs of ATLS class III shock (30–40% of blood volume). Treat as an emergency even if the bleeding looks controlled.",
+"actions": "Lie her flat with legs raised and keep her warm; Oxygen if indicated by the protocol; Flight surgeon now",
+"basis": "ATLS class III: 30–40% loss, HR 120–140, decreased BP. Shock index above 1 is linked to about four times the mortality."
+},
 "stages": [
 {
 "label": "NORMAL",
@@ -864,26 +872,511 @@ window.CHARM_SCENARIOS = [
 "n": 8,
 "code": "NORMAL",
 "down": true
+}
+]
 },
 {
-"label": "CRITICAL - SHOCK",
-"stage": "If shock develops (any time)",
-"what": "Sarah becomes pale, sweaty and confused; the pulse is fast and weak.",
-"key": "HR above 120 | Systolic BP falling (below 90) | RR above 30 | Shock index 1.0 or more",
-"assess": "Signs of ATLS class III shock (30–40% of blood volume). Treat as an emergency even if the bleeding looks controlled.",
-"checks": "Look again for bleeding; Continuous HR, BP, SpO2.",
-"labs": "Hemoglobin if available.",
-"actions": "Lie her flat with legs raised and keep her warm; Oxygen if indicated by the protocol; Flight surgeon now",
-"equip": "Oxygen, IV kit if trained, monitoring.",
-"treat": "IV fluids only per the approved protocol.",
-"basis": "ATLS class III: 30–40% loss, HR 120–140, decreased BP. Shock index above 1 is linked to about four times the mortality.",
+"id": "arr",
+"title": "Cardiac Arrhythmia during a Mars Mission",
+"kind": "Emergency",
+"file": "arrhythmia_scenario.csv",
+"sub": "Sarah · Mars transit · irregular pulse to clinician-reviewed atrial fibrillation, instability and recovery",
+"time": "Named observation windows, not clock times.",
+"m": [
+[
+"hr",
+"Heart rate",
+"bpm",
+0
+],
+[
+"bp",
+"Blood pressure",
+"mmHg",
+0
+],
+[
+"rr",
+"Respiratory rate",
+"/min",
+0
+],
+[
+"spo2",
+"SpO₂",
+"%",
+0
+]
+],
+"demo": [
+"All stage values are synthetic illustrative values from the medic team, not a NASA patient record and not ECG signal data.",
+"A wearable irregular pulse is a screening flag only. Atrial fibrillation is shown only after the Crew Medical Officer reviews an ECG (stage 4). CHARM does not diagnose a rhythm or choose drugs or doses.",
+"Stage 5 is CRITICAL because Sarah is hypotensive and severely dizzy with the abnormal rhythm (AHA tachyarrhythmia algorithm: hypotension, altered mental status, signs of shock, ischemic chest discomfort or acute heart failure), not because of a heart-rate number."
+],
+"stages": [
+{
+"label": "NORMAL",
+"code": "NORMAL",
+"stage": "Baseline · Before episode",
+"what": "Sarah feels well during routine Mars transit.",
+"symptoms": "None.",
+"key": "HR 68 bpm · BP 118/76 mmHg · RR 14/min · SpO2 98%",
+"pulse": "Regular",
+"ecg": "Sinus rhythm documented at baseline",
+"evid": "BASELINE ECG",
+"alertTitle": "No active alert",
+"basis": "Personal baseline; no concerning symptoms",
+"trend": "Stable",
+"assess": "Stable compared with her personal baseline; no rhythm concern.",
+"checks": "Routine vital-sign monitoring; review established baseline.",
+"labs": "None.",
+"actions": "Continue routine activity and monitoring.",
+"equip": "Wearable vital-sign sensor; ECG baseline record if available.",
+"treat": "None.",
+"v": {
+"hr": 68.0,
+"sbp": 118.0,
+"dbp": 76.0,
+"rr": 14.0,
+"spo2": 98.0,
+"spo2b": 98.0
+},
+"rows": [
+{
+"k": "hr",
+"v": 68.0
+},
+{
+"k": "rr",
+"v": 14.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 118.0,
+"v2": 76.0
+},
+{
+"k": "sym",
+"x": {
+"palp": false,
+"dizzy": "none",
+"inf": false,
+"conf": false
+}
+},
+{
+"k": "ecg",
+"x": {
+"irr": false,
+"sec": 60
+}
+}
+],
+"earth": false,
+"n": 1,
+"down": true
+},
+{
+"label": "ATTENTION",
+"code": "ATTENTION",
+"stage": "First irregularity · Early observation",
+"what": "Sarah notices brief fluttering in her chest while at rest.",
+"symptoms": "Brief palpitations; no dizziness, chest pain, or breathlessness.",
+"key": "HR 96 bpm · BP 116/74 mmHg · RR 16/min · SpO2 98%",
+"pulse": "Intermittently irregular (screening signal)",
+"ecg": "Not yet obtained; rhythm unconfirmed",
+"evid": "SCREENING FLAG",
+"alertTitle": "Irregular Pulse – Verify Signal",
+"basis": "Symptoms + irregular pulse screening; confirmation required",
+"trend": "New irregularity",
+"assess": "Possible rhythm irregularity. Signal artifact or a benign cause remains possible; do not diagnose from pulse data.",
+"checks": "Repeat resting HR and BP; confirm signal quality; ask about symptoms; request ECG recording if pattern recurs.",
+"labs": "No laboratory test initially.",
+"actions": "Pause exertion, rest, repeat measurements, record onset and symptoms.",
+"equip": "Wearable; BP cuff; ECG-capable device if available.",
+"treat": "No arrhythmia treatment from wearable alert alone.",
+"v": {
+"hr": 96.0,
+"sbp": 116.0,
+"dbp": 74.0,
+"rr": 16.0,
+"spo2": 98.0,
+"spo2b": 98.0
+},
+"rows": [
+{
+"k": "hr",
+"v": 96.0,
+"irr": true
+},
+{
+"k": "rr",
+"v": 16.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 116.0,
+"v2": 74.0
+},
+{
+"k": "sym",
+"x": {
+"palp": true,
+"dizzy": "none",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"n": 2,
+"down": false
+},
+{
+"label": "CAUTION",
+"code": "CAUTION",
+"stage": "Persistent irregular rhythm · Repeat assessment",
+"what": "Palpitations persist; Sarah feels mildly lightheaded.",
+"symptoms": "Persistent palpitations; mild lightheadedness; alert and responsive.",
+"key": "HR 118 bpm · BP 112/72 mmHg · RR 20/min · SpO2 97%",
+"pulse": "Irregular",
+"ecg": "ECG requested; no clinician-confirmed diagnosis yet",
+"evid": "ECG REQUESTED",
+"alertTitle": "Persistent Irregular Rhythm – ECG Required",
+"basis": "Repeated irregularity + palpitations + increased resting HR",
+"trend": "Worsening",
+"assess": "Persistent symptomatic tachycardia with irregular pulse raises concern for a clinically important arrhythmia.",
+"checks": "Obtain quality ECG/rhythm strip; repeat BP, HR, SpO2 and symptom assessment; check for urgent warning signs.",
+"labs": "Electrolytes and glucose only if clinically indicated and onboard testing is available.",
+"actions": "Notify Crew Medical Officer; stop exertion; continue reassessment; document rhythm observations.",
+"equip": "ECG-capable monitor; BP cuff; pulse oximeter; onboard analyzer if available.",
+"treat": "Follow approved assessment protocol; no automated drug selection.",
+"v": {
+"hr": 118.0,
+"sbp": 112.0,
+"dbp": 72.0,
+"rr": 20.0,
+"spo2": 97.0,
+"spo2b": 97.0
+},
+"rows": [
+{
+"k": "hr",
+"v": 118.0,
+"irr": true
+},
+{
+"k": "rr",
+"v": 20.0
+},
+{
+"k": "spo2",
+"v": 97.0
+},
+{
+"k": "bp",
+"v": 112.0,
+"v2": 72.0
+},
+{
+"k": "sym",
+"x": {
+"palp": true,
+"dizzy": "mild",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"n": 3,
+"down": false
+},
+{
+"label": "CAUTION",
+"code": "CAUTION",
+"stage": "Rhythm reviewed · Clinical review",
+"what": "Crew Medical Officer reviews a simulated ECG compatible with atrial fibrillation.",
+"symptoms": "Ongoing palpitations; mild dizziness; awake and communicating.",
+"key": "HR 136 bpm · BP 106/68 mmHg · RR 22/min · SpO2 97%",
+"pulse": "Irregularly irregular",
+"ecg": "Simulated ECG reviewed by Crew Medical Officer: atrial fibrillation with rapid ventricular response",
+"evid": "CLINICIAN-REVIEWED ECG",
+"alertTitle": "Clinician-Reviewed Arrhythmia – Close Monitoring",
+"basis": "Clinician-reviewed simulated ECG + symptoms; stable enough for reassessment",
+"trend": "Persistent tachycardia",
+"assess": "Clinician-reviewed ECG supports AF in this fictional case. Requires continued evaluation and close monitoring; no automatic diagnosis by CHARM.",
+"checks": "Confirm ECG interpretation; reassess circulation, BP, symptoms, and mental status; review onset history.",
+"labs": "Electrolytes, kidney function and other tests only if indicated and available.",
+"actions": "Medical officer directs evaluation; keep Sarah at rest; begin continuous rhythm and vital-sign monitoring; review approved protocol.",
+"equip": "ECG/rhythm monitor; BP cuff; pulse oximeter; local protocol access.",
+"treat": "Only clinician-authorized care per onboard protocol; CHARM does not select medicines or dosing.",
+"v": {
+"hr": 136.0,
+"sbp": 106.0,
+"dbp": 68.0,
+"rr": 22.0,
+"spo2": 97.0,
+"spo2b": 97.0
+},
+"rows": [
+{
+"k": "hr",
+"v": 136.0,
+"irr": true
+},
+{
+"k": "rr",
+"v": 22.0
+},
+{
+"k": "spo2",
+"v": 97.0
+},
+{
+"k": "bp",
+"v": 106.0,
+"v2": 68.0
+},
+{
+"k": "sym",
+"x": {
+"palp": true,
+"dizzy": "mild",
+"inf": false,
+"conf": false
+}
+},
+{
+"k": "ecg",
+"x": {
+"irr": true,
+"noP": true,
+"sec": 60
+}
+}
+],
+"earth": false,
+"n": 4,
+"down": false
+},
+{
+"label": "CRITICAL",
+"code": "CRITICAL",
+"stage": "Hemodynamic deterioration · High-risk event",
+"what": "Sarah becomes very dizzy and cannot continue her tasks.",
+"symptoms": "Severe lightheadedness; marked weakness; difficulty remaining upright; responsive.",
+"key": "HR 162 bpm · BP 88/56 mmHg · RR 26/min · SpO2 95%",
+"pulse": "Rapid and irregular",
+"ecg": "Previously reviewed AF pattern; continuing abnormal rhythm on simulated monitor",
+"evid": "CLINICIAN-REVIEWED ECG",
+"alertTitle": "CRITICAL – Unstable Rhythm / Low Blood Pressure",
+"basis": "Hypotension + severe symptoms + rapid abnormal rhythm, not heart rate alone",
+"trend": "Critical deterioration",
+"assess": "Rapid arrhythmia with hypotension and severe symptoms: possible hemodynamic instability requiring immediate emergency assessment.",
+"checks": "Immediate airway, breathing and circulation assessment by trained crew; reassess consciousness, BP, HR, rhythm and SpO2 continuously.",
+"labs": "Do not delay emergency assessment for laboratory testing; use available results as appropriate.",
+"actions": "Alert responding crew and Crew Medical Officer; activate approved onboard tachyarrhythmia emergency protocol; document events.",
+"equip": "ECG/vital-sign monitor; BP monitor; emergency medical equipment specified by mission protocol.",
+"treat": "Emergency rhythm care only by appropriately trained crew under approved protocol; CHARM never selects drugs or procedural settings.",
+"v": {
+"hr": 162.0,
+"sbp": 88.0,
+"dbp": 56.0,
+"rr": 26.0,
+"spo2": 95.0,
+"spo2b": 95.0
+},
+"rows": [
+{
+"k": "hr",
+"v": 162.0,
+"irr": true
+},
+{
+"k": "rr",
+"v": 26.0
+},
+{
+"k": "spo2",
+"v": 95.0
+},
+{
+"k": "bp",
+"v": 88.0,
+"v2": 56.0
+},
+{
+"k": "sym",
+"x": {
+"palp": false,
+"dizzy": "severe",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"n": 5,
+"down": false
+},
+{
+"label": "CRITICAL",
+"code": "CRITICAL",
+"stage": "Earth unavailable · Communication interruption",
+"what": "Ground medical communication becomes temporarily unavailable during the critical event.",
+"symptoms": "Continuing critical episode; no new symptom assessment supplied for this stage.",
+"key": "Stage 5 (last recorded): HR 162 bpm, BP 88/56 mmHg, RR 26/min, SpO2 95%. DISPLAY AS LAST KNOWN ONLY.",
+"pulse": "No new sample supplied",
+"ecg": "Monitoring continues locally; no new numeric ECG data or vital-sign snapshot supplied",
+"evid": "NO NEW SAMPLE",
+"alertTitle": "Earth Link Unavailable – Onboard Emergency Protocol Active",
+"basis": "Critical stage persists; loss of Earth link is a communication state, not a new diagnosis",
+"trend": "Status maintained; no new numbers",
+"assess": "Communication outage does not interrupt onboard assessment or the approved emergency protocol. No new values are invented.",
+"checks": "Continue local rhythm and vital-sign monitoring; preserve timestamps and mark stale values clearly.",
+"labs": "Use results already available onboard; do not invent laboratory findings.",
+"actions": "Open cached approved emergency protocol; continue clinician/crew-led reassessment; log actions for later synchronization.",
+"equip": "Local CHARM device; onboard monitoring equipment; cached approved protocols.",
+"treat": "Continue only care authorized by the mission protocol and trained medical officer.",
 "v": {},
 "rows": [],
-"earth": false,
-"branch": true,
-"n": 9,
-"code": "CRITICAL",
+"earth": true,
+"n": 6,
 "down": false
+},
+{
+"label": "CAUTION - RECOVERING",
+"code": "CAUTION",
+"stage": "Response and monitoring · After protocol-led care",
+"what": "Sarah feels less dizzy after treatment directed under the approved onboard protocol.",
+"symptoms": "Palpitations and dizziness improving; residual fatigue.",
+"key": "HR 98 bpm · BP 110/70 mmHg · RR 18/min · SpO2 98%",
+"pulse": "Rhythm reassessment required",
+"ecg": "Follow-up ECG review pending; specific rhythm not asserted",
+"evid": "FOLLOW-UP ECG PENDING",
+"alertTitle": "CAUTION – Improving, Continue Monitoring",
+"basis": "Improved BP and rate, but rhythm requires reassessment",
+"trend": "Improving",
+"assess": "Blood pressure and heart rate improve, but recurrence and residual arrhythmia remain possible.",
+"checks": "Repeat ECG/rhythm strip and full vital signs; reassess symptoms and mental status.",
+"labs": "Repeat relevant tests only if clinically indicated and available.",
+"actions": "Continue observation; document response; maintain planned follow-up; no immediate return to duty.",
+"equip": "ECG monitor; BP cuff; pulse oximeter; CHARM tablet.",
+"treat": "Continue clinician-directed plan; do not infer safe discharge from one improved reading.",
+"v": {
+"hr": 98.0,
+"sbp": 110.0,
+"dbp": 70.0,
+"rr": 18.0,
+"spo2": 98.0,
+"spo2b": 98.0
+},
+"rows": [
+{
+"k": "hr",
+"v": 98.0
+},
+{
+"k": "rr",
+"v": 18.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 110.0,
+"v2": 70.0
+},
+{
+"k": "sym",
+"x": {
+"palp": true,
+"dizzy": "mild",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"n": 7,
+"down": true
+},
+{
+"label": "NORMAL - FOLLOW-UP",
+"code": "NORMAL",
+"stage": "Recovery and follow-up · Later follow-up",
+"what": "Sarah feels well again following ongoing medical assessment.",
+"symptoms": "Palpitations and dizziness resolved; medical follow-up still required.",
+"key": "HR 72 bpm · BP 116/74 mmHg · RR 15/min · SpO2 98%",
+"pulse": "Regular",
+"ecg": "Follow-up simulated ECG reviewed by medical officer: sinus rhythm",
+"evid": "FOLLOW-UP ECG REVIEWED",
+"alertTitle": "Rhythm Episode Resolved – Follow-Up Needed",
+"basis": "Clinician-reviewed follow-up ECG + sustained symptom improvement",
+"trend": "Near baseline",
+"assess": "Symptoms and measurements return near baseline; episode resolved in this simulated case, without automatic medical clearance.",
+"checks": "Scheduled rhythm review, symptom check and follow-up vital signs.",
+"labs": "Further tests only if clinically indicated.",
+"actions": "Complete event report; review possible causes and recurrence risk; return to duty only after medical clearance.",
+"equip": "Routine wearable; ECG equipment for follow-up if required.",
+"treat": "Continue or complete the medical officer-approved plan as directed.",
+"v": {
+"hr": 72.0,
+"sbp": 116.0,
+"dbp": 74.0,
+"rr": 15.0,
+"spo2": 98.0,
+"spo2b": 98.0
+},
+"rows": [
+{
+"k": "hr",
+"v": 72.0
+},
+{
+"k": "rr",
+"v": 15.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 116.0,
+"v2": 74.0
+},
+{
+"k": "sym",
+"x": {
+"palp": false,
+"dizzy": "none",
+"inf": false,
+"conf": false
+}
+},
+{
+"k": "ecg",
+"x": {
+"irr": false,
+"sec": 60
+}
+}
+],
+"earth": false,
+"n": 8,
+"down": true
 }
 ]
 },
@@ -1791,7 +2284,7 @@ window.CHARM_SCENARIOS = [
 "disclaimer": "Simulated Sarah workflow; biomarker values from one real anonymized ground-based bed-rest analog participant (C3D_7984). No validated alert thresholds, DXA, or onboard assays implied.",
 "n": 5,
 "code": "ALERT",
-"down": false
+"down": true
 },
 {
 "label": "YELLOW / MONITORING",
@@ -1843,7 +2336,7 @@ window.CHARM_SCENARIOS = [
 "disclaimer": "Simulated Sarah workflow; biomarker values from one real anonymized ground-based bed-rest analog participant (C3D_7984). No validated alert thresholds, DXA, or onboard assays implied.",
 "n": 7,
 "code": "ALERT",
-"down": false
+"down": true
 }
 ]
 }
