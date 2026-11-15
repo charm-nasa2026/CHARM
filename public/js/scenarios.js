@@ -447,6 +447,448 @@ window.CHARM_SCENARIOS = [
 ]
 },
 {
+"id": "bleed",
+"title": "Severe Bleeding from a Deep Cut",
+"kind": "Emergency",
+"file": "severe_bleeding_scenario.csv",
+"sub": "Sarah · maintenance injury · life-threatening bleeding, tourniquet, monitoring for shock",
+"time": "Minutes 0 to 30, then hours, played as a demonstration sequence.",
+"m": [
+[
+"hr",
+"Heart rate",
+"bpm",
+0
+],
+[
+"bp",
+"Blood pressure",
+"mmHg",
+0
+],
+[
+"si",
+"Shock index (HR ÷ systolic)",
+"",
+2
+],
+[
+"rr",
+"Respiratory rate",
+"/min",
+0
+]
+],
+"demo": [
+"Vital signs are simulated: each stage sits inside the ATLS hemorrhage class it names (class I: HR under 100, normal BP; class II: HR 100–120, normal systolic BP; class III: HR 120–140, falling BP).",
+"Steps follow Stop the Bleed (American College of Surgeons): pressure, wound packing, tourniquet 5–8 cm (2–3 in) above the wound, never on a joint, note the time.",
+"Shock index thresholds (0.9 and 1.0) are from published trauma research. Skin laceration and traumatic hypovolemic shock are conditions in NASA's Integrated Medical Model for long missions.",
+"Written by the CHARM team from these sources; needs review by the medic team before operational use."
+],
+"stages": [
+{
+"label": "NORMAL",
+"stage": "1. Baseline",
+"what": "Sarah is doing maintenance on a cabin panel. She feels well.",
+"key": "HR 68 | BP 118/76 | RR 14 | SpO2 98%",
+"assess": "Vital signs at her personal baseline.",
+"checks": "Routine monitoring.",
+"labs": "None.",
+"actions": "Continue work; wear gloves for panel work.",
+"equip": "Wearable vital-sign sensors.",
+"treat": "None.",
+"basis": "Sarah's baseline from the medic team's scenarios.",
+"v": {
+"hr": 68.0,
+"sbp": 118.0,
+"dbp": 76.0,
+"rr": 14.0,
+"spo2": 98.0
+},
+"rows": [
+{
+"k": "hr",
+"v": 68.0
+},
+{
+"k": "rr",
+"v": 14.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 118.0,
+"v2": 76.0
+}
+],
+"earth": false,
+"branch": false,
+"n": 1,
+"code": "NORMAL",
+"down": true
+},
+{
+"label": "CRITICAL",
+"stage": "2. 0 min: injury",
+"what": "A sharp panel edge cuts deep into her left forearm. Bright red blood pulses out and floats away as droplets.",
+"key": "Bleeding: active | HR 96 | BP 120/80 | RR 18 | SpO2 98% | Shock index 0.80",
+"assess": "Life-threatening bleeding: blood is pulsing from the wound. Vital signs are still normal (ATLS class I, under 15% of blood volume), but they will not stay normal. Act before they change.",
+"checks": "Find the exact bleeding point; check that she is awake and talking.",
+"labs": "None now. Bleeding control comes first.",
+"actions": "Put on gloves and eye protection; Anchor Sarah and yourself with foot loops; Press gauze firmly on the wound with both hands; Call the crew: bleeding kit and tourniquet now",
+"equip": "Gloves, eye protection, gauze, bleeding-control kit with tourniquet.",
+"treat": "Bleeding control only. No medication is needed for this step.",
+"basis": "Stop the Bleed (American College of Surgeons): pulsing blood = life-threatening bleeding; apply pressure. ATLS class I: under 15% blood loss, HR under 100, normal BP.",
+"v": {
+"hr": 96.0,
+"sbp": 120.0,
+"dbp": 80.0,
+"rr": 18.0,
+"spo2": 98.0,
+"si": 0.8
+},
+"rows": [
+{
+"k": "hr",
+"v": 96.0
+},
+{
+"k": "rr",
+"v": 18.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 120.0,
+"v2": 80.0
+},
+{
+"k": "sym",
+"x": {
+"bleed": "active",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"branch": false,
+"n": 2,
+"code": "CRITICAL",
+"down": false
+},
+{
+"label": "CRITICAL",
+"stage": "3. 1–3 min: still bleeding",
+"what": "Blood soaks through the gauze despite pressure. Sarah is anxious and breathing faster.",
+"key": "Bleeding: active | HR 112 | BP 116/88 | RR 22 | SpO2 98% | Shock index 0.97",
+"assess": "Bleeding continues despite pressure. Heart rate 100–120 with normal systolic pressure fits ATLS class II (15–30% of blood volume). A tourniquet is needed now.",
+"checks": "Is blood still coming through the dressing?; Heart rate and blood pressure.",
+"labs": "None now.",
+"actions": "Keep pressing while a crewmate opens the tourniquet; Pack the wound with hemostatic gauze if a tourniquet is delayed; Do not lift the dressing to look",
+"equip": "Tourniquet, hemostatic gauze, BP monitor, pulse oximeter.",
+"treat": "Bleeding control only.",
+"basis": "Stop the Bleed: bleeding that continues despite pressure is life-threatening; pack the wound. ATLS class II: 15–30% loss, HR 100–120, normal systolic BP.",
+"v": {
+"hr": 112.0,
+"sbp": 116.0,
+"dbp": 88.0,
+"rr": 22.0,
+"spo2": 98.0,
+"si": 0.97
+},
+"rows": [
+{
+"k": "hr",
+"v": 112.0
+},
+{
+"k": "rr",
+"v": 22.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 116.0,
+"v2": 88.0
+},
+{
+"k": "sym",
+"x": {
+"bleed": "active",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"branch": false,
+"n": 3,
+"code": "CRITICAL",
+"down": false
+},
+{
+"label": "ALERT",
+"stage": "4. 3–5 min: tourniquet on",
+"what": "The tourniquet is placed above the wound and tightened. The bleeding stops.",
+"key": "Bleeding: controlled | HR 108 | BP 114/82 | RR 20 | SpO2 98% | Shock index 0.95",
+"assess": "Bleeding controlled. Heart rate over 100 and shock index above 0.9 show real blood loss (ATLS class II). Watch for shock.",
+"checks": "Bleeding stopped?; Heart rate and blood pressure every 5 minutes; Awake and talking?",
+"labs": "Hemoglobin and hematocrit if an onboard analyzer is available (a first value may still look normal).",
+"actions": "Place the tourniquet 5–8 cm above the wound, not on a joint; Twist the windlass until the bleeding stops; Lock the windlass; Write down the time; Do not loosen it without the flight surgeon",
+"equip": "Tourniquet, marker or tablet for the time, BP monitor, pulse oximeter, analyzer if available.",
+"treat": "No medication decision by CHARM. Fluids only per the approved mission protocol.",
+"basis": "Stop the Bleed: tourniquet 2–3 inches above the wound, never on a joint, tighten until bleeding stops, note the time. Shock index above 0.9 is linked to worse outcomes.",
+"v": {
+"hr": 108.0,
+"sbp": 114.0,
+"dbp": 82.0,
+"rr": 20.0,
+"spo2": 98.0,
+"si": 0.95
+},
+"rows": [
+{
+"k": "hr",
+"v": 108.0
+},
+{
+"k": "rr",
+"v": 20.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 114.0,
+"v2": 82.0
+},
+{
+"k": "sym",
+"x": {
+"bleed": "controlled",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"branch": false,
+"n": 4,
+"code": "ALERT",
+"down": true
+},
+{
+"label": "ALERT",
+"stage": "5. Earth unavailable",
+"what": "The flight surgeon cannot answer in real time: the signal delay is too long.",
+"key": "Live values keep streaming to CHARM.",
+"assess": "CHARM keeps the onboard bleeding protocol and reassessment running until Earth answers. Loss of the link does not change the status.",
+"checks": "Keep all live monitoring.",
+"labs": "Use the results you have.",
+"actions": "Follow the onboard bleeding protocol; Record every step with its time",
+"equip": "CHARM tablet plus the same equipment.",
+"treat": "Continue the plan already authorized for the mission.",
+"basis": "—",
+"v": {},
+"rows": [],
+"earth": true,
+"branch": false,
+"n": 5,
+"code": "ALERT",
+"down": false
+},
+{
+"label": "ALERT - MONITORING",
+"stage": "6. 15–30 min: monitoring",
+"what": "Sarah rests, anchored. The tourniquet holds. She drinks small sips.",
+"key": "Bleeding: controlled | HR 98 | BP 116/78 | RR 18 | SpO2 98% | Shock index 0.84",
+"assess": "Heart rate back under 100 and shock index under 0.9: the circulation is coping. Still watch closely.",
+"checks": "Heart rate and blood pressure every 15 minutes; Tourniquet time; Fingers below the tourniquet stay pale and cool (expected)",
+"labs": "Repeat hemoglobin if available.",
+"actions": "Keep her warm and anchored; Small sips of fluid if she is fully awake and not nauseous; Check the tourniquet time every 15 minutes",
+"equip": "BP monitor, pulse oximeter, blanket, fluid pouch.",
+"treat": "Fluids only per the approved protocol. CHARM does not choose or dose fluids or drugs.",
+"basis": "ATLS class I–II range: HR under 100 with normal BP.",
+"v": {
+"hr": 98.0,
+"sbp": 116.0,
+"dbp": 78.0,
+"rr": 18.0,
+"spo2": 98.0,
+"si": 0.84
+},
+"rows": [
+{
+"k": "hr",
+"v": 98.0
+},
+{
+"k": "rr",
+"v": 18.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 116.0,
+"v2": 78.0
+},
+{
+"k": "sym",
+"x": {
+"bleed": "controlled",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"branch": false,
+"n": 6,
+"code": "ALERT",
+"down": true
+},
+{
+"label": "ALERT - STABLE",
+"stage": "7. 1–2 h: wound care",
+"what": "The flight surgeon answers with the plan for the wound and the tourniquet.",
+"key": "Bleeding: controlled | HR 86 | BP 118/76 | RR 16 | SpO2 98%",
+"assess": "Stable. Wound care and the tourniquet plan follow the flight surgeon's instructions.",
+"checks": "Vital signs every 30 minutes; Dressing dry?",
+"labs": "Repeat hemoglobin per the flight surgeon.",
+"actions": "Follow the flight surgeon's wound plan; Document the tourniquet time and the wound care",
+"equip": "Wound care kit, dressings, tablet.",
+"treat": "Wound closure and any medication only on the flight surgeon's instructions.",
+"basis": "—",
+"v": {
+"hr": 86.0,
+"sbp": 118.0,
+"dbp": 76.0,
+"rr": 16.0,
+"spo2": 98.0
+},
+"rows": [
+{
+"k": "hr",
+"v": 86.0
+},
+{
+"k": "rr",
+"v": 16.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 118.0,
+"v2": 76.0
+},
+{
+"k": "sym",
+"x": {
+"bleed": "controlled",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"branch": false,
+"n": 7,
+"code": "ALERT",
+"down": true
+},
+{
+"label": "NORMAL / RESOLVED",
+"stage": "8. Next day: recovered",
+"what": "The wound is dressed and Sarah is back on light duty.",
+"key": "Bleeding: none | HR 74 | BP 118/76 | RR 14 | SpO2 98%",
+"assess": "Back to her baseline. Keep watching the wound for infection.",
+"checks": "Daily wound check; Temperature.",
+"labs": "Hemoglobin follow-up if it was low.",
+"actions": "Return to light duty after clearance; Report fever, redness or swelling at once",
+"equip": "Routine monitoring.",
+"treat": "Follow-up per the flight surgeon.",
+"basis": "—",
+"v": {
+"hr": 74.0,
+"sbp": 118.0,
+"dbp": 76.0,
+"rr": 14.0,
+"spo2": 98.0
+},
+"rows": [
+{
+"k": "hr",
+"v": 74.0
+},
+{
+"k": "rr",
+"v": 14.0
+},
+{
+"k": "spo2",
+"v": 98.0
+},
+{
+"k": "bp",
+"v": 118.0,
+"v2": 76.0
+},
+{
+"k": "sym",
+"x": {
+"bleed": "none",
+"inf": false,
+"conf": false
+}
+}
+],
+"earth": false,
+"branch": false,
+"n": 8,
+"code": "NORMAL",
+"down": true
+},
+{
+"label": "CRITICAL - SHOCK",
+"stage": "If shock develops (any time)",
+"what": "Sarah becomes pale, sweaty and confused; the pulse is fast and weak.",
+"key": "HR above 120 | Systolic BP falling (below 90) | RR above 30 | Shock index 1.0 or more",
+"assess": "Signs of ATLS class III shock (30–40% of blood volume). Treat as an emergency even if the bleeding looks controlled.",
+"checks": "Look again for bleeding; Continuous HR, BP, SpO2.",
+"labs": "Hemoglobin if available.",
+"actions": "Lie her flat with legs raised and keep her warm; Oxygen if indicated by the protocol; Flight surgeon now",
+"equip": "Oxygen, IV kit if trained, monitoring.",
+"treat": "IV fluids only per the approved protocol.",
+"basis": "ATLS class III: 30–40% loss, HR 120–140, decreased BP. Shock index above 1 is linked to about four times the mortality.",
+"v": {},
+"rows": [],
+"earth": false,
+"branch": true,
+"n": 9,
+"code": "CRITICAL",
+"down": false
+}
+]
+},
+{
 "id": "dehy",
 "title": "Dehydration during a Mars Mission",
 "kind": "Acute",

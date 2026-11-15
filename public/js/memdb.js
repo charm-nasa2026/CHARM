@@ -46,10 +46,6 @@
     delete this.status[pid]; delete this.overrides[pid]; this.changed('purge'); return n;
   };
   P.deleteCrew = async function (id) { delete this.crew[id]; this.changed('crew'); };
-  P.listPush = async function () { var p = this.push || {}; return Object.keys(p).map(function (k) { return Object.assign({ id: k }, p[k]); }); };
-  P.setPush = async function (id, o) { (this.push || (this.push = {}))[id] = Object.assign({}, o); };
-  P.delPush = async function (id) { if (this.push) delete this.push[id]; };
-  P.sendPush = async function (tokens, data) { (this.sent || (this.sent = [])).push({ tokens: tokens.slice(), data: data }); return { invalid: tokens.filter(function (t) { return /^dead/.test(t); }) }; };
   P.addInbox = async function (arr) { var me = this; arr.forEach(function (o) { me.inbox.push(Object.assign({ id: me.id('i') }, o)); }); this.changed('inbox'); };
   return MemDB;
 });

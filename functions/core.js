@@ -45,33 +45,7 @@
     var saved = await db.addEvents(events);
     var ob = saved.filter(function (e) { return !e.replayed; }).map(outboxFor).filter(Boolean); // replayed history is not re-sent to Earth
     if (ob.length) await db.addOutbox(ob);
-    await notify(db, saved);
     return saved;
-  }
-
-  /*
-   * Phone alerts. CAUTION (orange) goes to the phone of the astronaut it is about (cabin alerts: every phone);
-   * CRITICAL (red) and Emergency Mode go to every registered phone. Replayed history never sends.
-   * A failure here never blocks the alert itself.
-   */
-  function pushId(token) { var h = 5381; for (var i = 0; i < token.length; i++) h = ((h * 33) ^ token.charCodeAt(i)) >>> 0; return 'p' + h.toString(36) + token.length.toString(36) + token.slice(-12).replace(/[^A-Za-z0-9_-]/g, ''); }
-  async function notify(db, saved) {
-    if (!db.listPush || !db.sendPush) return;
-    try {
-      var evs = saved.filter(function (e) { return !e.replayed && ((e.type === 'raise' && e.lv >= E.CAU) || e.type === 'emergency'); });
-      if (!evs.length) return;
-      var devs = await db.listPush(); if (!devs.length) return;
-      var crew = await db.listCrew(), names = {}; crew.forEach(function (c) { names[c.id] = c.name; });
-      for (var i = 0; i < evs.length; i++) {
-        var ev = evs[i], lv = ev.type === 'emergency' ? E.CRI : ev.lv;
-        var to = devs.filter(function (d) { return lv >= E.CRI || !ev.pid || d.pid === ev.pid; });
-        if (!to.length) continue;
-        var data = { l: String(lv >= E.CRI ? 3 : 2), pid: ev.pid || '', name: (ev.pid && names[ev.pid]) || '', k: ev.k || '', text: str(ev.text, 200), sub: str(ev.sub || '', 200), t: String(ev.t), id: ev.id || '', sim: ev.sim ? '1' : '' };
-        var res = await db.sendPush(to.map(function (d) { return d.token; }), data);
-        var bad = (res && res.invalid) || [];
-        for (var j = 0; j < bad.length; j++) await db.delPush(pushId(bad[j]));
-      }
-    } catch (e) { if (typeof console !== 'undefined') console.warn('phone alert not sent:', e && e.message); }
   }
 
   async function bootstrap(db, now) {
@@ -491,20 +465,6 @@
         return { ok: true, offsets: offs };
       }
       case 'replay': return replay(db, d, meta);
-      case 'pushRegister': {
-        var tok = str(d.token, 4096); if (tok.length < 20) throw err('invalid-argument', 'Missing phone token');
-        var who = d.pid === 'shared' ? 'shared' : (await crewDoc(db, d.pid)) ? d.pid : null; if (!who) throw err('invalid-argument', 'Unknown astronaut');
-        await db.setPush(pushId(tok), { token: tok, pid: who, device: str(d.device, 80) || null, updated: meta.now });
-        return { ok: true, pid: who };
-      }
-      case 'pushUnregister': { var tk = str(d.token, 4096); if (tk) await db.delPush(pushId(tk)); return { ok: true }; }
-      case 'pushTest': {
-        var tt = str(d.token, 4096); if (tt.length < 20) throw err('invalid-argument', 'Missing phone token');
-        var lvT = d.l === 2 ? 2 : 3;
-        var r = await db.sendPush([tt], { l: String(lvT), pid: '', name: 'Test', k: '', text: 'Test alert from CHARM: this phone gets ' + (lvT === 3 ? 'CRITICAL' : 'CAUTION') + ' alerts', sub: 'Nothing is wrong. Sent by ' + (meta.by || 'crew'), t: String(meta.now), id: '', sim: '' });
-        if (r && r.invalid && r.invalid.length) { await db.delPush(pushId(tt)); throw err('failed-precondition', 'This phone is no longer registered. Turn alerts on again.'); }
-        return { ok: true };
-      }
       /*
        * Delete an astronaut's data (mode 'data': readings, alerts, logs, baseline, limits; the crew member stays)
        * or remove the astronaut from the system (mode 'all'). Irreversible, so the exact name must be typed.
@@ -529,5 +489,5 @@
     }
   }
 
-  return { pushId: pushId, api: api, tick: tick, pumpDemo: pumpDemo, evaluate: evaluate, evaluateEnv: evaluateEnv, bootstrap: bootstrap, SEED_CREW: SEED_CREW, outboxFor: outboxFor };
+  return { api: api, tick: tick, pumpDemo: pumpDemo, evaluate: evaluate, evaluateEnv: evaluateEnv, bootstrap: bootstrap, SEED_CREW: SEED_CREW, outboxFor: outboxFor };
 });

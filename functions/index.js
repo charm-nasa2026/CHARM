@@ -12,7 +12,6 @@ const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { setGlobalOptions, logger } = require('firebase-functions');
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
-const { getMessaging } = require('firebase-admin/messaging');
 const E = require('./engine.js');
 const C = require('./core.js');
 
@@ -78,19 +77,6 @@ const db = {
     return n;
   },
   deleteCrew: (id) => col('crew').doc(id).delete(),
-  // phone alerts (collection 'push' is not readable by the app: see firestore.rules)
-  listPush: async () => data(await col('push').get()),
-  setPush: (id, o) => col('push').doc(id).set(clean(o)),
-  delPush: (id) => col('push').doc(id).delete(),
-  sendPush: async (tokens, payload) => {
-    const invalid = [];
-    for (let i = 0; i < tokens.length; i += 500) {
-      const part = tokens.slice(i, i + 500);
-      const res = await getMessaging().sendEachForMulticast({ tokens: part, data: payload, webpush: { headers: { Urgency: 'high', TTL: '3600' } } });
-      res.responses.forEach((r, j) => { if (!r.success && r.error && /registration-token-not-registered|invalid-registration-token|invalid-argument/.test(r.error.code)) invalid.push(part[j]); });
-    }
-    return { invalid };
-  },
   addInbox: (arr) => commitAll(arr.map((o) => (b) => b.set(col('inbox').doc(), clean(o))))
 };
 

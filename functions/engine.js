@@ -44,13 +44,14 @@
     c_sans: { label: 'SANS (eyes and optic disc)', short: 'SANS', unit: '', dec: 0, cond: true, hidden: true },
     c_vte: { label: 'Venous thrombosis (neck vein)', short: 'VTE', unit: '', dec: 0, cond: true, hidden: true },
     c_anem: { label: 'Fluid loss and space anemia', short: 'Anemia', unit: '', dec: 0, cond: true, hidden: true },
+    c_bleed: { label: 'Bleeding (injury)', short: 'Bleeding', unit: '', dec: 0, cond: true, hidden: true },
     c_vol: { label: 'Circulation strain (shock index)', short: 'Shock index', unit: '', dec: 0, cond: true, hidden: true },
     rt: { label: 'Reaction time', short: 'Reaction', unit: 'ms', dec: 0, hidden: true }
   };
   var EXAMK = ['ecg', 'ortho', 'urine', 'ijv', 'sym'];
-  var CONDK = ['c_inf', 'c_af', 'c_orth', 'c_kid', 'c_sans', 'c_vte', 'c_anem', 'c_vol'];
+  var CONDK = ['c_inf', 'c_af', 'c_orth', 'c_kid', 'c_sans', 'c_vte', 'c_anem', 'c_vol', 'c_bleed'];
   var MKEYS = ['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'fluid', 'wt', 'vision', 'blood', 'bone'].concat(EXAMK).concat(CONDK);
-  var LKEYS = ['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'wt', 'bone', 'c_vol'].concat(CONDK.filter(function (k) { return k !== 'c_vol'; })); // what raises alerts (the first of equal levels is the headline: shock index before the infection screen)
+  var LKEYS = ['hr', 'bp', 'spo2', 'rr', 'temp', 'glu', 'sleep', 'mood', 'ex', 'dose', 'wt', 'bone', 'c_bleed', 'c_vol'].concat(CONDK.filter(function (k) { return k !== 'c_vol' && k !== 'c_bleed'; })); // what raises alerts (the first of equal levels is the headline: shock index before the infection screen)
   var RKEYS = MKEYS.filter(function (k) { return CONDK.indexOf(k) < 0; }).concat(['rt']); // every metric a reading can carry
   /* Alert levels. -1 NO DATA · 0 NORMAL (green) · 1 ATTENTION (yellow: one screening limit crossed)
      · 2 CAUTION (orange: medical criterion or multi-signal pattern) · 3 CRITICAL (red: urgent). */
@@ -230,7 +231,7 @@
     urine: { vol: [0, 10], blood: 'b', us: ['none', 'stone', 'hydro'] },
     ijv: { vel: [0, 200], retro: 'b', thrombus: 'b' },
     vision: { trt: [-100, 400], frisen: [0, 5], refr: [-10, 10], folds: ['none', 'any', 'sharp'], flat: ['none', 'present', 'moderate'], self: ['none', 'same', 'worse'], stable: 'b' },
-    sym: { inf: 'b', conf: 'b', faint: 'b', chest: 'b' },
+    sym: { inf: 'b', conf: 'b', faint: 'b', chest: 'b', bleed: ['none', 'controlled', 'active'] },
     bone: { ntx: [0, 1000], oc: [0, 500], bsap: [0, 500], follow: 'b' },
     blood: { hb: [2, 25], hct: [10, 75], wbc: [0, 200], plt: [0, 3000], lym: [0, 50000] }
   };
@@ -258,7 +259,7 @@
         var ve = [x.trt != null && x.trt >= 20, x.refr != null && x.refr >= 0.75, x.folds === 'any' || x.folds === 'sharp', x.flat === 'present' || x.flat === 'moderate'].filter(Boolean).length;
         if (vc) return x.stable ? CAU : CRI; // scenario 3: an established finding reviewed as not rising is followed, not an emergency
         return ve >= 2 ? CAU : ve || x.self === 'worse' ? ATT : 0;
-      case 'sym': return x.inf || x.conf || x.faint || x.chest ? ATT : 0;
+      case 'sym': if (x.bleed === 'active') return CRI; return x.inf || x.conf || x.faint || x.chest || x.bleed === 'controlled' ? ATT : 0;
       case 'blood': var l = 0, up = function (v) { if (v > l) l = v; };
         if (x.wbc != null && (x.wbc > 12 || x.wbc < 4)) up(ATT);        // SIRS WBC criterion
         if (x.wbc != null && (x.wbc > 20 || x.wbc < 2)) up(CRI);
@@ -278,7 +279,7 @@
       case 'ijv': if (x.vel != null) p.push(x.vel + ' cm/s'); if (x.retro) p.push('retrograde flow'); if (x.thrombus) p.push('thrombus seen'); return p.join(' · ') || 'Normal flow';
       case 'vision': if (x.trt != null) p.push('ΔTRT ' + (x.trt > 0 ? '+' : '') + x.trt + ' µm'); if (x.frisen) p.push('Frisén ' + x.frisen); if (x.refr) p.push('refraction ' + (x.refr > 0 ? '+' : '') + x.refr + ' D'); if (x.stable) p.push('reviewed: not rising'); if (x.folds && x.folds !== 'none') p.push(x.folds === 'sharp' ? 'sharp folds near macula' : 'folds'); if (x.flat && x.flat !== 'none') p.push(x.flat + ' globe flattening'); if (x.self === 'worse') p.push('self vision test worse than before flight'); else if (x.self === 'same') p.push('self vision test unchanged'); return p.join(' · ') || 'No change from baseline';
       case 'bone': if (x.ntx != null) p.push('NTX ' + x.ntx); if (x.oc != null) p.push('osteocalcin ' + x.oc); if (x.bsap != null) p.push('BSAP ' + x.bsap); if (x.follow) p.push('follow-up pending'); return p.join(' · ');
-      case 'sym': if (x.inf) p.push('suspected infection'); if (x.conf) p.push('confusion'); if (x.faint) p.push('fainting'); if (x.chest) p.push('chest pain'); return p.length ? p.join(' · ') : 'No symptoms';
+      case 'sym': if (x.inf) p.push('suspected infection'); if (x.conf) p.push('confusion'); if (x.faint) p.push('fainting'); if (x.chest) p.push('chest pain'); if (x.bleed === 'active') p.push('bleeding, not controlled'); if (x.bleed === 'controlled') p.push('bleeding controlled'); return p.length ? p.join(' · ') : 'No symptoms';
       case 'blood': if (x.hb != null) p.push('Hb ' + x.hb); if (x.wbc != null) p.push('WBC ' + x.wbc); if (x.plt != null) p.push('Plt ' + x.plt); if (x.lym != null) p.push('Lymph ' + x.lym); return p.join(' · ');
     }
     return null;
@@ -446,7 +447,9 @@
     var q = []; if (rr != null && rr >= 22) q.push('breathing ' + Math.round(rr)); if (sb != null && sb <= 100) q.push('systolic ' + Math.round(sb)); if (sy.conf) q.push('new confusion');
     var tb = th.temp && th.temp.b, warm = tp != null && tb && tp >= tb + 0.8, fever = tp != null && tp > 38.0;
     // Scenario 3. CRITICAL: qSOFA >= 2 with an infection sign; ALERT: >= 2 SIRS signs, or temperature > 38.0 alone; WATCH: one sign, or 0.8 °C above own normal
-    if (q.length >= 2 && (sy.inf || crit.length)) m.c_inf = cond(CRI, 'Infection with warning signs – urgent', q.concat(crit), '1) Lie down; a crewmate stays. 2) Vitals and SpO2 every 15 min. 3) Flight surgeon now. 4) Flight surgeon decides treatment from the medical kit.', 'INF-QSOFA');
+    var bleedOnly = (sy.bleed === 'active' || sy.bleed === 'controlled') && !sy.inf && !(tp != null && (tp > I.tHi || tp < I.tLo)) && !(b.wbc != null && (b.wbc > 12 || b.wbc < 4));
+    if (bleedOnly) m.c_inf = cond(0, 'No infection pattern: fast heart and breathing are explained by the reported bleeding', crit, '', 'INF-BLEED');
+    else if (q.length >= 2 && (sy.inf || crit.length)) m.c_inf = cond(CRI, 'Infection with warning signs – urgent', q.concat(crit), '1) Lie down; a crewmate stays. 2) Vitals and SpO2 every 15 min. 3) Flight surgeon now. 4) Flight surgeon decides treatment from the medical kit.', 'INF-QSOFA');
     else if (crit.length >= 2 || fever) m.c_inf = cond(CAU, 'Signs of infection', crit, '1) Rest and drink. 2) Vitals and SpO2 every 4 h. 3) Mask, distance, clean shared surfaces. 4) Blood count if available. 5) Tell the CMO; flight surgeon reviews today. 6) Medication only per protocol.', 'INF-SIRS');
     else if (crit.length === 1 || warm || sy.inf) m.c_inf = cond(ATT, crit.length || warm ? 'Watch: one sign of infection' : 'Watch: symptoms of infection reported', crit.length ? crit : warm ? ['temperature ' + tp + ' °C, 0.8 °C or more above own normal'] : ['crew symptom check: suspected infection'], '1) Re-measure temperature, HR and RR in 4 h. 2) Rest and drink.', 'INF-WATCH');
     else m.c_inf = cond(0, 'No infection pattern', crit, 'Combine temperature, heart rate, breathing and WBC; log symptoms if infection is suspected.', 'INF-SCREEN');
@@ -499,6 +502,16 @@
       else if (si >= 0.9 || (si >= 0.8 && loss.length)) m.c_vol = cond(ATT, 'Watch: heart rate rising against blood pressure', sw, '1) Stop strenuous activity and rest. 2) Drink (oral rehydration). 3) Repeat HR and BP in 5 min.', 'VOL-WATCH');
       else m.c_vol = cond(0, 'Shock index normal', sw, '', 'VOL');
     } else m.c_vol = cond(0, 'No recent heart rate and blood pressure pair', [], '', 'VOL');
+    // Severe bleeding (scenario 5). Life-threatening bleeding = Stop the Bleed (American College of Surgeons); blood-loss signs =
+    // ATLS hemorrhage classes: class II HR 100-120, class III HR > 120 with falling blood pressure; shock index >= 1 (4x mortality).
+    var bl = sy.bleed, hrv = hv && !hv.ex ? hv.v : null, sbv = bv2 ? bv2.v : null, si2 = hrv != null && sbv ? hrv / sbv : null;
+    var bw = [bl === 'active' ? 'bleeding not controlled (crew report)' : 'bleeding controlled (crew report)'];
+    if (hrv != null) bw.push('heart rate ' + Math.round(hrv)); if (sbv != null) bw.push('systolic ' + Math.round(sbv)); if (si2 != null) bw.push('shock index ' + si2.toFixed(2));
+    if (bl === 'active') m.c_bleed = cond(CRI, 'Life-threatening bleeding – stop the bleed now', bw, '1) Gloves on. 2) Firm direct pressure with both hands. 3) Limb: tourniquet 5–8 cm above the wound, not on a joint; tighten until the bleeding stops; note the time. Elsewhere: pack the wound and press. 4) CMO and flight surgeon now.', 'BLEED-ACTIVE');
+    else if (bl === 'controlled' && ((hrv != null && hrv > 120) || (sbv != null && sbv < 90) || (si2 != null && si2 >= 1))) m.c_bleed = cond(CRI, 'Bleeding controlled, but signs of shock (ATLS class III)', bw, '1) Lie flat, legs up, keep warm. 2) Continuous HR, BP, SpO2. 3) IV fluids only per the approved protocol. 4) Flight surgeon now.', 'BLEED-SHOCK');
+    else if (bl === 'controlled' && ((hrv != null && hrv >= 100) || (si2 != null && si2 >= 0.9))) m.c_bleed = cond(CAU, 'Bleeding controlled – signs of blood loss (ATLS class II)', bw, '1) Keep the tourniquet or pressure on; do not loosen it. 2) HR and BP every 5 min. 3) Drink if alert. 4) Tell the CMO; flight surgeon reviews.', 'BLEED-LOSS');
+    else if (bl === 'controlled') m.c_bleed = cond(ATT, 'Bleeding controlled – keep watching', bw, '1) Check the dressing and the tourniquet time. 2) HR and BP every 15 min. 3) Flight surgeon plans the wound care.', 'BLEED-WATCH');
+    else m.c_bleed = cond(0, 'No bleeding reported', [], '', 'BLEED');
   }
   function hasAnyCurrent(st) { return LKEYS.some(function (k) { return !MDEF[k].cond && st.m[k].l >= 0; }); }
   /* The wearable counts as silent when its last heart-rate reading came from a sensor (not typed in) and is stale. */

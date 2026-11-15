@@ -241,30 +241,6 @@ test('removeCrew: delete data keeps the person; remove deletes them and bootstra
   assert.ok(db.readingsL.some((x) => x.pid !== 'sarah'));
 });
 
-test('phone alerts: orange only to that astronaut, red to everyone, dead tokens removed', async () => {
-  const db = new MemDB(), now = Date.UTC(2026, 10, 14, 12);
-  await C.api(db, 'bootstrap', {}, { now });
-  const T = (s) => s + 'x'.repeat(30);
-  await C.api(db, 'pushRegister', { token: T('maya'), pid: 'maya' }, { now });
-  await C.api(db, 'pushRegister', { token: T('david'), pid: 'david' }, { now });
-  await C.api(db, 'pushRegister', { token: T('shared'), pid: 'shared' }, { now });
-  await C.api(db, 'pushRegister', { token: T('dead'), pid: 'john' }, { now });
-  // orange for Maya: SIRS with suspected infection
-  await C.api(db, 'addReadings', { src: 'manual', readings: [{ pid: 'maya', k: 'temp', t: now - 60000, v: 38.4 }, { pid: 'maya', k: 'hr', t: now - 60000, v: 104 }, { pid: 'maya', k: 'rr', t: now - 60000, v: 18 }, { pid: 'maya', k: 'sym', t: now - 60000, x: { inf: true } }] }, { now });
-  const orange = db.sent.filter((s) => s.data.l === '2');
-  assert.ok(orange.length >= 1);
-  orange.forEach((s) => assert.deepStrictEqual(s.tokens, [T('maya')]));
-  db.sent = [];
-  // red for David: SpO2 85
-  await C.api(db, 'addReadings', { src: 'manual', readings: [{ pid: 'david', k: 'spo2', t: now - 60000, v: 85 }] }, { now });
-  const red = db.sent.filter((s) => s.data.l === '3');
-  assert.strictEqual(red.length, 1);
-  assert.strictEqual(red[0].tokens.length, 4);
-  assert.strictEqual(red[0].data.name, 'David');
-  assert.ok(!(await db.listPush()).some((d) => d.pid === 'john'));
-  await assert.rejects(C.api(db, 'pushRegister', { token: T('x'), pid: 'nobody' }, { now }));
-});
-
 test('demo tools: generated values reach the chosen level and return to normal', () => {
   const th = E.profile(null, null, 'sarah', NOW - 59 * 86400e3);
   E.DEMO_KEYS.forEach((k) => {
@@ -339,10 +315,10 @@ test('alert scenario B: hemoglobin up while body mass falls is ATTENTION; down 1
 
 test('demo scenarios played live: the engine raises the medic team\'s levels by itself', async () => {
   global.window = {}; require('../public/js/scenarios.js'); const SC = global.window.CHARM_SCENARIOS;
-  assert.deepStrictEqual(SC.map(s => s.id), ['pulm', 'dehy', 'sans', 'bone']);
+  assert.deepStrictEqual(SC.map(s => s.id), ['pulm', 'bleed', 'dehy', 'sans', 'bone']);
   // stage n -> worst level CHARM must reach (team: NORMAL 0, ALERT >= 1, CRITICAL 3). Dehydration step 8 has no new RR,
   // so the last RR 24 still counts and qSOFA keeps it CRITICAL until step 9 brings a full set (conservative on purpose).
-  const want = { pulm: [0, 1, 2, 3, 3, 3, 2, 0], dehy: [1, 1, 1, 2, 3, 3, 3, 3, 1, 0], sans: [null, null, 1, 2, 3, 3, 3, 2, 2, 2, 2], bone: [0, 0, 1, 1, 1, 1, 1] };
+  const want = { pulm: [0, 1, 2, 3, 3, 3, 2, 0], dehy: [1, 1, 1, 2, 3, 3, 3, 3, 1, 0], sans: [null, null, 1, 2, 3, 3, 3, 2, 2, 2, 2], bone: [0, 0, 1, 1, 1, 1, 1], bleed: [0, 3, 3, 2, 2, 1, 1, 0, null] };
   for (const sc of SC) {
     const db = new MemDB(); await C.api(db, 'bootstrap', {}, { now: NOW });
     let t = NOW;
@@ -355,7 +331,7 @@ test('demo scenarios played live: the engine raises the medic team\'s levels by 
     }
     const m = await db.getMission(); assert.strictEqual(m.demoScenario.sid, sc.id);
     assert.ok(db.readingsL.every(r => r.sim && r.src === 'scenario'));
-    if (sc.id === 'pulm' || sc.id === 'dehy') assert.ok(db.events.some(e => e.type === 'raise' && e.lv === 3), sc.id + ' raises a CRITICAL alert');
+    if (sc.id === 'pulm' || sc.id === 'dehy' || sc.id === 'bleed') assert.ok(db.events.some(e => e.type === 'raise' && e.lv === 3), sc.id + ' raises a CRITICAL alert');
     await C.api(db, 'demoStage', { stop: true }, { now: t + 1000, by: 'test' });
     assert.strictEqual((await db.getMission()).demoScenario, null);
   }

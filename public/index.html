@@ -12,7 +12,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="CHARM">
-<script src="js/push-config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/examples/jsm/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
@@ -499,7 +498,7 @@ table.map code{font-family:var(--f-mono);font-size:13px;color:#C8D5E8}
 .emtabs button{height:42px;padding:0 18px;border-radius:12px 12px 0 0;border:1px solid transparent;background:none;color:var(--mute);font-weight:700}
 .emtabs button[aria-pressed="true"]{border-color:var(--crit);border-bottom-color:#070B16;background:#120C18;color:var(--ink)}
 .embody{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:28px;padding:22px 24px}
-.emstep{display:flex;flex-direction:column;gap:18px;justify-content:center}.emstep.cmo{gap:12px;justify-content:flex-start}.emstep.cmo h3{font-size:32px}.emstep.cmo p{font-size:16px}.emstep.cmo .yn button{width:auto;min-width:200px;height:72px;font-size:22px;letter-spacing:1px;padding:0 28px}.btn.tick{white-space:normal;height:auto;min-height:48px;padding-top:10px;padding-bottom:10px;line-height:1.35;text-align:left;justify-content:flex-start}
+.emstep{display:flex;flex-direction:column;gap:18px;justify-content:center}.emstep.cmo{gap:12px;justify-content:flex-start}.emrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,300px);gap:20px;align-items:start}.emrow>div:first-child{display:flex;flex-direction:column;gap:12px}.emill{border:1px solid var(--line);border-radius:16px;background:rgba(10,20,40,.7);padding:10px;display:flex;align-items:center;justify-content:center}.emill svg{width:100%;height:auto;max-height:240px}@media (max-width:760px){.emrow{grid-template-columns:minmax(0,1fr)}.emill{order:-1;max-width:260px}}.emstep.cmo h3{font-size:32px}.emstep.cmo p{font-size:16px}.emstep.cmo .yn button{width:auto;min-width:200px;height:72px;font-size:22px;letter-spacing:1px;padding:0 28px}.btn.tick{white-space:normal;height:auto;min-height:48px;padding-top:10px;padding-bottom:10px;line-height:1.35;text-align:left;justify-content:flex-start}
 .emstep .sn{display:flex;align-items:center;gap:14px;font-weight:700;color:var(--mute);font-size:17px}
 .emstep .sn i{display:inline-block;width:46px;height:8px;border-radius:4px;background:#26334F}
 .emstep .sn i.on{background:var(--ink)}
@@ -997,6 +996,7 @@ var MDEF={
  c_sans:{label:'SANS (eyes and optic disc)',short:'SANS',unit:'',dec:0,sys:'head',src:'Combined rule · OCT, refraction, imaging',csv:'n0',cond:true,hidden:true},
  c_vte:{label:'Venous thrombosis (neck vein)',short:'VTE',unit:'',dec:0,sys:'blood',src:'Combined rule · Doppler ultrasound',csv:'v0',cond:true,hidden:true},
  c_anem:{label:'Fluid loss and space anemia',short:'Anemia',unit:'',dec:0,sys:'blood',src:'Combined rule · blood count, body mass, fluids',csv:'a0',cond:true,hidden:true},
+ c_bleed:{label:'Bleeding (injury)',short:'Bleeding',unit:'',dec:0,sys:'blood',src:'Combined rule · crew report, ATLS blood-loss signs',csv:'b0',cond:true,hidden:true},
  c_vol:{label:'Circulation strain (shock index)',short:'Shock index',unit:'',dec:0,sys:'heart',src:'Combined rule · heart rate ÷ systolic blood pressure',csv:'h0',cond:true,hidden:true}
 };
 var MKEYS=EN.MKEYS.slice();
@@ -1254,8 +1254,11 @@ var IC={
    boundary: the data still reaches every device (see README, Security note). */
 function isCMO(id){return id==='doctor';}
 function isDoc(){return S.signed==='doctor';}
-function canSee(pid){return isDoc()||S.signed===pid||!!S.unlocked[pid];}
-function signedIn(){return isDoc()||!!CREWBY[S.signed];}
+/* NASA reviewer (judges): sees every file, no password; cannot change alert thresholds (doctor only) */
+function isRev(){return S.signed==='reviewer';}
+function canSee(pid){return isDoc()||isRev()||S.signed===pid||!!S.unlocked[pid];}
+function signedIn(){return isDoc()||isRev()||!!CREWBY[S.signed];}
+var REV_AV='<svg viewBox="0 0 64 64" aria-hidden="true" style="width:100%;height:100%"><circle cx="32" cy="32" r="32" fill="#16305C"/><circle cx="32" cy="32" r="30" fill="none" stroke="#8FDcff" stroke-width="1.5" stroke-dasharray="2 3"/><circle cx="32" cy="24" r="10" fill="#F6D7C3"/><path d="M22 22c0-12 20-12 20 0-4-5-16-5-20 0z" fill="#3B2A22"/><path d="M14 56c2-12 9-18 18-18s16 6 18 18z" fill="#2D5BA8"/><rect x="36" y="38" width="16" height="20" rx="2" fill="#EAF1FB"/><rect x="40" y="36" width="8" height="4" rx="1.5" fill="#8FDcff"/><path d="M39 47l3 3 7-7" fill="none" stroke="#3DDC97" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 var DOC_HASH='06a1255eadaf45b7e26d6a39dcbacff435e8f98b3193545d3126df44f4088dae'; // SHA-256 of 'CHARM-doctor|<user>|<password>'
 function ssGet(k){try{return sessionStorage.getItem(k);}catch(e){return null;}}
 function ssSet(k,v){try{if(v==null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v);}catch(e){}}
@@ -1267,7 +1270,6 @@ async function docLogin(){
   var hex=Array.prototype.map.call(new Uint8Array(buf),function(b){return ('0'+b.toString(16)).slice(-2);}).join('');
   if(hex!==DOC_HASH){S.docErr='Wrong user name or password.';renderOv();var f=$('docp');if(f){f.value='';f.focus();}return;}
   S.signed='doctor';lsSet('charm-signed','doctor');ssSet('charm-doc','1');S.docForm=false;S.docErr='';S.unlocked={};S.ov=null;
-  if(pushTok())api('pushRegister',{token:pushTok(),pid:'shared'}).catch(function(){});
   renderAll();toast('Signed in as the doctor','You can see every crew member\'s file. Sign out in Settings › Who is using this device.');afterSignIn();
 }
 function av(pid,l,cls){var p=CREWBY[pid]||{img:'',name:''};return '<span class="av '+(l!=null?'r-'+lvKey(l):'')+' '+(cls||'')+'"><img src="'+p.img+'" alt=""></span>';}
@@ -1286,9 +1288,9 @@ function renderNav(){
   h+='<button class="navbtn navgrp" data-act="crewgrp" aria-expanded="'+S.crewOpen+'" title="Crew ('+CREW.length+')">'+IC.crew+'<span class="navlabel">Crew · '+CREW.length+'</span><span class="cnt">'+badges(c)+IC.chev+'</span></button>';
   if(S.crewOpen)h+='<div class="navsub">'+list.map(function(x){return navCrewBtn(x.p,t,r);}).join('')+'</div>';
   h+=navBtn('matrix','table','All crew metrics',r.v==='matrix');
-  h+='<div class="navsec">TOOLS</div>'+navBtn('events','hist','Alerts and history',r.v==='events')+navBtn('tests','test','Guided tests',r.v==='tests'||r.v==='test')+navBtn('earth','earth','Earth link',r.v==='earth')+'<button class="navbtn" data-act="entry" title="Add measurement">'+IC.plus+'<span class="navlabel">Add measurement</span></button><button class="navbtn" data-act="import" title="Import data">'+IC.up+'<span class="navlabel">Import data</span></button>'+navBtn('prefs','gear','Settings',r.v==='prefs');
+  h+='<div class="navsec">TOOLS</div>'+navBtn('events','hist','Alerts and history',r.v==='events')+navBtn('tests','test','Guided tests',r.v==='tests'||r.v==='test')+navBtn('scenario','play','Simulate scenario',r.v==='scenario')+navBtn('earth','earth','Earth link',r.v==='earth')+'<button class="navbtn" data-act="entry" title="Add measurement">'+IC.plus+'<span class="navlabel">Add measurement</span></button><button class="navbtn" data-act="import" title="Import data">'+IC.up+'<span class="navlabel">Import data</span></button>'+navBtn('prefs','gear','Settings',r.v==='prefs');
   var me=S.signed==='shared'?null:CREWBY[S.signed]||null;
-  h+='<div class="navfoot"><button class="whoami" data-act="go" data-to="prefs" data-tab="who" title="Signed in">'+(me?av(me.id,null):'<span class="av"></span>')+'<span><b>'+(me?me.name:isDoc()?'Doctor':'Not signed in')+'</b><small>'+(me?me.role:isDoc()?'Flight surgeon · all crew files':'Pick who you are')+'</small></span></button>';
+  h+='<div class="navfoot"><button class="whoami" data-act="go" data-to="prefs" data-tab="who" title="Signed in">'+(me?av(me.id,null):isRev()?'<span class="av">'+REV_AV+'</span>':'<span class="av"></span>')+'<span><b>'+(me?me.name:isDoc()?'Doctor':isRev()?'NASA Reviewer':'Not signed in')+'</b><small>'+(me?me.role:isRev()?'Judge · all crew files':isDoc()?'Flight surgeon · all crew files':'Pick who you are')+'</small></span></button>';
   h+='<div class="protonote">Thresholds are demo values and need medical review. '+(CONN.mode==='local'?'Local test mode: nothing is saved.':'Live data · '+esc(CONN.project||''))+'</div></div>';
   $('nav').innerHTML=h;
 }
@@ -1326,7 +1328,6 @@ function renderTop(){
   if(activeCrit(t).length||(S.emg&&Object.keys(S.emg).length))h+='<button class="embtn" data-act="empick">'+IC.dia+'<span class="tlong">EMERGENCY</span></button>'; // only while a crew member is CRITICAL or an emergency is open
   h+=syncPill();
   h+='<button class="laybtn" data-act="layout" aria-label="Switch to '+(isTablet()?'laptop':'tablet')+' view" title="Switch to '+(isTablet()?'laptop':'tablet')+' view">'+(isTablet()?IC.tablet:IC.laptop)+'<span class="tlong">'+(isTablet()?'Tablet':'Laptop')+' <span class="lb2">view</span></span></button>';
-  h+='<button class="iconbtn gearbtn" data-act="go" data-to="prefs" aria-label="Settings" title="Settings" '+(S.route.v==='prefs'?'style="border-color:var(--cyan);color:var(--cyan2)"':'')+'>'+IC.gear+'</button>';
   $('top').innerHTML=h;
 }
 function isTablet(){return S.layout?S.layout==='tablet':(matchMedia('(pointer: coarse)').matches&&window.innerWidth<1400);}
@@ -1508,7 +1509,7 @@ function compareCard(t){
 }
 
 /* --- astronaut file --- */
-var SYS=[{id:'head',label:'Head and eyes',ks:['vision','c_sans']},{id:'mind',label:'Mind and sleep',ks:['sleep','mood','sym']},{id:'heart',label:'Heart',ks:['hr','bp','c_af','c_orth','c_vol']},{id:'lungs',label:'Lungs',ks:['spo2','rr']},{id:'abdomen',label:'Metabolism and kidneys',ks:['glu','fluid','c_kid']},{id:'muscle',label:'Bones and muscles',ks:['ex','wt','bone']},{id:'skin',label:'Temperature',ks:['temp']},{id:'blood',label:'Blood, immune and veins',ks:['blood','c_inf','c_vte','c_anem']}];
+var SYS=[{id:'head',label:'Head and eyes',ks:['vision','c_sans']},{id:'mind',label:'Mind and sleep',ks:['sleep','mood','sym']},{id:'heart',label:'Heart',ks:['hr','bp','c_af','c_orth','c_vol']},{id:'lungs',label:'Lungs',ks:['spo2','rr']},{id:'abdomen',label:'Metabolism and kidneys',ks:['glu','fluid','c_kid']},{id:'muscle',label:'Bones and muscles',ks:['ex','wt','bone']},{id:'skin',label:'Temperature',ks:['temp']},{id:'blood',label:'Blood, immune and veins',ks:['blood','c_bleed','c_inf','c_vte','c_anem']}];
 function sysLevel(st,s){var b=0;s.ks.forEach(function(k){var l=st.m[k].l;if(rank(l)>rank(b))b=l;});return b;}
 function zoneTip(st,z){var parts=z.ks.map(function(k){var m=st.m[k];return MDEF[k].label+': '+(m.val?fmtV(k,m.val)+(m.val.txt?'':' '+MDEF[k].unit):'no reading')+' · '+WORD[lvKey(m.l)];});return '<b>'+z.label+'</b>'+parts.map(esc).join('<br>');}
 /* where the face sits in each 320 px face image: [eye-midpoint x, eye-line y, eye distance + eye-to-mouth] */
@@ -1602,7 +1603,7 @@ function issueCard(pid,it,st,t){
     h+='<div class="card issue i-'+it.l+'"><div class="row1">'+lvw(it.l)+'<span class="conf">Condition alert · '+esc(MDEF[k].label)+'</span></div><h3>'+esc(v.txt)+'</h3>';
     if(v.why&&v.why.length)h+='<p class="det"><b>Found:</b> '+v.why.map(esc).join(' · ')+'</p>';
     h+='<p class="det faint" style="font-size:13px">'+esc(c.why||'')+'</p><div class="nx"><div><span class="muted">Next step:</span> '+esc(v.next)+'</div>';
-    var ex={c_af:['ecg','test-ecg-'+pid,'Record a 1-min ECG'],c_orth:['ortho',null,'Repeat orthostatic test'],c_kid:['urine',null,'Log a urine check'],c_sans:['vision',null,'Log an eye exam'],c_vte:['ijv',null,'Log a neck-vein scan'],c_anem:['blood',null,'Log a blood count'],c_inf:['sym',null,'Update symptoms']}[k];
+    var ex={c_af:['ecg','test-ecg-'+pid,'Record a 1-min ECG'],c_orth:['ortho',null,'Repeat orthostatic test'],c_kid:['urine',null,'Log a urine check'],c_sans:['vision',null,'Log an eye exam'],c_vte:['ijv',null,'Log a neck-vein scan'],c_anem:['blood',null,'Log a blood count'],c_bleed:['sym',null,'Update the bleeding status'],c_inf:['sym',null,'Update symptoms']}[k];
     if(isLive()){if(it.l===3)h+='<button class="btn pri" data-act="emer" data-id="'+pid+'" style="background:#C9262B;border-color:#C9262B;color:#fff">Open Emergency Mode</button>';
       if(ex)h+=ex[1]?'<button class="btn" data-act="go" data-to="'+ex[1]+'">'+ex[2]+'</button>':'<button class="btn" data-act="entry" data-id="'+pid+'" data-k="'+ex[0]+'">'+ex[2]+'</button>';}
     h+='</div><p class="faint" style="font-size:12px;margin:8px 0 0">Rule '+esc(v.rule||'')+' · medic team thresholds (data/reference/charm_alert_rules.csv)</p>';
@@ -1900,6 +1901,53 @@ function illus(kind,k,pid){
   return base+'</svg>';
 }
 
+/* Emergency Mode illustrations for the Crew Medical Officer screens (same drawing style as the guided tests).
+   The picture is chosen from the words of the step. */
+var EMI_SK='#F6D7C3',EMI_SU='#2D5BA8',EMI_DK='#1E3A70',EMI_CY='#38BDF8',EMI_AM='#FFB020',EMI_RD='#E34B5B',EMI_GN='#3DDC97',EMI_PN='#0E1830';
+function emiBase(inner,label){return '<svg viewBox="0 0 440 320" role="img" aria-label="'+esc(label||'Illustration')+'"><defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 10 5 0 10z" fill="'+EMI_AM+'"/></marker></defs>'+inner+'</svg>';}
+function emiTxt(x,y,t,c,sz){return '<text x="'+x+'" y="'+y+'" text-anchor="middle" font-size="'+(sz||21)+'" font-weight="700" fill="'+(c||EMI_AM)+'">'+t+'</text>';}
+/* forearm, wrist to elbow, with an optional wound */
+function emiArm(wound){return '<path d="M40 190 L300 150 Q330 146 340 160 L344 190 Q338 206 306 210 L44 236 Q28 214 40 190z" fill="'+EMI_SK+'"/><path d="M300 150 l40 -6 l30 10 l6 40 l-32 12" fill="'+EMI_SU+'"/>'+(wound?'<path d="M150 186 q30 -8 60 -10" stroke="#9B1C2C" stroke-width="7" stroke-linecap="round"/>':'');}
+function emiDrops(x,y){var h='';[[0,0,9],[26,-22,6],[-20,-30,5],[44,-48,4],[8,-58,3.5]].forEach(function(d){h+='<circle cx="'+(x+d[0])+'" cy="'+(y+d[1])+'" r="'+d[2]+'" fill="'+EMI_RD+'"/>';});return h;}
+function emiHand(x,y,rot){return '<g transform="translate('+x+' '+y+') rotate('+(rot||0)+')"><rect x="-34" y="-20" width="68" height="40" rx="18" fill="#C8E1FF"/><rect x="-30" y="-46" width="14" height="32" rx="7" fill="#C8E1FF"/><rect x="-12" y="-52" width="14" height="38" rx="7" fill="#C8E1FF"/><rect x="6" y="-50" width="14" height="36" rx="7" fill="#C8E1FF"/><rect x="24" y="-42" width="12" height="28" rx="6" fill="#C8E1FF"/></g>';}
+function emiPerson(lying){if(lying)return '<rect x="40" y="226" width="360" height="40" rx="18" fill="#36466A"/><circle cx="92" cy="214" r="26" fill="'+EMI_SK+'"/><path d="M66 210c0-32 52-32 52 0-8-12-44-12-52 0z" fill="#5B3A29"/><path d="M120 196h170q14 0 14 16v18H120z" fill="'+EMI_SU+'"/><path d="M300 200l70 -40 14 20 -66 44z" fill="'+EMI_DK+'"/>';
+  return '<circle cx="150" cy="80" r="34" fill="'+EMI_SK+'"/><path d="M116 76c0-44 68-44 68 0-10-16-58-16-68 0z" fill="#5B3A29"/><path d="M106 130c0-12 20-20 44-20s44 8 44 20v110H106z" fill="'+EMI_SU+'"/>';}
+var EMI={
+ resp:function(){return emiPerson(true)+'<rect x="230" y="60" width="150" height="56" rx="16" fill="'+EMI_PN+'" stroke="'+EMI_CY+'" stroke-width="2"/>'+emiTxt(305,96,'Can you hear me?','#EAF1FB',15)+'<path d="M250 116 l-20 26" stroke="'+EMI_CY+'" stroke-width="2"/>'+emiHand(140,172,90)+emiTxt(220,300,'name + squeeze the shoulder');},
+ gloves:function(){return '<g transform="translate(70 70)"><path d="M0 120 V40 q0-14 12-14 t12 14 V0 q0-14 13-14 t13 14 v-10 q0-14 13-14 t13 14 v20 q0-12 12-12 t12 12 v90 q0 50 -50 50 h-10 q-40 0 -40 -50z" fill="#7FD1FF"/></g><g transform="translate(220 70)"><path d="M0 120 V40 q0-14 12-14 t12 14 V0 q0-14 13-14 t13 14 v-10 q0-14 13-14 t13 14 v20 q0-12 12-12 t12 12 v90 q0 50 -50 50 h-10 q-40 0 -40 -50z" fill="#7FD1FF"/></g><rect x="300" y="236" width="110" height="38" rx="18" fill="none" stroke="'+EMI_CY+'" stroke-width="5"/><line x1="355" y1="236" x2="355" y2="274" stroke="'+EMI_CY+'" stroke-width="5"/>'+emiTxt(220,306,'blood floats: protect eyes');},
+ anchor:function(){return emiPerson(false)+'<rect x="112" y="240" width="30" height="50" fill="'+EMI_DK+'"/><rect x="160" y="240" width="30" height="50" fill="'+EMI_DK+'"/><rect x="60" y="292" width="320" height="10" rx="5" fill="#24324D"/><path d="M100 286 q28 -22 56 0 M150 286 q28 -22 56 0" fill="none" stroke="'+EMI_AM+'" stroke-width="5"/>'+emiTxt(320,150,'feet in the loops')+emiTxt(320,178,'so you can push');},
+ pressure:function(){return emiArm(true)+emiDrops(240,120)+'<rect x="140" y="160" width="84" height="40" rx="6" fill="#FFFFFF" opacity=".95"/>'+emiHand(182,148,0)+emiHand(186,110,0)+'<path d="M300 60 v50" stroke="'+EMI_AM+'" stroke-width="4" marker-end="url(#ar2)"/>'+emiTxt(300,48,'press hard')+emiTxt(220,296,'don\'t lift to look','#EAF1FB');},
+ pack:function(){return emiArm(false)+'<path d="M150 188 q30 -10 60 -12" stroke="#9B1C2C" stroke-width="12" stroke-linecap="round"/><path d="M180 60 q-10 40 0 116" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/><rect x="150" y="30" width="60" height="34" rx="6" fill="#FFFFFF"/>'+emiTxt(180,52,'gauze','#0E1830',13)+emiTxt(310,90,'pack it in')+emiTxt(310,118,'then press');},
+ tourniquet:function(){return emiArm(true)+'<rect x="262" y="140" width="26" height="78" rx="6" fill="#1B1B1B" transform="rotate(-8 275 179)"/><rect x="246" y="168" width="62" height="10" rx="5" fill="'+EMI_AM+'" transform="rotate(-50 277 173)"/><path d="M210 128 h44" stroke="'+EMI_CY+'" stroke-width="2"/><path d="M210 120 v16 M254 120 v16" stroke="'+EMI_CY+'" stroke-width="2"/>'+emiTxt(232,110,'5–8 cm',EMI_CY,18)+'<rect x="300" y="40" width="110" height="56" rx="12" fill="'+EMI_PN+'" stroke="'+EMI_AM+'" stroke-width="2"/>'+emiTxt(355,76,'time ✎','#EAF1FB',20)+emiTxt(200,296,'never on a joint');},
+ time:function(){return '<rect x="120" y="40" width="200" height="250" rx="18" fill="'+EMI_PN+'" stroke="'+EMI_CY+'" stroke-width="3"/><circle cx="220" cy="110" r="44" fill="none" stroke="'+EMI_AM+'" stroke-width="5"/><path d="M220 110 v-28 M220 110 l20 12" stroke="'+EMI_AM+'" stroke-width="5" stroke-linecap="round"/>'+[0,1,2].map(function(i){return '<path d="M150 '+(186+i*30)+' l8 8 14-16" fill="none" stroke="'+EMI_GN+'" stroke-width="4"/><rect x="182" y="'+(182+i*30)+'" width="110" height="10" rx="5" fill="#36466A"/>';}).join('')+emiTxt(220,312,'write the time');},
+ call:function(){return '<circle cx="120" cy="150" r="70" fill="#123058" stroke="'+EMI_CY+'" stroke-width="3"/><path d="M84 150a36 36 0 0 1 72 0" fill="none" stroke="#EAF1FB" stroke-width="8"/><rect x="74" y="146" width="18" height="34" rx="8" fill="#EAF1FB"/><rect x="148" y="146" width="18" height="34" rx="8" fill="#EAF1FB"/><path d="M220 150 q50 -40 100 0" fill="none" stroke="'+EMI_AM+'" stroke-width="4" stroke-dasharray="6 8"/><circle cx="360" cy="150" r="40" fill="#1E6FB8"/><path d="M336 140 q20 -14 40 4 q-10 20 -30 14z" fill="#3DDC97"/>'+emiTxt(220,270,'call the crew now');},
+ airway:function(){return '<circle cx="150" cy="150" r="80" fill="'+EMI_SK+'"/><path d="M80 120c10-70 130-80 150-10-40-30-110-30-150 10z" fill="#5B3A29"/><path d="M200 170 q40 10 60 50" fill="none" stroke="'+EMI_CY+'" stroke-width="6" marker-end="url(#ar2)"/><path d="M300 220 q30 -20 60 0 q-30 20 -60 0z" fill="none" stroke="'+EMI_GN+'" stroke-width="4"/>'+emiTxt(330,190,'chest rises?')+emiTxt(220,300,'airway · breathing');},
+ monitor:function(){return '<rect x="70" y="50" width="300" height="190" rx="16" fill="'+EMI_PN+'" stroke="'+EMI_CY+'" stroke-width="3"/><polyline points="90,120 140,120 150,96 160,140 170,120 230,120 240,96 250,140 260,120 350,120" fill="none" stroke="'+EMI_GN+'" stroke-width="3"/>'+emiTxt(130,190,'HR','#8FDcff',14)+emiTxt(220,190,'BP','#8FDcff',14)+emiTxt(310,190,'SpO₂','#8FDcff',14)+emiTxt(130,220,'♥','#EAF1FB',20)+emiTxt(220,220,'—/—','#EAF1FB',18)+emiTxt(310,220,'%','#EAF1FB',18)+'<rect x="200" y="240" width="40" height="40" fill="#36466A"/>'+emiTxt(220,306,'continuous monitoring');},
+ spo2:function(){return '<path d="M120 300V170c0-16 14-28 30-28s30 12 30 28v130z" fill="'+EMI_SK+'"/><rect x="104" y="130" width="92" height="70" rx="20" fill="'+EMI_CY+'"/><rect x="230" y="70" width="150" height="110" rx="16" fill="'+EMI_PN+'" stroke="'+EMI_CY+'" stroke-width="2"/>'+emiTxt(305,138,'SpO₂ %','#8FDcff',26)+'<path d="M196 160 q20 -20 34 -30" stroke="'+EMI_CY+'" stroke-width="3" fill="none"/>'+emiTxt(240,250,'warm finger, wait 30 s');},
+ bp:function(){return illus('cuff','bp');},
+ temp:function(){return '<rect x="190" y="40" width="60" height="200" rx="30" fill="#EAF1FB"/><rect x="208" y="90" width="24" height="140" rx="12" fill="'+EMI_RD+'"/><circle cx="220" cy="250" r="40" fill="'+EMI_RD+'"/>'+[0,1,2,3,4].map(function(i){return '<path d="M250 '+(80+i*30)+' h18" stroke="#36466A" stroke-width="3"/>';}).join('')+emiTxt(220,312,'temperature');},
+ oxygen:function(){return '<rect x="300" y="60" width="70" height="200" rx="30" fill="#3DDC97"/><rect x="318" y="36" width="34" height="30" rx="6" fill="#36466A"/><path d="M300 120 q-80 -10 -120 50" fill="none" stroke="#EAF1FB" stroke-width="5"/><circle cx="140" cy="170" r="56" fill="'+EMI_SK+'"/><path d="M118 186 q22 -30 50 0 q-4 24 -26 24 q-22 0 -24 -24z" fill="#C8E1FF" opacity=".9"/>'+emiTxt(220,306,'only per protocol');},
+ iv:function(){return '<rect x="250" y="30" width="90" height="120" rx="14" fill="#C8E1FF" opacity=".9"/>'+emiTxt(295,96,'IV','#0E1830',22)+'<path d="M295 150 q0 70 -100 90" fill="none" stroke="#C8E1FF" stroke-width="4"/>'+emiArm(false)+emiTxt(200,296,'only if trained');},
+ drink:function(){return '<rect x="160" y="70" width="120" height="180" rx="24" fill="'+EMI_CY+'" opacity=".85"/><path d="M220 70 v-40 h40" stroke="#EAF1FB" stroke-width="6" fill="none"/><path d="M180 150 h80" stroke="#EAF1FB" stroke-width="3" stroke-dasharray="6 6"/>'+emiTxt(220,190,'ORS','#0E1830',24)+emiTxt(220,300,'small sips if awake');},
+ rest:function(){return emiPerson(true)+'<path d="M120 196h180v22H120z" fill="#8FA8D8" opacity=".8"/><path d="M380 150 v-40" stroke="'+EMI_AM+'" stroke-width="4" marker-end="url(#ar2)"/>'+emiTxt(320,96,'legs up')+emiTxt(220,306,'keep warm, stay with her');},
+ lab:function(){return '<rect x="110" y="60" width="220" height="190" rx="18" fill="'+EMI_PN+'" stroke="'+EMI_CY+'" stroke-width="3"/><rect x="140" y="90" width="160" height="60" rx="8" fill="#123058"/>'+emiTxt(220,128,'Hb · Hct','#8FDcff',22)+'<rect x="196" y="190" width="48" height="40" rx="6" fill="#36466A"/><circle cx="220" cy="176" r="10" fill="'+EMI_RD+'"/>'+emiTxt(220,300,'if the analyzer is available');},
+ eye:function(){return '<path d="M60 160 q160 -120 320 0 q-160 120 -320 0z" fill="#EAF1FB"/><circle cx="220" cy="160" r="52" fill="#2D6CB8"/><circle cx="220" cy="160" r="22" fill="#0B1220"/><circle cx="236" cy="146" r="8" fill="#FFFFFF"/>'+emiTxt(220,290,'eye check · vision test');},
+ kit:function(){return '<rect x="100" y="100" width="240" height="160" rx="22" fill="#B3141B"/><rect x="180" y="74" width="80" height="34" rx="10" fill="none" stroke="#B3141B" stroke-width="10"/><rect x="204" y="140" width="32" height="88" fill="#FFFFFF"/><rect x="176" y="168" width="88" height="32" fill="#FFFFFF"/>'+emiTxt(220,300,'bring it to the patient');},
+ protocol:function(){return '<rect x="130" y="40" width="180" height="240" rx="14" fill="#EAF1FB"/><rect x="190" y="28" width="60" height="26" rx="8" fill="#36466A"/>'+[0,1,2,3].map(function(i){return '<path d="M154 '+(100+i*40)+' l8 8 14-16" fill="none" stroke="#1F8F5F" stroke-width="4"/><rect x="186" y="'+(96+i*40)+'" width="100" height="10" rx="5" fill="#9DB0CB"/>';}).join('')+emiTxt(220,312,'approved protocol only');},
+ reassess:function(){return '<path d="M140 160 a80 80 0 1 1 30 62" fill="none" stroke="'+EMI_CY+'" stroke-width="8" marker-end="url(#ar2)"/><path d="M200 150 q20 -30 40 0 q20 -30 40 0 q0 30 -40 56 q-40 -26 -40 -56z" fill="'+EMI_RD+'"/>'+emiTxt(220,306,'repeat every few minutes');}
+};
+function emIllKind(step){
+  var t=((step.h||'')+' '+(step.list||[]).join(' ')).toLowerCase();
+  if(step.yn)return 'resp';
+  if(step.id==='eq')return 'kit'; if(step.id==='tx')return 'protocol'; if(step.end)return 'reassess'; if(step.id==='lab')return 'lab'; if(step.id==='chk')return /eye|vision|oct|refraction/.test(t)?'eye':/spo2|oxygen sat/.test(t)?'spo2':/temperature/.test(t)?'temp':'monitor';
+  var R=[[/tourniquet|windlass/,'tourniquet'],[/glove|eye protection/,'gloves'],[/foot loop|anchor|restrain|secured/,'anchor'],[/pack the wound|hemostatic/,'pack'],[/write down the time|record every|document/,'time'],[/press(?!ure)|pressure on the wound|press gauze|keep pressing/,'pressure'],
+    [/airway|breathing and responsiveness|abc assessment/,'airway'],[/oxygen(?! sat)/,'oxygen'],[/\biv\b|saline|crystalloid/,'iv'],[/drink|sips|ors\b|oral rehydration|hydrate|oral fluids/,'drink'],[/legs raised|lie her flat|warm|rest/,'rest'],
+    [/spo2/,'spo2'],[/blood pressure|\bbp\b/,'bp'],[/temperature|thermometer/,'temp'],[/monitor|vital/,'monitor'],[/hemoglobin|cbc|analy[sz]er|blood test/,'lab'],[/glasses|eye|vision|oct|refraction|fundus|images to earth/,'eye'],
+    [/call|notify|crew medical officer|flight surgeon|earth|alert responding/,'call'],[/protocol|treatment/,'protocol']];
+  for(var i=0;i<R.length;i++)if(R[i][0].test(t))return R[i][1];
+  return 'kit';}
+function emIll(step){var k=emIllKind(step),f=EMI[k];return f?(k==='bp'?f():emiBase(f(),step.h)):'';}
+
 /* --- earth --- */
 /* Earth outbox and inbox come from the server. Records leave the queue only after the ground acknowledges them. */
 function outbox(t){
@@ -1924,7 +1972,7 @@ function orbitCard(t){
 function vEarth(){
   var t=viewT(),e=envAt(t),h='';
   h+='<div class="ph"><div><h1>Earth link</h1><p>Every record goes to the flight surgeon automatically. It leaves the queue only after the ground confirms it.</p></div></div>';
-  h+='<div class="two"><div class="stack"><div class="card pad"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span class="dot '+(e.link?'d-0':'d-n')+'"></span><b style="font-size:18px">'+(e.link?'Connected · one-way '+delayTxt():'Offline · records queue on board')+'</b></div><p class="muted" style="margin:8px 0 0">Distance from Earth: <b style="color:var(--ink)">'+distTxt()+'</b> · one-way '+fmtSec(oneWay())+' · round trip '+roundTxt()+'. Keep following the steps on board while you wait.</p></div>'+(S.env==='mars'?orbitCard(t):'');
+  h+='<div class="two"><div class="stack"><div class="card pad"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span class="dot '+(e.link?'d-0':'d-n')+'"></span><b style="font-size:18px">'+(e.link?'Connected · one-way '+delayTxt():'Offline · records queue on board')+'</b></div><p class="muted" style="margin:8px 0 0">Distance from Earth: <b style="color:var(--ink)">'+distTxt()+'</b> · one-way '+fmtSec(oneWay())+' · round trip '+roundTxt()+'. Keep following the steps on board while you wait.</p>'+(S.env==='mars'?'<p class="note" style="margin:8px 0 0">How: radio (X- and Ka-band) through NASA\'s Deep Space Network, at the speed of light, so the delay is the distance divided by 299,792 km/s. On the way to Mars it grows from 0 at launch to about 1 min on day 60, 3–6 min on days 120–150 and about 8 min at arrival; around Mars it reaches up to 22 min. Near solar conjunction the Sun blocks the link for about 2–3 weeks.</p>':'')+'</div>'+(S.env==='mars'?orbitCard(t):'');
   h+='<div class="card pad"><div class="tabs"><button data-act="etab" data-v="out" aria-pressed="'+(S.earthTab==='out')+'">To Earth · '+outboxCount(t)+' open</button><button data-act="etab" data-v="in" aria-pressed="'+(S.earthTab==='in')+'">From Earth</button></div>';
   if(S.earthTab==='out'){var ob=outbox(t);var later=OUTBOX.filter(function(o){return o.t>t;}).length,nAll=ob.length,lim=S.obLim||25;
     if(later)h+='<div class="envbanner" style="border-color:var(--cyan);background:var(--cyanbg);margin:10px 0">'+later+' record'+(later>1?'s are':' is')+' after the time you are viewing ('+fmtT(t)+'). <button class="btn sm" data-act="live">Back to live</button></div>';
@@ -1975,6 +2023,7 @@ async function libRun(list){
 }
 function whoModal(){
   var h='<div class="scrim" data-act="ovx"></div><div class="pop modal whopop" role="dialog" aria-label="Who are you?"><h2>Who are you?</h2><p class="muted">Pick your name: you see your own health data and the status of the rest of the crew. Your name goes on what you enter and on the logs. You can change it any time in Settings › Who is using this device.</p><div class="whogrid">';
+  h+='<button class="whot'+(isRev()?' cur':'')+'" data-act="revpick"><span class="av">'+REV_AV+'</span><b>NASA Reviewer</b><small>Judge · sees every file · no password</small></button>';
   h+=CREW.map(function(p){return '<button class="whot'+(S.signed===p.id?' cur':'')+'" data-act="whopick" data-id="'+p.id+'"><span class="av"><img src="'+p.img+'" alt=""></span><b>'+esc(p.name)+'</b><small>'+esc(p.role)+' · '+esc(p.agency)+'</small></button>';}).join('');
   h+='<button class="whot'+(S.signed==='doctor'?' cur':'')+'" data-act="docpick"><span class="av shared">'+IC.plus.replace('<svg','<svg aria-hidden="true"')+'</span><b>Doctor</b><small>Flight surgeon · sign in</small></button>';
   h+='</div>';
@@ -1984,50 +2033,8 @@ function whoModal(){
 /* show the picker once the crew list has arrived and the intro clip is gone; never over an emergency or a red alert */
 function maybeWho(){if(!(window.__charmWho||!signedIn())||!READY.crew||!CREW.length)return;
   if(window.CHARM_INTRO&&window.CHARM_INTRO.active()){setTimeout(maybeWho,400);return;}
-  window.__charmWho=false;if(S.emSel||S.ov==='redalert'||S.ov==='import'||S.ov==='entry'||S.ov==='pushalert')return;S.ov='who';renderOv();}
+  window.__charmWho=false;if(S.emSel||S.ov==='redalert'||S.ov==='import'||S.ov==='entry')return;S.ov='who';renderOv();}
 /* ---- phone alerts ---- */
-var PUSH={st:null,err:'',busy:false};
-function pushTok(){return lsGet('charm-push-token')||'';}
-function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
-function isStandalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;}
-function pushState(){
-  if(CONN.mode==='local')return 'local';
-  if(!window.CHARM_VAPID_KEY)return 'nokey';
-  if(!('serviceWorker' in navigator)||!('Notification' in window)||!('PushManager' in window))return isIOS()&&!isStandalone()?'ios-home':'unsupported';
-  if(Notification.permission==='denied')return 'denied';
-  return pushTok()&&Notification.permission==='granted'?'on':'off';
-}
-async function pushEnable(){
-  var FB=window.CHARM_FB,app=window.__charmFbApp;if(!FB||!app||!FB.getMessaging)throw new Error('Phone alerts need the live site.');
-  if(FB.isSupported&&!(await FB.isSupported()))throw new Error(isIOS()&&!isStandalone()?'On iPhone, add CHARM to the Home Screen first and open it from there.':'This browser cannot receive push alerts.');
-  var perm=await Notification.requestPermission();if(perm!=='granted')throw new Error('Notifications were not allowed. Allow them for this site in the browser settings.');
-  var reg=await navigator.serviceWorker.register('/charm-sw.js');await navigator.serviceWorker.ready;
-  var tok=await FB.getToken(FB.getMessaging(app),{vapidKey:window.CHARM_VAPID_KEY,serviceWorkerRegistration:reg});if(!tok)throw new Error('No push token was given.');
-  await api('pushRegister',{token:tok,pid:S.signed,device:(isIOS()?'iPhone/iPad':/Android/.test(navigator.userAgent)?'Android':'Computer')+' · '+(isStandalone()?'app':'browser')});
-  lsSet('charm-push-token',tok);
-}
-async function pushDisable(){var tok=pushTok();if(tok)await api('pushUnregister',{token:tok}).catch(function(){});try{var FB=window.CHARM_FB;if(FB&&FB.deleteToken&&window.__charmFbApp)await FB.deleteToken(FB.getMessaging(window.__charmFbApp));}catch(e){}lsSet('charm-push-token','');}
-function pushRun(fn,okMsg){PUSH.busy=true;PUSH.err='';renderView();fn().then(function(){PUSH.busy=false;if(okMsg)toast(okMsg[0],okMsg[1]);renderView();},function(e){PUSH.busy=false;PUSH.err=e.message||String(e);renderView();});}
-function pushBox(){
-  var st=pushState(),me=S.signed==='shared'||!CREWBY[S.signed]?null:CREWBY[S.signed];
-  var h='<div class="hr"></div><div class="sec">PHONE ALERTS</div><p class="muted" style="margin-top:0"><b class="c-3">CRITICAL (red)</b> alerts go to every crew phone. <b class="c-2">CAUTION (orange)</b> alerts go only to the phone of the astronaut they are about; cabin alerts (CO₂, radiation) go to everyone. Tapping an alert opens CHARM on a full-screen alert in its colour.</p>';
-  h+='<p class="muted">This device is '+(me?'<b>'+esc(me.name)+'\'s</b>: it gets red alerts for the whole crew and orange alerts for '+esc(me.name)+'.':'the <b>shared display</b>: it gets red alerts only. Pick a name above to also get your own orange alerts.')+'</p>';
-  var msg={local:'Phone alerts work on the live site only (not in local test mode).',nokey:'Not set up yet: the Web Push key is missing in js/push-config.js (Firebase Console › Project settings › Cloud Messaging › Web Push certificates).',unsupported:'This browser cannot receive push alerts. Use Chrome on Android, or Safari on iPhone (iOS 16.4 or later) from the Home Screen.','ios-home':'On iPhone: tap Share › Add to Home Screen, open CHARM from the new icon, then come back here.',denied:'Notifications are blocked for this site. Allow them in the browser or phone settings, then try again.',on:'On. This phone receives CHARM alerts.',off:'Off on this device.'}[st];
-  h+='<div class="qrow"><span class="q"><span class="'+(st==='on'?'c-0':st==='off'?'':'c-1')+'">'+esc(msg)+'</span></span></div>';
-  if(PUSH.err)h+='<div class="errbox" role="alert">'+esc(PUSH.err)+'</div>';
-  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">';
-  if(st==='off')h+='<button class="btn pri" data-act="pushon" '+(PUSH.busy?'disabled':'')+'>'+(PUSH.busy?'Turning on…':'Get alerts on this phone')+'</button>';
-  if(st==='on')h+='<button class="btn" data-act="pushtest" data-v="3" '+(PUSH.busy?'disabled':'')+'>Send a red test</button><button class="btn" data-act="pushtest" data-v="2" '+(PUSH.busy?'disabled':'')+'>Send an orange test</button><button class="btn ghost" data-act="pushoff" '+(PUSH.busy?'disabled':'')+'>Turn off</button>';
-  return h+'</div>';
-}
-function pushAlertView(){
-  var a=S.pushA||{},l=+a.l>=3?3:2,p=CREWBY[a.pid];
-  var h='<div class="palert l'+l+'" role="alertdialog" aria-label="'+(l===3?'Critical':'Caution')+' alert"><span class="pshape">'+shape(l).replace('<svg','<svg width="96" height="96"')+'</span><div class="pword">'+(l===3?'CRITICAL':'CAUTION')+'</div>';
-  h+='<div class="pname">'+esc(p?p.name:a.name||'Cabin')+'</div><div class="ptext">'+esc(a.msg||'')+'</div>'+(a.sub?'<div class="psub">'+esc(a.sub)+'</div>':'')+(a.t?'<div class="psub">'+fmtT(+a.t)+' GMT · '+(function(x){return /now/.test(x)?x:x+' ago';})(fmtAgo(Date.now()-(+a.t)))+'</div>':'');
-  h+='<div class="pbtns">'+(p?'<button class="btn pri" data-act="open" data-id="'+p.id+'">Open '+esc(p.name)+'\'s file</button>':'')+'<button class="btn" data-act="palert" data-v="events">Alerts and history</button><button class="btn" data-act="palert" data-v="x">Dismiss</button></div></div>';
-  return h;
-}
-function showPushAlert(d){S.pushA={l:d.l,pid:d.pid,name:d.name,msg:d.msg||d.text,sub:d.sub,t:d.t};S.ov='pushalert';renderOv();}
 function vPrefs(){
   var h='<div class="ph"><div><h1>Settings</h1></div></div><div class="pgrid"><div class="pmenu">';
   [['thr','Alert thresholds'],['who','Who is using this device'],['crew','Crew'],['mission','Mission'],['disp','Display'],['dtools','Demo tools'],['about','About']].forEach(function(x){h+='<button data-act="ptab" data-v="'+x[0]+'" aria-pressed="'+(S.prefTab===x[0])+'">'+x[1]+'</button>';});
@@ -2056,7 +2063,7 @@ function vPrefs(){
     var tl=allEvents().filter(function(e){return /^(Alert thresholds changed|Threshold reset)/.test(e.text);}).slice(0,20);
     h+='<div class="sec" style="margin-top:16px">CHANGE LOG</div>'+(tl.length?tl.map(function(x){return '<div class="qrow"><span class="q">'+(x.pid&&CREWBY[x.pid]?'<b>'+CREWBY[x.pid].name+'</b> · ':'')+esc(x.text)+(x.sub?' <span class="faint">'+esc(x.sub)+'</span>':'')+'</span><span class="tnum faint">'+fmtT(x.t)+'</span></div>';}).join(''):'<p class="muted">No changes yet. Everyone uses the CHARM common values.</p>');
   }
-  if(tab==='who'){h+='<div class="sec">WHO IS USING THIS DEVICE</div><p class="muted" style="margin-top:0">Astronauts pick their name (no password): they see their own data and only the status of the others. The doctor signs in with a user name and password and sees every file. A CRITICAL crew member\'s file opens for the crew in an emergency, and the opening is logged. This lock is in the app\'s screens only; it is not a security boundary.</p><div class="whosel">'+CREW.map(function(x){return '<button class="whob" data-act="signin" data-id="'+x.id+'" aria-pressed="'+(S.signed===x.id)+'">'+av(x.id,null)+x.name+'</button>';}).join('')+'<button class="whob" data-act="docpick" aria-pressed="'+isDoc()+'"><span class="av"></span>Doctor'+(isDoc()?' · signed in':' · sign in')+'</button></div>'+pushBox();}
+  if(tab==='who'){h+='<div class="sec">WHO IS USING THIS DEVICE</div><p class="muted" style="margin-top:0">Astronauts pick their name (no password): they see their own data and only the status of the others. The doctor signs in with a user name and password and sees every file. A CRITICAL crew member\'s file opens for the crew in an emergency, and the opening is logged. This lock is in the app\'s screens only; it is not a security boundary.</p><div class="whosel">'+CREW.map(function(x){return '<button class="whob" data-act="signin" data-id="'+x.id+'" aria-pressed="'+(S.signed===x.id)+'">'+av(x.id,null)+x.name+'</button>';}).join('')+'<button class="whob" data-act="revpick" aria-pressed="'+isRev()+'"><span class="av">'+REV_AV+'</span>NASA Reviewer</button><button class="whob" data-act="docpick" aria-pressed="'+isDoc()+'"><span class="av"></span>Doctor'+(isDoc()?' · signed in':' · sign in')+'</button></div>';}
   if(tab==='crew'){h+='<div class="sec">CREW · '+CREW.length+'</div>'+CREW.map(function(p){return '<div class="qrow">'+av(p.id,null)+'<span class="q"><b>'+esc(p.full)+'</b><br><span class="faint" style="font-size:12.5px">'+esc(p.role)+' · '+esc(p.agency)+'</span></span><button class="btn sm ghost" data-act="open" data-id="'+p.id+'">Open file</button><button class="btn sm ghost" data-act="rmcrew" data-id="'+p.id+'" aria-expanded="'+!!(S.rm&&S.rm.pid===p.id)+'">Delete…</button></div>'+(S.rm&&S.rm.pid===p.id?rmBox(p):'');}).join('');
     h+='<div class="hr"></div><div class="sec">ADD A CREW MEMBER</div><form class="mform" data-form="addcrew"><div class="row"><label>Full name<input id="ncname" required maxlength="60" placeholder="e.g. Nathan Gagnon"></label><label>Agency<select id="ncag">'+['NASA','ESA','JAXA','CSA','ISRO','DLR','MBRSC','Other'].map(function(a){return '<option>'+a+'</option>';}).join('')+'</select></label></div><label>Role<input id="ncrole" maxlength="60" placeholder="e.g. Flight Engineer"></label><div><button class="btn pri" '+(S.busy?'disabled':'')+'>Add crew member</button></div></form><p class="note">Crew members are also created automatically when an imported file contains a new name.</p>';}
   if(tab==='disp'){h+='<div class="sec">LAYOUT</div><div class="seg" role="group" aria-label="Layout">'+[['laptop','Laptop'],['tablet','Tablet']].map(function(x){return '<button data-act="layout" data-v="'+x[0]+'" aria-pressed="'+((isTablet()?'tablet':'laptop')===x[0])+'">'+x[1]+'</button>';}).join('')+'</div><p class="note" style="margin:8px 0 16px">Tablet view: bigger buttons and text for touch and gloves, menu as an icon rail. Also switchable from the button next to the gear.</p>'+sw('night','Night mode','Dim red display for sleep periods, so crewmates are not woken.')+sw('reduce','Reduce motion','Stops pulsing rings, floating figures and slides.')+sw('autoRot','Rotate panels every 2.5 s','Status panels and the task list move on their own. Crew pages change only when you swipe or tap.');
@@ -2090,9 +2097,6 @@ function demoParse(text){
 function demoTools(){
   var lv=MISSION&&MISSION.demoLive,ms=MISSION&&MISSION.demoScenario,busy=S.busy,card=function(title,body,accent){return '<div class="card pad" style="margin-top:12px'+(accent?';border:2px solid '+accent:'')+'"><div class="sec" style="margin:0 0 8px">'+title+'</div>'+body+'</div>';};
   var h='<div class="envbanner" role="note" style="border-color:rgba(167,139,250,.7);background:rgba(167,139,250,.12);margin-top:0"><span class="demotag">DEMO</span><span><b>For the video and the judges only.</b> Everything made here is constructed and marked DEMO. Never use it as health data.</span></div>';
-  /* 1. medic-team scenarios */
-  h+=card('MEDIC-TEAM SCENARIOS · RUN LIVE',(ms?'<p style="margin:0 0 10px"><span class="demotag">RUNNING</span> '+esc(srStageMsg())+'</p>':'<p class="muted" style="margin:0 0 10px">Pulmonary infection · Dehydration · SANS · Bone health. Each stage goes into Sarah\'s file and CHARM raises the alerts, the RED ALERT and Emergency Mode by itself.</p>')+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-act="go" data-to="scenario">Open the scenarios</button>'+(ms?'<button class="btn ghost" data-act="srstop">Stop</button>':'')+'</div>','var(--crit)');
   /* 2. one demo alert */
   var pid=S.daWho&&CREWBY[S.daWho]?S.daWho:(CREWBY[S.signed]?S.signed:(CREW[0]||{}).id),k=S.daK||'hr',th=PROFILE[pid]||EN.profile(null),lvs=EN.demoLevels(k,th,liveNow()),lev=lvs.indexOf(+S.daL)>=0?+S.daL:lvs[lvs.length-1];
   var pv=lvs.length?EN.demoReading(k,lev,th,liveNow()):null,al=demoAlerts(),b='<p class="muted" style="margin:0 0 6px">One value at the level you pick. Back to normal by itself after 5 minutes.</p>';
@@ -2172,7 +2176,7 @@ function srStageMsg(){var ms=MISSION&&MISSION.demoScenario;return ms?ms.title+' 
 function srClear(){if(SR.timer){clearTimeout(SR.timer);SR.timer=null;}SR.next=0;}
 function srSchedule(){srClear();var sc=scnGet(SR.sid);if(!sc||SR.paused||!SR.every||SR.busy)return;if(SR.n>=sc.stages.length){SR.done=true;return;}
   SR.next=Date.now()+SR.every*1000;SR.timer=setTimeout(function(){SR.timer=null;srSend(SR.n+1);},SR.every*1000);}
-function srSend(n){var sc=scnGet(SR.sid);if(!sc)return;n=Math.max(1,Math.min(sc.stages.length,n));var st=sc.stages[n-1],prev=n>1?sc.stages[n-2]:null,pid=SR.pid;
+function srSend(n){var sc=scnGet(SR.sid);if(!sc)return;if(S.mode!=='live')S.mode='live';n=Math.max(1,Math.min(sc.stages.length,n));var st=sc.stages[n-1],prev=n>1?sc.stages[n-2]:null,pid=SR.pid;
   srClear();SR.busy=true;SR.err='';SR.n=n;S.scn=n;S.scnSid=sc.id;
   if(st.code==='CRITICAL'&&(!prev||prev.code!=='CRITICAL'))delete S.seenCrit[pid]; // the RED ALERT pops again for this run
   renderAll();
@@ -2213,9 +2217,9 @@ function vScenario(){
   if(!sc)return '<div class="card pad"><p class="err">The scenario data did not load (js/scenarios.js). Run tools/build_scenarios.py.</p></div>';
   if(srRunning()&&SR.sid===sc.id&&SR.n)S.scn=SR.n;
   var N=sc.stages.length,i=Math.min(S.scn||0,N);
-  h+='<div class="ph"><div><h1>'+esc(sc.title)+'</h1><p>'+esc(sc.sub)+' · '+N+' stages</p></div><span class="sp"></span><button class="btn sm" data-act="go" data-to="prefs" data-tab="dtools">Demo tools</button></div>';
-  h+='<div class="tabs" style="margin-bottom:12px;flex-wrap:wrap">'+L.map(function(x){return '<button data-act="scnsid" data-v="'+x.id+'" aria-pressed="'+(x.id===sc.id)+'">'+esc({pulm:'Pulmonary infection',dehy:'Dehydration',sans:'SANS (vision)',bone:'Bone health'}[x.id]||x.title)+(SR.sid===x.id?' · LIVE':'')+'</button>';}).join('')+'</div>';
-  h+='<div class="envbanner" role="note" style="border-color:rgba(167,139,250,.7);background:rgba(167,139,250,.12);margin-top:0"><span class="demotag">DEMO</span><span><b>Simulated demonstration – not a flight-certified medical protocol.</b> CHARM supports the crew\'s decisions; it is not an autonomous physician and does not choose or dose medication. '+esc(sc.time)+' Source: the medic team\'s scenario ('+esc(sc.file)+').</span></div>';
+  h+='<div class="ph"><div><h1>'+esc(sc.title)+'</h1><p>'+esc(sc.sub)+' · '+N+' stages</p></div></div>';
+  h+='<div class="tabs" style="margin-bottom:12px;flex-wrap:wrap">'+L.map(function(x){return '<button data-act="scnsid" data-v="'+x.id+'" aria-pressed="'+(x.id===sc.id)+'">'+esc({pulm:'Pulmonary infection',bleed:'Severe bleeding',dehy:'Dehydration',sans:'SANS (vision)',bone:'Bone health'}[x.id]||x.title)+(SR.sid===x.id?' · LIVE':'')+'</button>';}).join('')+'</div>';
+  h+='<div class="envbanner" role="note" style="border-color:rgba(167,139,250,.7);background:rgba(167,139,250,.12);margin-top:0"><span class="demotag">DEMO</span><span><b>Simulated demonstration – not a flight-certified medical protocol.</b> CHARM supports the crew\'s decisions; it is not an autonomous physician and does not choose or dose medication. '+esc(sc.time)+' Source: '+(sc.id==='bleed'?'CHARM team, built on ATLS hemorrhage classes and Stop the Bleed (':'the medic team\'s scenario (')+esc(sc.file)+').</span></div>';
   h+=srCard(sc);
   if(!i){h+='<div class="card pad"><h2 style="margin-top:0">Step through the scenario</h2><p class="muted">Read each stage without writing any data: what happens, CHARM\'s assessment, the checks, tests, actions, equipment and treatment guidance from the medic team. Or press <b>Start live</b> above to play it into the app.</p><div class="acts"><button class="btn" data-act="scnset" data-v="1">Read stage 1</button></div></div>';return h+scnNotes(sc);}
   var st=sc.stages[i-1],shown=scnHas(st,sc.m)?st:scnLast(sc,i),last=shown&&shown!==st,c=scnColor(st.code),live=SR.sid===sc.id;
@@ -2224,7 +2228,7 @@ function vScenario(){
   if(st.branch)h+='<div class="envbanner" role="note" style="border-color:var(--warn);background:rgba(255,176,32,.10)"><b>Side branch – not a step in time.</b><span>The medic team lists this so the crew checks it at any stage. Running it live adds no new values.</span></div>';
   var tag=/RECOVER/.test(st.label)?' <span class="chip">↗ recovering</span>':/RESOLV/.test(st.label)?' <span class="chip">✓ resolved</span>':'';
   h+='<div class="card pad" style="border-left:6px solid '+c+'"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="font-family:var(--f-disp);font-weight:800;font-size:22px;letter-spacing:1px;color:'+c+'">'+(st.code==='CRITICAL'?'▲ ':st.code==='ALERT'?'◆ ':'● ')+esc(st.label)+'</span>'+tag+'<span class="faint">'+esc(st.stage)+'</span><span class="sp" style="flex:1"></span><button class="btn sm ghost" data-act="scnsay">Charmy reads it</button></div>';
-  h+='<p style="margin:10px 0 0;font-size:16px"><b>What happens:</b> '+esc(st.what)+'</p><p class="muted" style="margin:6px 0 0"><b>Key measurements:</b> '+esc(st.key)+'</p><p class="muted" style="margin:6px 0 0"><b>CHARM assessment:</b> '+esc(st.assess)+'</p>'+(st.code==='CRITICAL'?'<p style="margin:8px 0 0;color:var(--crit);font-weight:700">Crew response required now.</p>':'')+'</div>';
+  h+='<p style="margin:10px 0 0;font-size:16px"><b>What happens:</b> '+esc(st.what)+'</p><p class="muted" style="margin:6px 0 0"><b>Key measurements:</b> '+esc(st.key)+'</p><p class="muted" style="margin:6px 0 0"><b>CHARM assessment:</b> '+esc(st.assess)+'</p>'+(st.basis&&st.basis!=='—'?'<p class="faint" style="margin:6px 0 0;font-size:13px"><b>Medical basis:</b> '+esc(st.basis)+'</p>':'')+(st.code==='CRITICAL'?'<p style="margin:8px 0 0;color:var(--crit);font-weight:700">Crew response required now.</p>':'')+'</div>';
   if(shown){
     h+='<div class="sec" style="margin-top:14px">MEASUREMENTS'+(last?' · LAST KNOWN (STAGE '+shown.n+')':'')+'</div>';
     if(last)h+='<p class="note" style="margin-top:0">The source gives no new numbers for this stage, so the values below are the last known ones from stage '+shown.n+', not new measurements.</p>';
@@ -2286,7 +2290,6 @@ function renderOv(){
   if(S.ov==='import')h+=importModal();
   if(S.ov==='access')h+=accessModal();
   if(S.ov==='who')h+=whoModal();
-  if(S.ov==='pushalert')h+=pushAlertView();
   if(S.ov==='symptom')h+=symptomModal();
   if(S.ov==='entry'&&S.entry)h+=entryModal();
   if(S.emSel)h+=emerView();
@@ -2348,7 +2351,7 @@ function entryModal(){
 /* exam forms: fields per exam (CHARM_Exact_Alert_Thresholds) */
 var YN=[['','—'],['no','No'],['yes','Yes']];
 var EXF={
- sym:[['inf','Suspected infection (fever, chills, sore throat, cough, wound…)','yn'],['conf','Confusion or altered mental state','yn'],['faint','Fainted or nearly fainted','yn'],['chest','Chest pain or palpitations','yn']],
+ sym:[['inf','Suspected infection (fever, chills, sore throat, cough, wound…)','yn'],['conf','Confusion or altered mental state','yn'],['faint','Fainted or nearly fainted','yn'],['chest','Chest pain or palpitations','yn'],['bleed','Bleeding (injury)','sel',[['none','None'],['controlled','Controlled (pressure, dressing or tourniquet)'],['active','Active, not controlled']]]],
  ecg:[['irr','Irregular RR intervals','yn'],['noP','No repeating P waves','yn'],['sec','Recording length (seconds)','n'],['unstable','Signs of instability (fainting, chest pain, BP < 90, confusion)','yn']],
  ortho:[['s1','Lying or seated · systolic','n'],['d1','Lying or seated · diastolic','n'],['s2','Standing · systolic','n'],['d2','Standing · diastolic','n'],['min','Minutes after standing','n'],['h1','Lying or seated · heart rate','n'],['h2','Standing · heart rate','n'],['syncope','Fainted during the test','yn']],
  urine:[['vol','24-hour urine volume (L)','n'],['blood','Blood in urine (dipstick)','yn'],['us','Kidney ultrasound','sel',[['none','Not done / normal'],['stone','Stone seen'],['hydro','Hydronephrosis']]]],
@@ -2540,15 +2543,17 @@ function emerView(){
   var stepNo=step===flow[0]?1:/2/.test(step.id||'')?2:/3/.test(step.id||'')?3:4;var tot=isEnv?3:flow===EMSTEPS.gen?3:4;if(flow.scn){var mi=flow.scn.main.indexOf(step);stepNo=mi<0?1:mi+1;tot=flow.scn.main.length;}
   h+='<div class="sn">Step '+Math.min(stepNo,tot)+' of '+tot+' <span>'+Array.apply(null,{length:tot}).map(function(_,i){return '<i class="'+(i<stepNo?'on':'')+'"></i>';}).join(' ')+'</span></div>';
   if(step.cmo)h+='<div class="sec" style="margin:2px 0 0;color:#8FDcff">CREW MEDICAL OFFICER</div>';
+  var ill=flow.scn?emIll(step):'';if(ill)h+='<div class="emrow"><div>';
   h+='<h3>'+esc(step.h.replace('{n}',nm))+'</h3><p>'+esc(step.p.replace('{n}',nm).replace('{rt}',roundTxt()))+'</p>'+(step.note?'<p class="faint" style="font-size:13px;margin-top:-6px">'+esc(step.note)+'</p>':'');
-  if(!isLive())h+='<p class="c-1">Viewing history: steps are read-only.</p>';
+  if(!isLive())h+='<div class="yn"><button class="d" data-act="emlive">Back to live · continue</button></div><p class="c-1" style="margin-top:4px">You were viewing history, so the steps were paused.</p>';
   else if(step.yn)h+='<div class="yn"><button class="y" data-act="emans" data-a="YES">YES</button><button class="n" data-act="emans" data-a="NO">NO</button></div>';
   else if(step.ecg)h+='<div class="yn" style="margin-top:6px"><button class="d" data-act="emecg">ECG recorded · next</button></div>';
   else if(step.crew)h+='<div class="emgrid">'+CREW.map(function(p){return '<button data-act="emsafe" data-id="'+p.id+'" aria-pressed="'+(!!es.safe[p.id])+'" style="'+(es.safe[p.id]?'border-color:var(--ok);background:rgba(61,220,151,.12)':'')+'">'+av(p.id,null)+p.name+(es.safe[p.id]?' ✓':'')+'</button>';}).join('')+'</div><div class="yn"><button class="d" data-act="emdone">'+(Object.keys(es.safe).length===5?'All safe · next':'Next')+'</button></div>';
   else if(step.list){var tk=es.tick||{},alld=step.list.every(function(_,i){return tk[step.id+':'+i];});h+='<div style="display:flex;flex-direction:column;gap:8px;margin:6px 0 4px">'+step.list.map(function(x,i){var on=!!tk[step.id+':'+i];return '<button class="btn tick" data-act="emtick" data-i="'+i+'" aria-pressed="'+on+'" style="font-size:16px;'+(on?'border-color:var(--ok);background:rgba(61,220,151,.12)':'')+'">'+(on?'✓ ':'○ ')+esc(x)+'</button>';}).join('')+'</div><div class="yn"><button class="d" data-act="emdone">'+(alld?'All done · next':'Next')+'</button></div>';}
   else if(step.done)h+='<div class="yn"><button class="d" data-act="emdone">'+esc(step.confirm||'Done · next step')+'</button></div>';
   else if(step.end)h+='<div class="yn"><button class="d" data-act="emresolve">Resolve…</button></div>';
-  h+='<div class="src">Steps: '+(flow.scn?'the medic team\'s '+esc(flow.scn.title)+' scenario · demo':'CHARM indicator playbook')+' · needs medical review before use</div></div>';
+  if(ill)h+='</div><div class="emill">'+ill+'</div></div>';
+  h+='<div class="src">Steps: '+(flow.scn?(flow.scn.sid==='bleed'?'CHARM team, from ATLS and Stop the Bleed':'the medic team\'s '+esc(flow.scn.title)+' scenario')+' · demo':'CHARM indicator playbook')+' · needs medical review before use</div></div>';
   h+='<div class="vit" id="emvit">'+emVitals(id,t)+'</div></div>';
   h+='<div class="emnote">Flight surgeon notified automatically · signal round trip '+roundTxt()+' ('+distTxt()+' from Earth) · continue with the next step</div>';
   h+='<div class="embot"><button class="btn" data-act="emspeak">'+IC.hist.replace('<svg','<svg width="22" height="22"')+'Repeat voice</button><button class="btn" data-act="voice">'+IC.spk.replace('<svg','<svg width="22" height="22"')+(S.voice?'Mute voice':'Unmute voice')+'</button><button class="btn" data-act="emcall">'+IC.msg.replace('<svg','<svg width="22" height="22"')+'Call flight surgeon</button>'+(isEnv?'':'<button class="btn" data-act="emfile" data-id="'+id+'">Open '+nm+'\'s file</button>')+'<button class="btn" data-act="emresolve" style="border-color:var(--nd)">Resolve…</button></div>';
@@ -2720,11 +2725,11 @@ function parseHash(){
 }
 function go(to){S.drawer=false;if(to==='test-sans-'+(to.split('-')[2]||'')){toast('Do on Medical Station','The SANS test needs the Medical Station camera. It is marked there for you.');return;}
   if(('#'+to)===location.hash){S.route=parseHash();renderAll();}else location.hash=to;}
-function canOpen(pid){return isCMO(S.signed)||S.signed===pid||S.unlocked[pid]||personAt(pid,viewT()).lvl===3;}
+function canOpen(pid){return isCMO(S.signed)||isRev()||S.signed===pid||S.unlocked[pid]||personAt(pid,viewT()).lvl===3;}
 /* after someone signs in from the private-file message, go on to the file they wanted (when they may open it) */
 function afterSignIn(){var p=S.accessId;S.accessId=null;if(p&&CREWBY[p]&&canOpen(p)){S.ov=null;go('astro-'+p);}}
 function openFile(pid){if(!canOpen(pid)){S.accessId=pid;S.ov='access';renderOv();return;}if(personAt(pid,viewT()).lvl===3&&!isCMO(S.signed)&&S.signed!==pid&&!S.unlocked[pid]){S.unlocked[pid]=true;log({pid:pid,type:'crew',text:'File opened in emergency by '+whoName(),src:'crew'});}go('astro-'+pid);}
-function whoName(){return S.signed==='doctor'?'the doctor (flight surgeon)':CREWBY[S.signed]?CREWBY[S.signed].name:'crew (not signed in)';}
+function whoName(){return S.signed==='doctor'?'the doctor (flight surgeon)':S.signed==='reviewer'?'the NASA reviewer':CREWBY[S.signed]?CREWBY[S.signed].name:'crew (not signed in)';}
 window.addEventListener('hashchange',function(){S.route=parseHash();S.saveErr=null;if(S.route.v!=='test')RUN=null;S.bodySel=S.route.v==='astro'?S.bodySel:null;renderAll();$('view').scrollTop=0;});
 
 /* ===================== actions ===================== */
@@ -2741,7 +2746,7 @@ document.addEventListener('click',function(e){
   if(el.tagName==='A')e.preventDefault();
   switch(a){
     case 'go': if(ds.task)S.curTask=ds.task; if(ds.tab)S.prefTab=ds.tab; S.ov=null; go(ds.to); break;
-    case 'open': if(S.ov==='pushalert'){S.ov=null;S.pushA=null;renderOv();} openFile(ds.id); break;
+    case 'open': openFile(ds.id); break;
     case 'metric': if(!canOpen(ds.id)){S.accessId=ds.id;S.ov='access';renderOv();break;} go('metric-'+ds.id+'-'+ds.k); break;
     case 'collapse': S.collapsed=!S.collapsedNow; lsSet('charm-collapsed',S.collapsed?'1':'0'); renderAll(); break;
     case 'drawer': S.drawer=true; renderAll(); break;
@@ -2769,6 +2774,7 @@ document.addEventListener('click',function(e){
     case 'empickset': S.emPick=ds.v; S.emArm=false; renderOv(); break;
     case 'emgo': if(!S.emArm){S.emArm=true;renderOv();setTimeout(function(){if(S.emArm){S.emArm=false;if(S.ov==='empick')renderOv();}},3000);break;} S.ov=null; S.emArm=false; openEmer(S.emPick,true); break;
     case 'emer': openEmer(ds.id,false); break;
+    case 'emlive': S.mode='live'; renderAll(); break;
     case 'emtab': S.emSel=ds.id; renderOv(); drawEcgs(); break;
     case 'emans': emAdvance(ds.a==='YES'?0:1); break;
     case 'emdone': emAdvance(-1); break;
@@ -2814,12 +2820,9 @@ document.addEventListener('click',function(e){
     case 'thrdiscard': S.thrDraft={}; S.thrErr=''; renderView(); break;
     case 'thrapply': thrApply(); break;
     case 'thrreset': api('resetThreshold',{pids:thrSelIds(),k:ds.k,f:ds.f}).then(function(r){toast('Reset to CHARM common value',r.reset+' astronaut'+(r.reset===1?'':'s')+'.');},function(e){toast('Not reset',e.message);}); break;
-    case 'pushon': pushRun(pushEnable,['Phone alerts on','Red alerts for the whole crew'+(S.signed!=='shared'&&CREWBY[S.signed]?' and orange alerts for '+CREWBY[S.signed].name:'')+'.']); break;
-    case 'pushoff': pushRun(pushDisable,['Phone alerts off','This device no longer gets CHARM alerts.']); break;
-    case 'pushtest': var lvt=+ds.v; pushRun(function(){return api('pushTest',{token:pushTok(),l:lvt});},['Test sent','It should arrive on this phone in a few seconds.']); break;
-    case 'palert': var pa=S.pushA||{}; S.ov=null; S.pushA=null; if(ds.v==='file'&&CREWBY[pa.pid])go('astro-'+pa.pid); else if(ds.v==='events')go('events'); else renderOv(); break;
-    case 'whopick': ssSet('charm-doc',null); S.docForm=false; S.signed=ds.id; lsSet('charm-signed',ds.id); if(pushTok())api('pushRegister',{token:pushTok(),pid:ds.id}).catch(function(){}); S.unlocked={}; S.ov=null; renderAll(); toast('Hi '+CREWBY[ds.id].name,'You see your own data and the status of the crew.'); afterSignIn(); break;
+    case 'whopick': ssSet('charm-doc',null); S.docForm=false; S.signed=ds.id; lsSet('charm-signed',ds.id); S.unlocked={}; S.ov=null; renderAll(); toast('Hi '+CREWBY[ds.id].name,'You see your own data and the status of the crew.'); afterSignIn(); break;
     case 'accwho': S.accessId=ds.id; S.docForm=false; S.docErr=''; S.ov='who'; renderOv(); break;
+    case 'revpick': ssSet('charm-doc',null); S.docForm=false; S.signed='reviewer'; lsSet('charm-signed','reviewer'); S.unlocked={}; S.ov=null; renderAll(); toast('Welcome, reviewer','You see every crew file. Start with Simulate scenario in the side panel.'); afterSignIn(); break;
     case 'docpick': S.docForm=true; S.docErr=''; S.ov='who'; renderOv(); setTimeout(function(){var f=$('docu');if(f)f.focus();},50); break;
     case 'docx': S.docForm=false; S.docErr=''; renderOv(); break;
     case 'dlgo': demoLiveGo(); break;
@@ -2835,7 +2838,7 @@ document.addEventListener('click',function(e){
     case 'srpause': SR.paused=!SR.paused; SR.critPause=false; if(SR.paused)srClear(); else srSchedule(); renderView(); break;
     case 'scnset': if(SR.sid&&SR.sid===(S.scnSid||SR.sid))break; var nv=Math.max(1,Math.min(scnCur().stages.length,+ds.v||1)); S.scn=nv; if(S.route.v!=='scenario')go('scenario'); else renderView(); $('view').scrollTop=0; break;
     case 'scnsay': var sd=scnCur().stages[(S.scn||1)-1]; speak('Stage '+sd.n+'. '+sd.label.replace(' - ',', ')+'. '+sd.what+' '+sd.assess,{voice:true}); break;
-    case 'signin': ssSet('charm-doc',null); S.signed=ds.id; lsSet('charm-signed',ds.id); if(pushTok())api('pushRegister',{token:pushTok(),pid:ds.id}).catch(function(){}); S.unlocked={}; renderAll(); afterSignIn(); break;
+    case 'signin': ssSet('charm-doc',null); S.signed=ds.id; lsSet('charm-signed',ds.id); S.unlocked={}; renderAll(); afterSignIn(); break;
     case 'sw': var k=ds.k; if(k==='collapsedNow'){S.collapsed=!S.collapsedNow;lsSet('charm-collapsed',S.collapsed?'1':'0');}else S[k]=!S[k]; renderAll(); break;
     case 'toast': toast(ds.msg,''); break;
     case 'cpage': setCrewPage((S.cpage||0)+(+ds.d)); S.lastPg=Date.now(); break;
@@ -2939,6 +2942,7 @@ document.addEventListener('pointerup',function(){if(S.drag){S.drag=false;renderA
 
 /* emergency helpers */
 function openEmer(id,manual){
+  if(S.mode!=='live'){S.mode='live';}
   S.emSel=id; syncEmergency(); var es=emState(id);
   if(manual&&!HAZ[id]){log({pid:id,type:'emergency',text:'Emergency Mode started by '+whoName(),sub:'Flight surgeon notified automatically',src:'crew'});}
   if(manual&&HAZ[id]){log({pid:null,type:'emergency',text:'Cabin emergency: '+HAZ[id]+' · started by '+whoName(),src:'crew'});}
@@ -3028,8 +3032,8 @@ function dataChanged(){if(RQ)return;RQ=setTimeout(function(){RQ=0;buildProfiles(
   renderAll();checkRed();},150);}
 document.addEventListener('focusout',function(){setTimeout(function(){if(DIRTY&&!typing()&&S.ov!=='entry'&&S.ov!=='import'){DIRTY=false;renderAll();}},50);});
 S.route=parseHash();
-(function(){try{var q=new URLSearchParams(location.search);if(q.get('push')==='1'){S.pushA={l:q.get('l'),pid:q.get('pid'),name:q.get('name'),msg:q.get('msg'),sub:q.get('sub'),t:q.get('t')};S.ov='pushalert';['push','l','pid','k','msg','sub','t','name'].forEach(function(k){q.delete(k);});var qs=q.toString();history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')+location.hash);}}catch(e){}
-  if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',function(e){if(e.data&&e.data.type==='charm-push')showPushAlert(e.data.d||{});});})();
+/* phone alerts were removed (15.11): unregister the old alert service worker if a device still has it */
+(function(){try{if('serviceWorker' in navigator&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});});localStorage.removeItem('charm-push-token');}catch(e){}})();
 applyLayout();
 requestAnimationFrame(anim);
 window.CHARM_BACKEND.start({
