@@ -1074,7 +1074,7 @@ function reasonOf(pid,st,t){
   if(!st.top){return hasData(pid)?'All current metrics in range':'No readings yet';}
   var k=st.top,m=st.m[k],v=m.val;
   if(m.l===-1){var lt=lastT(pid,'hr',t);return hasData(pid)?'Wearable not reporting'+(lt?' since '+hm(lt):''):'No readings yet';}
-  if(k==='hr'&&v.irr)return 'Irregular heart rhythm · '+fmtV('hr',v)+' bpm';
+  if(k==='hr'&&v.irr)return 'Irregular pulse (screening) · '+fmtV('hr',v)+' bpm';
   if(k==='sleep')return 'Sleep '+fmtV('sleep',v)+' h last night';
   if(k==='wt'&&v.l30!=null)return 'Body mass '+fmtV(k,v)+' kg · '+v.l30+' % lost in 30 days';
   return MDEF[k].label+' '+fmtV(k,v)+(MDEF[k].unit?' '+MDEF[k].unit:'')+(v.pm?' · unusual for '+(S.signed===pid?'you':CREWBY[pid].name):'');
@@ -1433,7 +1433,7 @@ function crewCard(x,t){
 }
 function cardIssues(pid,st,t){
   var out=[];
-  LKEYS.forEach(function(k){var m=st.m[k];if(m.l>0){var v=m.val;out.push({k:k,l:m.l,v:v,text:k==='hr'&&v.irr?'Irregular heart rhythm · '+fmtV('hr',v)+' bpm':k==='sleep'?'Sleep '+fmtV(k,v)+' h last night':MDEF[k].label+' '+fmtV(k,v)+' '+MDEF[k].unit});}});
+  LKEYS.forEach(function(k){var m=st.m[k];if(m.l>0){var v=m.val;out.push({k:k,l:m.l,v:v,text:k==='hr'&&v.irr?'Irregular pulse (screening) · '+fmtV('hr',v)+' bpm':k==='sleep'?'Sleep '+fmtV(k,v)+' h last night':MDEF[k].label+' '+fmtV(k,v)+' '+MDEF[k].unit});}});
   out.sort(function(a,b){return b.l-a.l;});
   if(st.lvl===-1&&hasData(pid)){var k2=lastT(pid,'hr',t);out.unshift({k:'hr',l:-1,text:'Wearable not reporting'+(k2?' since '+hm(k2):'')});}
   else if(!hasData(pid))out.unshift({l:-1,text:'No readings yet · add a measurement'});
@@ -1613,7 +1613,7 @@ function issueCard(pid,it,st,t){
     return h+'</div>';
   }
   var cf=confidence(pid,k,m,t),nx=NEXT[k];
-  var title=k==='hr'&&v&&v.irr?'Irregular heart rhythm · '+fmtV(k,v)+' bpm':k==='sleep'?'Sleep '+fmtV(k,v)+' h last night'+(v.prev!=null?' (night before '+v.prev+' h)':''):MDEF[k].label+' '+fmtV(k,v)+' '+MDEF[k].unit;
+  var title=k==='hr'&&v&&v.irr?'Irregular pulse (screening) · '+fmtV(k,v)+' bpm':k==='sleep'?'Sleep '+fmtV(k,v)+' h last night'+(v.prev!=null?' (night before '+v.prev+' h)':''):MDEF[k].label+' '+fmtV(k,v)+' '+MDEF[k].unit;
   h+='<div class="card issue i-'+it.l+'"><div class="row1">'+lvw(it.l)+dtag(v)+'<span class="conf">Confidence: <b>'+cf[0]+'</b> · <button class="linkbtn" style="min-height:0" data-act="why" data-key="'+key+'">Why?</button></span></div>';
   h+='<h3>'+esc(title)+'</h3><p class="det">'+esc(c.why||'')+'</p>';
   if(S['why'+key])h+='<div class="why">'+cf[1].map(esc).join(' · ')+'</div>';
@@ -2552,7 +2552,7 @@ function emerView(){
   var crit=CREW.filter(function(p){return personAt(p.id,t).lvl===3;}).map(function(p){return p.id;});if(crit.indexOf(id)<0&&!isEnv)crit.unshift(id);
   Object.keys(S.emg).forEach(function(k){if(HAZ[k]&&crit.indexOf(k)<0)crit.push(k);});
   var st=isEnv?null:personAt(id,t),start=isEnv?es.opened:(emAlertStart(id)||es.opened);
-  var title=isEnv?'EMERGENCY · '+HAZ[id]+' · all crew':'CRITICAL · '+nm+' · '+(st.m.hr.val&&st.m.hr.val.irr&&!(st.m.c_af&&st.m.c_af.l>=2)?'Irregular heart rhythm':reasonOf(id,st,t));
+  var title=isEnv?'EMERGENCY · '+HAZ[id]+' · all crew':'CRITICAL · '+nm+' · '+(st.m.hr.val&&st.m.hr.val.irr&&!(st.m.c_af&&st.m.c_af.l>=2)?'Irregular pulse (screening, ECG needed)':reasonOf(id,st,t));
   var h='<div class="emer" role="dialog" aria-label="Emergency Mode"><div class="emtop">'+IC.dia.replace('<svg','<svg width="30" height="30" style="color:#fff"')+'<h2>'+esc(title)+'</h2><div class="tm tnum" id="emtimer">'+fmtClock(t-start)+'<small>since alert'+(isLive()?'':' · history')+'</small></div></div>';
   h+='<div class="emtabs">'+crit.map(function(c){return '<button data-act="emtab" data-id="'+c+'" aria-pressed="'+(c===id)+'">'+(HAZ[c]?HAZ[c]:CREWBY[c].name)+'</button>';}).join('')+'<span style="margin-left:auto;align-self:center;color:var(--mute);font-size:13px">'+crit.length+' active</span></div>';
   h+='<div class="embody"><div class="emstep'+(flow.scn?' cmo':'')+'">'+(isEnv?'':scnEmPanel(id));

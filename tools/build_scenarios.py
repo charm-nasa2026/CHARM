@@ -312,6 +312,7 @@ def arrhythmia():
                        time='Named observation windows, not clock times.',
                        m=[['hr', 'Heart rate', 'bpm', 0], ['bp', 'Blood pressure', 'mmHg', 0], ['rr', 'Respiratory rate', '/min', 0], ['spo2', 'SpO₂', '%', 0]],
                        demo=['All stage values are synthetic illustrative values from the medic team, not a NASA patient record and not ECG signal data.',
+                             'There is no ECG recording in our data. Pulse, blood pressure and symptoms are a first indication and set the urgency: a fast irregular pulse with dizziness and falling blood pressure raises the alert and asks for an ECG. The rhythm is named only from the medical officer\'s reading of that ECG (entered as a result, not a trace). Later, if needed, a heart ultrasound (echocardiography) checks the heart\'s structure and function.',
                              'A wearable irregular pulse is a screening flag only. Atrial fibrillation is shown only after the Crew Medical Officer reviews an ECG (stage 4). CHARM does not diagnose a rhythm or choose drugs or doses.',
                              'Stage 5 is CRITICAL because Sarah is hypotensive and severely dizzy with the abnormal rhythm (AHA tachyarrhythmia algorithm: hypotension, altered mental status, signs of shock, ischemic chest discomfort or acute heart failure), not because of a heart-rate number.'],
                        stages=st))

@@ -349,3 +349,18 @@ test('mood and wellbeing check: 1-5 answers, levels and notes', () => {
   assert.ok(/Wellbeing 3.0 \/ 5/.test(E.examText('well', x)) && /noisy fan/.test(E.examText('well', x)));
   assert.ok(E.validateExam('well', { mood: 6 }));
 });
+
+test('rhythm: pulse and BP give urgency; the rhythm is named only after an ECG is read', () => {
+  const th = E.profile(null, null, 'sarah', NOW - 59 * 86400e3), t = NOW;
+  const st = (rows) => E.personStatus(E.sortSeries(rows.map((r, i) => Object.assign({ pid: 'sarah', t: t - 60000, src: 'manual', id: 'r' + i }, r))), th, t);
+  const fastIrr = { k: 'hr', v: 150, irr: true };
+  // fast irregular pulse + low blood pressure + severe dizziness, no ECG yet: CRITICAL, "record an ECG now", no AF named
+  let s = st([fastIrr, { k: 'bp', v: 86, v2: 56 }, { k: 'sym', x: { dizzy: 'severe' } }]);
+  assert.strictEqual(s.m.c_af.l, 3); assert.ok(/record an ECG now/.test(s.m.c_af.val.txt)); assert.ok(!/fibrillation/i.test(s.m.c_af.val.txt));
+  // same pulse, stable, with palpitations: CAUTION, ECG required
+  s = st([fastIrr, { k: 'bp', v: 118, v2: 76 }, { k: 'sym', x: { palp: true } }]);
+  assert.strictEqual(s.m.c_af.l, 2); assert.ok(/ECG required/.test(s.m.c_af.val.txt));
+  // after the medical officer reads the ECG: compatible with AF
+  s = st([fastIrr, { k: 'bp', v: 118, v2: 76 }, { k: 'sym', x: { palp: true } }, { k: 'ecg', x: { irr: true, noP: true, sec: 60 } }]);
+  assert.strictEqual(s.m.c_af.l, 2); assert.ok(/read by the medical officer/.test(s.m.c_af.val.txt));
+});
